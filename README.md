@@ -1,4 +1,4 @@
-# diefpc
+# DIEFP-C
 
 A new Flutter application.
 
