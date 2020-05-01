@@ -27,7 +27,7 @@ class HomeScreen extends StatelessWidget {
            ),
         ],
       ),
-      body: Text('hola'),
+      body: Text('hola, aquí debería ir ael menú, estamos trabajando para usted'),
     );
   }
 }
