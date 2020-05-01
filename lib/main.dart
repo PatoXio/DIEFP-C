@@ -1,3 +1,11 @@
+import 'package:diefpc/app/app.dart';
+import 'package:flutter/material.dart';
+
+
+//Punto de entrada para su aplicación
+void main() => runApp(MyApp());
+
+/*
 import 'package:flutter/material.dart';
 import 'package:english_words/english_words.dart';
 
@@ -72,6 +80,8 @@ class RandomWordsState extends State<RandomWords> {
      },
    );
  }
+ */
+/*
  void _pushSaved(){
    Navigator.of(context).push(
      MaterialPageRoute<void>(
@@ -94,7 +104,7 @@ class RandomWordsState extends State<RandomWords> {
          .toList();
          return Scaffold(
            appBar: AppBar(
-              title: _saved.length != 0 ? Text('Guardado') : Text('Aún no has\nGuardado nada'),
+              title: _saved.length != 0 ? Text('Guardados') : Text('Aún no has\nGuardado nada'),
            ),
            body: ListView(children: divided),
            backgroundColor: Colors.cyanAccent,
@@ -105,7 +115,7 @@ class RandomWordsState extends State<RandomWords> {
    );
  }
 }
-/*
+
 import 'package:flutter/material.dart';
 
 void main() => runApp(MyApp());
