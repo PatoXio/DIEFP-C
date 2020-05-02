@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:diefpc/screens/carrito.dart';
+import 'package:diefpc/app/app.dart';
+import 'package:diefpc/screens/buscarLocales.dart';
+
 
 /*class CarritoScreen extends StatefulWidget {
   static Route<dynamic> route() {
@@ -21,8 +24,16 @@ class MenuScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text("Estás en el Menú"),
+        actions: <Widget>[
+          IconButton(icon: Icon(Icons.list),
+              tooltip: 'Configuración',
+              onPressed: (){
+                configMenu(context);
+              }
+          ),
+        ],
       ),
-      body:       ListView(
+      body: ListView(
         children: <Widget>[
           Card(
             child: ListTile(
@@ -33,8 +44,23 @@ class MenuScreen extends StatelessWidget {
                   goToCarrito(context);
                 },
               ),
-              title: Text('Menu Carrito'),
+              title: Text('Menú Carrito'),
               subtitle: Text('Aquí puedes ver todas las compras que llevas antes de pagar'),
+              //trailing: Icon(Icons.more_vert),
+              isThreeLine: true,
+            ),
+          ),
+          Card(
+            child: ListTile(
+              leading: IconButton(icon: Icon(Icons.local_hospital),
+                iconSize: 40,
+                tooltip: 'Locales',
+                onPressed: (){
+                  goToLocales(context);
+                },
+              ),
+              title: Text('Menú Locales'),
+              subtitle: Text('Aquí puedes ver todos los locales cercanos'),
               //trailing: Icon(Icons.more_vert),
               isThreeLine: true,
             ),
@@ -43,9 +69,42 @@ class MenuScreen extends StatelessWidget {
       ),
     );
   }
+  /*Widget _buildImageColumn() => Container(
+    decoration: BoxDecoration(
+      color: Colors.black26,
+    ),
+    child: Column(
+      children: [
+        _buildImageRow(1),
+        _buildImageRow(3),
+      ],
+    ),
+  );
+  Widget _buildImageRow(int imageIndex) => Row(
+    children: [
+      _buildDecoratedImage(imageIndex),
+      _buildDecoratedImage(imageIndex + 1),
+    ],
+  );
+  Widget _buildDecoratedImage(int imageIndex) => Expanded(
+    child: Container(
+      decoration: BoxDecoration(
+        border: Border.all(width: 10, color: Colors.black38),
+        borderRadius: const BorderRadius.all(const Radius.circular(100)),
+      ),
+      margin: const EdgeInsets.all(20),
+      child: Image.asset('images/pic$imageIndex.jpg'),
+      //child: Text('Hola'),
+    ),
+  );*/
 }
 void goToCarrito(BuildContext context){
   Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => CarritoCompras()));
+}
+void goToLocales(BuildContext context){
+  Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => LocalesScreen()));
 }

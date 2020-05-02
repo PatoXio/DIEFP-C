@@ -25,7 +25,7 @@ class _LoginScreenState extends State<LoginScreen>
   RegExp contRegExp = new RegExp(r'^([1-zA-Z0-1@.\s]{1,255})$');
   String _correo;
   String _contrasena;
-  String mensaje = '';
+  var mensaje = '';
 
   bool _logueado = false;
 
@@ -119,7 +119,7 @@ class _LoginScreenState extends State<LoginScreen>
                       setState(() {
                         _logueado = true;
                       });
-                      mensaje = '$_correo';
+                      mensaje = '$_correo/$_contrasena';
 //                      Una forma correcta de llamar a otra pantalla
 //                      Navigator.of(context).push(HomeScreen.route(mensaje));
                     }

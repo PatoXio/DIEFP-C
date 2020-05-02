@@ -1,12 +1,13 @@
+import 'package:diefpc/screens/Menu.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:diefpc/app/app.dart';
+//import 'dart:core';
 
 class HomeScreen extends StatelessWidget {
-  final String mensaje;
-
+  final mensaje;
   const HomeScreen({Key key, @required this.mensaje}) : super( key: key );
 
-  get drawer => null;
   static Route<dynamic> route(String mensaje) {
     return MaterialPageRoute(
       builder: (context) => HomeScreen( mensaje: mensaje ),
@@ -14,6 +15,9 @@ class HomeScreen extends StatelessWidget {
   }
   @override
   Widget build(BuildContext context) {
+    String texto = mensaje;
+    var correo = texto.split('/')[0];
+    //var contrasena = texto.split('/')[1];
     return Scaffold(
       drawer: Text('Hola perro ql bastardo y la ctm uwu'),
       appBar: AppBar(
@@ -24,10 +28,36 @@ class HomeScreen extends StatelessWidget {
               onPressed: (){
                 configMenu(context);
               }
-           ),
+          ),
         ],
       ),
-      body: Text('hola, aquí debería ir ael menú, estamos trabajando para usted'),
+      body: Column(
+        children: <Widget>[
+            Card(
+              child:
+                Center(
+                  child: Text('\nBienvenido $correo\n\nEsperemos que tengas un buen día\n', style: TextStyle(fontSize: 20),
+                  ),
+                ),
+          ),
+          Card(
+            child: RaisedButton(
+             onPressed: (){
+               goToMenu(context);
+             },
+              color: Colors.black26,
+              child: Text('Menú',
+              style: TextStyle(fontSize: 50),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
+}
+void goToMenu(BuildContext context){
+  Navigator.push(
+    context,
+    MaterialPageRoute(builder: (context) => MenuScreen()));
 }
