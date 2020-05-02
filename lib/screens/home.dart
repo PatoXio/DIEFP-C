@@ -2,7 +2,7 @@ import 'package:diefpc/screens/Menu.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:diefpc/app/app.dart';
-//import 'dart:core';
+import 'dart:core';
 
 class HomeScreen extends StatelessWidget {
   final mensaje;
@@ -13,6 +13,7 @@ class HomeScreen extends StatelessWidget {
       builder: (context) => HomeScreen( mensaje: mensaje ),
     );
   }
+
   @override
   Widget build(BuildContext context) {
     String texto = mensaje;
@@ -39,6 +40,11 @@ class HomeScreen extends StatelessWidget {
                   child: Text('\nBienvenido $correo\n\nEsperemos que tengas un buen día\n', style: TextStyle(fontSize: 20),
                   ),
                 ),
+          ),
+          Card(
+            child:
+            Center(
+            ),
           ),
           Card(
             child: RaisedButton(

@@ -40,7 +40,7 @@ class _SplashScreenState extends State<SplashScreen> {
             child: SafeArea(
               child: FractionallySizedBox(
                 widthFactor: 0.7,
-                child: Image.asset('assets/argelbejarano.png'),
+                //child: Image.asset('assets/argelbejarano.png'),
               ),
             ),
           ),

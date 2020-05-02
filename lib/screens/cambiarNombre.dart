@@ -1,8 +1,8 @@
 import 'package:diefpc/screens/home.dart';
 import 'package:flutter/material.dart';
-import 'package:diefpc/app/app.dart';
-import 'package:diefpc/screens/login.dart';
 
+
+// ignore: must_be_immutable
 class CambioNombreScreen extends StatelessWidget {
   var correo = 'Francisco';
   @override
