@@ -6,7 +6,7 @@ import 'package:diefpc/app/app.dart';
 
 class HomeScreen extends StatelessWidget {
   final mensaje;
-  const HomeScreen({Key key, @required this.mensaje}) : super( key: key );
+  const HomeScreen({Key key, @required this.mensaje}) : super( key: key);
 
   static Route<dynamic> route(String mensaje) {
     return MaterialPageRoute(
@@ -16,8 +16,8 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     String texto = mensaje;
-    var correo = texto.split('/')[0];
-    //var contrasena = texto.split('/')[1];
+    String correo = texto.split('/')[0];
+    //String contrasena = texto.split('/')[1];
     return Scaffold(
       drawer: Text('Hola perro ql bastardo y la ctm uwu'),
       appBar: AppBar(

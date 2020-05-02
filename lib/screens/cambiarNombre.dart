@@ -1,41 +1,30 @@
+import 'package:diefpc/screens/home.dart';
 import 'package:flutter/material.dart';
 import 'package:diefpc/app/app.dart';
+import 'package:diefpc/screens/login.dart';
 
-/*class CarritoScreen extends StatefulWidget {
-  static Route<dynamic> route() {
-    return MaterialPageRoute(
-      builder: (context) => CarritoScreen( ),
-    );
-  }
-
-  @override
-  State<StatefulWidget> createState() {
-    // TODO: implement createState
-    throw UnimplementedError();
-  }
-}*/
-
-class CarritoCompras extends StatelessWidget {
+class CambioNombreScreen extends StatelessWidget {
+  var correo = 'Francisco';
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Carrito de Compras"),
-        actions: <Widget>[
+        title: Text("Cambiar Correo"),
+        /*actions: <Widget>[
           IconButton(icon: Icon(Icons.list),
               tooltip: 'Configuración',
               onPressed: (){
                 configMenu(context);
               }
           ),
-        ],
+        ],*/
       ),
       body: Center(
         child: RaisedButton(
           onPressed: () {
-            Navigator.pop(context);
+            Navigator.of(context).push(HomeScreen.route(correo));
           },
-          child: Text('Go back!'),
+          child: Text('Go back'),
         ),
       ),
     );

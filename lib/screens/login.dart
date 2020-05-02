@@ -20,8 +20,7 @@ class _LoginScreenState extends State<LoginScreen>
 
   GlobalKey<FormState> _key = GlobalKey();
 
-  RegExp emailRegExp =
-  new RegExp(r'^\w+[\w-\.]*\@\w+((-\w+)|(\w*))\.[a-z]{2,3}$');
+  RegExp emailRegExp = new RegExp(r'^\w+[\w-\.]*\@\w+((-\w+)|(\w*))\.[a-z]{2,3}$');
   RegExp contRegExp = new RegExp(r'^([1-zA-Z0-1@.\s]{1,255})$');
   String _correo;
   String _contrasena;
@@ -40,7 +39,6 @@ class _LoginScreenState extends State<LoginScreen>
   }
 
   dispose() {
-    // Es importante SIEMPRE realizar el dispose del controller.
     controller.dispose();
     super.dispose();
   }
@@ -48,7 +46,8 @@ class _LoginScreenState extends State<LoginScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _logueado ? HomeScreen(mensaje: mensaje) : loginForm(),
+      resizeToAvoidBottomInset: true,
+      body: Center(child: SingleChildScrollView(child: _logueado ? HomeScreen(mensaje: mensaje) : loginForm())),
     );
   }
 
@@ -115,13 +114,12 @@ class _LoginScreenState extends State<LoginScreen>
                   onPressed: () {
                     if (_key.currentState.validate()) {
                       _key.currentState.save();
-                      //Aqui se llamaria a su API para hacer el login
-                      setState(() {
+                      /*setState(() {
                         _logueado = true;
-                      });
+                      });*/
                       mensaje = '$_correo/$_contrasena';
 //                      Una forma correcta de llamar a otra pantalla
-//                      Navigator.of(context).push(HomeScreen.route(mensaje));
+                      Navigator.of(context).push(HomeScreen.route(mensaje));
                     }
                   },
                   icon: Icon(
