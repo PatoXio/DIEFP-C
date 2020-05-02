@@ -48,10 +48,10 @@ void configMenu(BuildContext context){
                 ListTile(
                   leading: Icon(Icons.power_settings_new),
                   title: Text('Cerrar Sesión'),
+                  ),
                   //subtitle: Text(''),
                   //trailing: Icon(Icons.more_vert),
                   //isThreeLine: true,
-                ),
               )
             ],
           ),
@@ -59,5 +59,28 @@ void configMenu(BuildContext context){
         );
       },
     ),
+  );
+}
+
+void alertaCerrarSesion(BuildContext context) {
+  // flutter defined function
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      // return object of type Dialog
+      return AlertDialog(
+        title: new Text("Alert Dialog title"),
+        content: new Text("Alert Dialog body"),
+        actions: <Widget>[
+          // usually buttons at the bottom of the dialog
+          new FlatButton(
+            child: new Text("Close"),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      );
+    },
   );
 }
