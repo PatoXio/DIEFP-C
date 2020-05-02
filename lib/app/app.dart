@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:diefpc/screens/splashScreen.dart';
-import 'package:flutter_test/flutter_test.dart';
-
+import 'package:diefpc/screens/cambiarContrasena.dart';
+import 'package:diefpc/screens/cambiarNombre.dart';
+import 'package:diefpc/screens/login.dart';
 
 
 class MyApp extends StatelessWidget {
@@ -28,27 +29,65 @@ void configMenu(BuildContext context){
             title: Text( 'Congifuración' ),
           ),
           body: ListView(
-            children: const <Widget>[
+            children: <Widget>[
               Card(
-                child:
-                ListTile(
-                  leading: Icon(Icons.supervised_user_circle),
-                  title: Text('Cambiar Nombre'),
+                child: ListTile(
+                  leading: IconButton(icon: Icon(Icons.supervised_user_circle),
+                    iconSize: 40,
+                    tooltip: 'Cambio de Contraseña',
+                    onPressed: (){
+                      goToCambioNombre(context);
+                    },
+                  ),
+                  title: Text('Cambiar Correo'),
                 ),
               ),
               Card(
-                child:
-                ListTile(
-                  leading: Icon(Icons.lock),
+                child: ListTile(
+                  leading: IconButton(icon: Icon(Icons.lock),
+                    iconSize: 40,
+                    tooltip: 'Cambio de Nombre',
+                    onPressed: (){
+                      goToCambioContrasena(context);
+                    },
+                  ),
                   title: Text('Cambiar Contraseña'),
                 ),
               ),
               Card(
-                child:
-                ListTile(
-                  leading: Icon(Icons.power_settings_new),
-                  title: Text('Cerrar Sesión'),
+                child: ListTile(
+                  leading: IconButton(icon: Icon(Icons.power_settings_new),
+                    iconSize: 40,
+                    tooltip: 'Cerrar Sesión',
+                    onPressed: () async {
+                      await showDialog<void>(
+                      context: context,
+                      builder: (BuildContext context){
+                        return AlertDialog(
+                          title: const Text('¿Estás seguro de cerrar sesión?'),
+                          actions: <Widget>[
+                            FlatButton(
+                              onPressed: (){
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context) =>LoginScreen()));
+                              },
+                              child: const Text('Si'),
+                            ),
+                            FlatButton(
+                              onPressed: (){
+                                Navigator.pop(context);
+                              },
+                              child: const Text('No'),
+                            )
+                          ],
+                        );
+                      }
+                      );
+                    },
                   ),
+                  title: Text('Cerrar Sesión'),
+                ),
                   //subtitle: Text(''),
                   //trailing: Icon(Icons.more_vert),
                   //isThreeLine: true,
@@ -83,4 +122,19 @@ void alertaCerrarSesion(BuildContext context) {
       );
     },
   );
+}
+
+void alertText(){
+
+}
+
+void goToCambioContrasena(BuildContext context){
+  Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => CambioContrasenaScreen()));
+}
+void goToCambioNombre(BuildContext context){
+  Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => CambioNombreScreen()));
 }
