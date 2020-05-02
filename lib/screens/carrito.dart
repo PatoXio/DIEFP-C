@@ -14,8 +14,12 @@ import 'package:diefpc/app/app.dart';
     throw UnimplementedError();
   }
 }*/
+class CarritoCompras extends StatefulWidget{
+  @override
+  _CarritoComprasState createState() => _CarritoComprasState();
+}
 
-class CarritoCompras extends StatelessWidget {
+class _CarritoComprasState extends State<CarritoCompras> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(

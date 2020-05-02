@@ -4,16 +4,16 @@ import 'package:flutter/material.dart';
 import 'package:diefpc/app/app.dart';
 import 'dart:core';
 
+
 class HomeScreen extends StatelessWidget {
   final mensaje;
-  const HomeScreen({Key key, @required this.mensaje}) : super( key: key);
+  HomeScreen({Key key, @required this.mensaje}) : super(key: key);
 
   static Route<dynamic> route(String mensaje) {
     return MaterialPageRoute(
-      builder: (context) => HomeScreen( mensaje: mensaje ),
+      builder: (context) => HomeScreen(mensaje: mensaje),
     );
   }
-
   @override
   Widget build(BuildContext context) {
     String texto = mensaje;

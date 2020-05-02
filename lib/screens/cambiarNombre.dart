@@ -1,9 +1,12 @@
 import 'package:diefpc/screens/home.dart';
 import 'package:flutter/material.dart';
 
+class CambioNombreScreen extends StatefulWidget{
+  @override
+  _CambioNombreScreenState createState() => _CambioNombreScreenState();
+}
 
-// ignore: must_be_immutable
-class CambioNombreScreen extends StatelessWidget {
+class _CambioNombreScreenState extends State<CambioNombreScreen> {
   var correo = 'Francisco';
   @override
   Widget build(BuildContext context) {

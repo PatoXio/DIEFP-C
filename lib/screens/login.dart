@@ -1,6 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:diefpc/screens/home.dart';
 import 'package:flutter/material.dart';
-//import 'package:cloud_firestore/cloud_firestore.dart';
 
 class LoginScreen extends StatefulWidget {
   static Route<dynamic> route() {
@@ -30,6 +30,19 @@ class _LoginScreenState extends State<LoginScreen>
 
   initState() {
     super.initState();
+
+    Firestore.instance.collection('usuarios').document('19617161-4')
+        .setData({
+      'Nombre': 'Patricio Ignacio Torres Rojas',
+      'Rut': '19.617.161-4',
+      'Edad': 22,
+      'Correo': 'patricio.igtr@gmail.com',
+      'Contraseña': 'Pato123',
+      'Admin': false,
+      'Delivery': false,
+      'Tienda': false
+    });
+
     controller = AnimationController(
       duration: const Duration(milliseconds: 1000),
       vsync: this,

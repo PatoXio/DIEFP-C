@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 
-class CambioContrasenaScreen extends StatelessWidget {
+class CambioContrasenaScreen extends StatefulWidget{
+  @override
+  _CambioContrasenaScreenState createState() => _CambioContrasenaScreenState();
+}
+
+class _CambioContrasenaScreenState extends State<CambioContrasenaScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(

@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 
-class LocalesScreen extends StatelessWidget {
+class LocalesScreen extends StatefulWidget{
+  @override
+  _LocalesScreenState createState() => _LocalesScreenState();
+}
+
+class _LocalesScreenState extends State<LocalesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(

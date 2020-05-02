@@ -3,7 +3,12 @@ import 'package:diefpc/screens/carrito.dart';
 import 'package:diefpc/app/app.dart';
 import 'package:diefpc/screens/buscarLocales.dart';
 
-class MenuScreen extends StatelessWidget {
+class MenuScreen extends StatefulWidget{
+  @override
+  _MenuScreenState createState() => _MenuScreenState();
+}
+
+class _MenuScreenState extends State<MenuScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
