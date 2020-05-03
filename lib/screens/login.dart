@@ -1,8 +1,326 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:diefpc/screens/home.dart';
 import 'package:flutter/material.dart';
+import 'package:dart_rut_validator/dart_rut_validator.dart' show RUTValidator;
+
+enum AuthMode { LOGIN, SINGUP }
+
+TextEditingController _rutController = TextEditingController();
+
+void onChangedApplyFormat(String text){
+  RUTValidator.formatFromTextController(_rutController);
+}
 
 class LoginScreen extends StatefulWidget {
+  const LoginScreen({Key key}) : super(key: key);
+  @override
+  _LoginScreenState createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+
+void initState(){
+  _rutController.clear();
+  super.initState();
+} // To adjust the layout according to the screen size
+  // so that our layout remains responsive ,we need to
+  // calculate the screen height
+  double screenHeight;
+  // Set intial mode to login
+  AuthMode _authMode = AuthMode.LOGIN;
+  @override
+  Widget build(BuildContext context) {
+    screenHeight = MediaQuery.of(context).size.height;
+    return Scaffold(
+      body: SingleChildScrollView(
+        child: Stack(
+          children: <Widget>[
+            lowerHalf(context),
+            _authMode == AuthMode.LOGIN
+                ? loginCard(context)
+                : singUpCard(context),
+            pageTitle(),
+          ],
+        ),
+      ),
+    );
+  }
+  Widget pageTitle() {
+    return Container(
+      margin: EdgeInsets.only(top: 50),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Icon(
+            Icons.local_hospital,
+            size: 48,
+            color: Colors.red,
+          ),
+          Text(
+            "DIEFP-C",
+            style: TextStyle(
+                fontSize: 34, color: Colors.blue, fontWeight: FontWeight.w400),
+          )
+        ],
+      ),
+    );
+  }
+  Widget loginCard(BuildContext context) {
+    return Column(
+      children: <Widget>[
+        Container(
+          margin: EdgeInsets.only(top: screenHeight / 4),
+          padding: EdgeInsets.only(left: 10, right: 10),
+          child: Card(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+            elevation: 8,
+            child: Padding(
+              padding: const EdgeInsets.all(30.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  Align(
+                    alignment: Alignment.topLeft,
+                    child: Text(
+                      "Ingrese sus datos",
+                      style: TextStyle(
+                        color: Colors.blue,
+                        fontSize: 28,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 15,
+                  ),
+                  TextFormField(
+                    decoration: InputDecoration(
+                        labelText: "Correo:"),
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  TextFormField(
+                    decoration: InputDecoration(
+                        labelText: "Contraseña:"),
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: <Widget>[
+                      MaterialButton(
+                        onPressed: () {},
+                        child: Text("¿Olvidaste tu\ncontraseña?",
+                        style: TextStyle(
+                          color: Colors.blue
+                        ),),
+                      ),
+                      Expanded(
+                        child: Container(),
+                      ),
+                      FlatButton(
+                        child: Text("Entrar"),
+                        color: Colors.blue,
+                        textColor: Colors.white,
+                        padding: EdgeInsets.only(
+                            left: 38, right: 38, top: 15, bottom: 15),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(5)),
+                        onPressed: () {},
+                      )
+                    ],
+                  )
+                ],
+              ),
+            ),
+          ),
+        ),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            SizedBox(
+              height: 40,
+            ),
+            Text(
+              "¿No tiene cuenta?",
+              style: TextStyle(color: Colors.grey),
+            ),
+            FlatButton(
+              onPressed: () {
+                setState(() {
+                  _authMode = AuthMode.SINGUP;
+                });
+              },
+              textColor: Colors.blue,
+              child: Text("Crear Cuenta"),
+            )
+          ],
+        )
+      ],
+    );
+  }
+  Widget singUpCard(BuildContext context) {
+    bool issSwitched = false;
+    return Column(
+      children: <Widget>[
+        Container(
+          margin: EdgeInsets.only(top: screenHeight / 5),
+          padding: EdgeInsets.only(left: 10, right: 10),
+          child: Card(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+            elevation: 8,
+            child: Padding(
+              padding: const EdgeInsets.all(30.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  Align(
+                    alignment: Alignment.topLeft,
+                    child: Text(
+                      "Crear Cuenta",
+                      style: TextStyle(
+                        color: Colors.blue,
+                        fontSize: 28,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 15,
+                  ),
+                  TextFormField(
+                    decoration: InputDecoration(
+                        labelText: "Correo"),
+                  ),
+                  SizedBox(
+                    height: 15,
+                  ),
+                  TextFormField(
+                    decoration: InputDecoration(
+                        labelText: "Contraseña"),
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  TextFormField(
+                    decoration: InputDecoration(
+                        labelText: "Nombre Completo",
+                    ),
+                    onSaved: (String nombre){
+
+                    },
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  TextFormField(
+                    controller: _rutController,
+                    onChanged: onChangedApplyFormat,
+                    decoration: InputDecoration(
+                        labelText: "Rut"
+                    ),
+                    validator: RUTValidator().validator,
+                  ),
+                  SizedBox(
+                    height: 5,
+                  ),
+                  Text(
+                    "Debe tener al menos 8 caracteres",
+                    style: TextStyle(color: Colors.blue),
+                  ),
+                  SwitchListTile(
+                    title: Text('¿Usted es Delivery?'),
+                    value: issSwitched,
+                    onChanged: (bool value){
+                      setState(() {
+                        issSwitched = value;
+                      });
+                    },
+                    activeTrackColor: Colors.lightGreenAccent,
+                    activeColor: Colors.green,
+                    secondary: const Icon(Icons.directions_bike),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: <Widget>[
+                      Expanded(
+                        child: Container(),
+                      ),
+                      FlatButton(
+                        child: Text("Registrarse"),
+                        color: Colors.blue,
+                        textColor: Colors.white,
+                        padding: EdgeInsets.only(
+                            left: 38, right: 38, top: 15, bottom: 15),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(5)),
+                        onPressed: () {},
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            SizedBox(
+              height: 40,
+            ),
+            Text(
+              "¿Ya tienes una cuenta?",
+              style: TextStyle(color: Colors.blue),
+            ),
+            FlatButton(
+              onPressed: () {
+                setState(() {
+                  _authMode = AuthMode.LOGIN;
+                });
+              },
+              textColor: Colors.black87,
+              child: Text("Ingresar",
+              style: TextStyle(color: Colors.blue),),
+            )
+          ],
+        ),
+        Align(
+          alignment: Alignment.bottomCenter,
+          child: FlatButton(
+            child: Text(
+              "Terminos y Condiciones",
+              style: TextStyle(
+                color: Colors.grey,
+              ),
+            ),
+            onPressed: () {},
+          ),
+        ),
+      ],
+    );
+  }
+  Widget lowerHalf(BuildContext context) {
+    return Align(
+      alignment: Alignment.bottomCenter,
+      child: Container(
+        height: screenHeight / 2,
+        color: Colors.white,
+      ),
+    );
+  }
+}
+
+/*class LoginScreen extends StatefulWidget {
   static Route<dynamic> route() {
     return MaterialPageRoute(
       builder: (context) => LoginScreen(),
@@ -170,4 +488,4 @@ class AnimatedLogo extends AnimatedWidget {
       ),
     );
   }
-}
+}*/

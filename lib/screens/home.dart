@@ -9,6 +9,7 @@ class HomeScreen extends StatelessWidget {
   final mensaje;
   HomeScreen({Key key, @required this.mensaje}) : super(key: key);
 
+
   static Route<dynamic> route(String mensaje) {
     return MaterialPageRoute(
       builder: (context) => HomeScreen(mensaje: mensaje),
@@ -41,10 +42,8 @@ class HomeScreen extends StatelessWidget {
                   ),
                 ),
           ),
-          Card(
-            child:
-            Center(
-            ),
+          SizedBox(
+            height: 50,
           ),
           Card(
             child: RaisedButton(

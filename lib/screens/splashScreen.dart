@@ -24,7 +24,10 @@ class _SplashScreenState extends State<SplashScreen> {
 
   void _onShowLogin() {
     if(mounted){
-      Navigator.of(context).pushReplacement(LoginScreen.route());
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => LoginScreen())
+      );
     }
   }
 
