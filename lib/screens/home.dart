@@ -8,7 +8,9 @@ import 'dart:core';
 class HomeScreen extends StatelessWidget {
   final String id;
   HomeScreen({Key key, @required this.id}) : super(key: key);
+initState(){
 
+}
 
   static Route<dynamic> route(String id) {
     return MaterialPageRoute(
@@ -18,7 +20,6 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     String rut = id;
-    //String contrasena = texto.split('/')[1];
     return Scaffold(
       drawer: Text('Hola perro ql bastardo y la ctm uwu'),
       appBar: AppBar(

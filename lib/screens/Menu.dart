@@ -7,14 +7,14 @@ class MenuScreen extends StatefulWidget{
   final String id;
   MenuScreen({Key key, @required this.id}) : super(key: key);
   @override
-  _MenuScreenState createState() => _MenuScreenState(id);
+  _MenuScreenState createState() => _MenuScreenState(id: id);
 }
 
 class _MenuScreenState extends State<MenuScreen> {
-  _MenuScreenState(String id);
-  String get id => this.id;
+  final String id;
+  _MenuScreenState({Key key, @required this.id});
 
-  @override
+ @override
   Widget build(BuildContext context) {
     String rut = id;
     return Scaffold(
