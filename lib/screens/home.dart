@@ -6,19 +6,18 @@ import 'dart:core';
 
 
 class HomeScreen extends StatelessWidget {
-  final mensaje;
-  HomeScreen({Key key, @required this.mensaje}) : super(key: key);
+  final String id;
+  HomeScreen({Key key, @required this.id}) : super(key: key);
 
 
-  static Route<dynamic> route(String mensaje) {
+  static Route<dynamic> route(String id) {
     return MaterialPageRoute(
-      builder: (context) => HomeScreen(mensaje: mensaje),
+      builder: (context) => HomeScreen(id: id),
     );
   }
   @override
   Widget build(BuildContext context) {
-    String texto = mensaje;
-    String correo = texto.split('/')[0];
+    String rut = id;
     //String contrasena = texto.split('/')[1];
     return Scaffold(
       drawer: Text('Hola perro ql bastardo y la ctm uwu'),
@@ -38,7 +37,7 @@ class HomeScreen extends StatelessWidget {
             Card(
               child:
                 Center(
-                  child: Text('\nBienvenido $correo\n\nEsperemos que tengas un buen día\n', style: TextStyle(fontSize: 20),
+                  child: Text('\nBienvenido $rut\n\nEsperemos que tengas un buen día\n', style: TextStyle(fontSize: 20),
                   ),
                 ),
           ),
@@ -48,7 +47,7 @@ class HomeScreen extends StatelessWidget {
           Card(
             child: RaisedButton(
              onPressed: (){
-               goToMenu(context);
+               goToMenu(context, rut);
              },
               color: Colors.black26,
               child: Text('Menú',
@@ -61,8 +60,8 @@ class HomeScreen extends StatelessWidget {
     );
   }
 }
-void goToMenu(BuildContext context){
+void goToMenu(BuildContext context, String rut){
   Navigator.push(
     context,
-    MaterialPageRoute(builder: (context) => MenuScreen()));
+    MaterialPageRoute(builder: (context) => MenuScreen(id: rut)));
 }

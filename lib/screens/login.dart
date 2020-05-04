@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:diefpc/screens/home.dart';
 import 'package:flutter/material.dart';
 import 'package:dart_rut_validator/dart_rut_validator.dart' show RUTValidator;
+import 'package:diefpc/models/usuario.dart' show User;
 
 enum AuthMode { LOGIN, SINGUP }
 
@@ -12,21 +13,21 @@ void onChangedApplyFormat(String text){
 }
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({Key key}) : super(key: key);
+  //const LoginScreen({Key key}) : super(key: key);
   @override
   _LoginScreenState createState() => _LoginScreenState();
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-
-void initState(){
-  _rutController.clear();
-  super.initState();
-} // To adjust the layout according to the screen size
-  // so that our layout remains responsive ,we need to
-  // calculate the screen height
+  final _formkey = GlobalKey<FormState>();
+  User model = User();
   double screenHeight;
   // Set intial mode to login
+  @override
+  initState(){
+    super.initState();
+    _rutController.clear();
+  }
   AuthMode _authMode = AuthMode.LOGIN;
   @override
   Widget build(BuildContext context) {
@@ -68,6 +69,7 @@ void initState(){
   }
   Widget loginCard(BuildContext context) {
     return Column(
+      key: _formkey,
       children: <Widget>[
         Container(
           margin: EdgeInsets.only(top: screenHeight / 4),
@@ -167,6 +169,7 @@ void initState(){
   }
   Widget singUpCard(BuildContext context) {
     bool issSwitched = false;
+    model.delivery = issSwitched;
     return Column(
       children: <Widget>[
         Container(
@@ -198,24 +201,43 @@ void initState(){
                   ),
                   TextFormField(
                     decoration: InputDecoration(
-                        labelText: "Correo"),
+                      labelText: "Correo",
+                    ),
+                    onChanged: (String value) {
+                    //  onSaved: (String value) {
+                        model.correo = "value";
+                      },
+                    //},
                   ),
                   SizedBox(
                     height: 15,
                   ),
                   TextFormField(
                     decoration: InputDecoration(
-                        labelText: "Contraseña"),
+                        labelText: "Contraseña",
+                    ),
+                    onChanged: (String value){
+                    //onSaved: (String value){
+                      model.contrasena = value;
+                    },
                   ),
                   SizedBox(
-                    height: 20,
+                    height: 5,
+                  ),
+                  Text(
+                    "Debe tener al menos 5 caracteres",
+                    style: TextStyle(color: Colors.blue),
+                  ),
+                  SizedBox(
+                    height: 7,
                   ),
                   TextFormField(
                     decoration: InputDecoration(
                         labelText: "Nombre Completo",
                     ),
-                    onSaved: (String nombre){
-
+                    onChanged: (String value){
+                      //onSaved: (String value){
+                      model.nombreCompleto = value;
                     },
                   ),
                   SizedBox(
@@ -223,30 +245,30 @@ void initState(){
                   ),
                   TextFormField(
                     controller: _rutController,
-                    onChanged: onChangedApplyFormat,
+                    validator: RUTValidator(validationErrorText: "Ingrese un rut válido por favor").validator,
                     decoration: InputDecoration(
-                        labelText: "Rut"
+                        labelText: "Rut",
                     ),
-                    validator: RUTValidator().validator,
+                      onChanged: (String value){
+                        RUTValidator.formatFromTextController(_rutController);
+                        model.rut = value;
+                      },
                   ),
                   SizedBox(
                     height: 5,
                   ),
-                  Text(
-                    "Debe tener al menos 8 caracteres",
-                    style: TextStyle(color: Colors.blue),
-                  ),
                   SwitchListTile(
                     title: Text('¿Usted es Delivery?'),
                     value: issSwitched,
-                    onChanged: (bool value){
-                      setState(() {
-                        issSwitched = value;
-                      });
-                    },
                     activeTrackColor: Colors.lightGreenAccent,
                     activeColor: Colors.green,
                     secondary: const Icon(Icons.directions_bike),
+                    onChanged: (value){
+                      setState(() {
+                        issSwitched = value;
+                        model.delivery = value;
+                      });
+                    },
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -262,7 +284,13 @@ void initState(){
                             left: 38, right: 38, top: 15, bottom: 15),
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(5)),
-                        onPressed: () {},
+                        onPressed: () {
+                          if(_crearUsuario(model) == true){
+                            _showConfirmado(context);
+                          }else{
+                            _showDesconfirmado(context);
+                          }
+                        },
                       ),
                     ],
                   ),
@@ -318,7 +346,79 @@ void initState(){
       ),
     );
   }
+  void _showConfirmado(BuildContext context) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context){
+          return AlertDialog(
+            title: Text('Cuenta Creada'),
+            content: Text('Cuenta creada con exito'),
+            actions: <Widget>[
+              FlatButton(
+                child: Text('Iniciar Sesión'),
+                onPressed: () {
+                  setState(() {
+                    _authMode = AuthMode.LOGIN;
+                  });
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => HomeScreen(id: model.rut)));
+                },
+              )
+            ],
+          );
+        });
+  }
 }
+void _showDesconfirmado(BuildContext context){
+  showDialog(
+      context: context,
+      builder: (BuildContext context){
+        return AlertDialog(
+          title: Text('Error'),
+          content: Text('No se pudo crear la cuenta, quizás ya existe'),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('ok'),
+              onPressed: (){
+                Navigator.of(context).pop();
+              },
+            )
+          ],
+        );
+      });
+}
+
+
+
+ bool _crearUsuario(User model)
+ {
+   String rut;
+
+   Firestore.instance
+       .collection('usuarios')
+       .document(rut)
+       .get()
+       .then((DocumentSnapshot ds) {
+         rut = ds["rut"];
+   });
+
+   if(rut == null) {
+     Firestore.instance.collection('usuarios').document(model.rut)
+         .setData( {
+       'Admin': false,
+       'Contraseña': model.contrasena,
+       'Correo': model.correo,
+       'Delivery': model.delivery,
+       'Nombre': model.nombreCompleto,
+       'Rut': model.rut,
+       'Tienda': model.tienda
+     } );
+     return true;
+   }else{
+    return false;
+   }
+ }
 
 /*class LoginScreen extends StatefulWidget {
   static Route<dynamic> route() {

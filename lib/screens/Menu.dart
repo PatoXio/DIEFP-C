@@ -4,13 +4,19 @@ import 'package:diefpc/app/app.dart';
 import 'package:diefpc/screens/buscarLocales.dart';
 
 class MenuScreen extends StatefulWidget{
+  final String id;
+  MenuScreen({Key key, @required this.id}) : super(key: key);
   @override
-  _MenuScreenState createState() => _MenuScreenState();
+  _MenuScreenState createState() => _MenuScreenState(id);
 }
 
 class _MenuScreenState extends State<MenuScreen> {
+  _MenuScreenState(String id);
+  String get id => this.id;
+
   @override
   Widget build(BuildContext context) {
+    String rut = id;
     return Scaffold(
       appBar: AppBar(
         title: Text("Estás en el Menú"),
