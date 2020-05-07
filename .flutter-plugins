@@ -1,5 +1,12 @@
 # This is a generated file; do not edit or check into version control.
 cloud_firestore=D:\\SRC\\flutter\\.pub-cache\\hosted\\pub.dartlang.org\\cloud_firestore-0.13.5\\
 cloud_firestore_web=D:\\SRC\\flutter\\.pub-cache\\hosted\\pub.dartlang.org\\cloud_firestore_web-0.1.1+2\\
+firebase_auth=D:\\SRC\\flutter\\.pub-cache\\hosted\\pub.dartlang.org\\firebase_auth-0.16.0\\
+firebase_auth_web=D:\\SRC\\flutter\\.pub-cache\\hosted\\pub.dartlang.org\\firebase_auth_web-0.1.2\\
 firebase_core=D:\\SRC\\flutter\\.pub-cache\\hosted\\pub.dartlang.org\\firebase_core-0.4.4+3\\
 firebase_core_web=D:\\SRC\\flutter\\.pub-cache\\hosted\\pub.dartlang.org\\firebase_core_web-0.1.1+2\\
+google_sign_in=D:\\SRC\\flutter\\.pub-cache\\hosted\\pub.dartlang.org\\google_sign_in-4.4.4\\
+google_sign_in_web=D:\\SRC\\flutter\\.pub-cache\\hosted\\pub.dartlang.org\\google_sign_in_web-0.9.1\\
+shared_preferences=D:\\SRC\\flutter\\.pub-cache\\hosted\\pub.dartlang.org\\shared_preferences-0.5.7+1\\
+shared_preferences_macos=D:\\SRC\\flutter\\.pub-cache\\hosted\\pub.dartlang.org\\shared_preferences_macos-0.0.1+8\\
+shared_preferences_web=D:\\SRC\\flutter\\.pub-cache\\hosted\\pub.dartlang.org\\shared_preferences_web-0.1.2+5\\

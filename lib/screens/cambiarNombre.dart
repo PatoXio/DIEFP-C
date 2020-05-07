@@ -24,10 +24,12 @@ class _CambioNombreScreenState extends State<CambioNombreScreen> {
       ),
       body: Center(
         child: RaisedButton(
-          onPressed: () {
-            Navigator.of(context).push(HomeScreen.route(correo));
-          },
           child: Text('Go back'),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => HomeScreen()));
+          },
         ),
       ),
     );

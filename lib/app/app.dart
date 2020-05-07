@@ -1,5 +1,7 @@
+import 'package:diefpc/screens/home.dart';
+import 'package:diefpc/states/login_state.dart';
 import 'package:flutter/material.dart';
-import 'package:diefpc/screens/splashScreen.dart';
+import 'package:provider/provider.dart';
 import 'package:diefpc/screens/cambiarContrasena.dart';
 import 'package:diefpc/screens/cambiarNombre.dart';
 import 'package:diefpc/screens/login.dart';
@@ -11,11 +13,24 @@ class MyApp extends StatelessWidget {
     // Todas sus apliaciones deben de estar dentro de Material App para poder
     // hacer uso de las facilidades de Material Design puede omitirce esto pero
     // no podran hacer uso de estos widgets de material.dart
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-//      theme: ThemeData.light(), //  Tema Claro
-      theme: ThemeData.dark(), // Tema Obscuro
-      home: SplashScreen(),
+    return ChangeNotifierProvider<LoginState>(
+      builder: (BuildContext context) => LoginState(),
+      child: MaterialApp(
+        title: "DIEFP-C",
+        debugShowCheckedModeBanner: false,
+          theme: ThemeData.light(),
+//        theme: ThemeData.dark(),
+        routes: {
+          "/":(BuildContext context){
+            var state = Provider.of<LoginState>(context);
+            if(state.isLoggedIn()){
+              return HomeScreen();
+            }else{
+              return LoginScreen();
+            }
+        }
+        },
+      ),
     );
   }
 }
@@ -68,9 +83,10 @@ void configMenu(BuildContext context){
                           actions: <Widget>[
                             FlatButton(
                               onPressed: (){
+                                Provider.of<LoginState>(context).logout();
                                 Navigator.push(
                                     context,
-                                    MaterialPageRoute(builder: (context) =>LoginScreen()));
+                                    MaterialPageRoute(builder: (context) =>MyApp()));
                               },
                               child: const Text('Si'),
                             ),
