@@ -10,10 +10,11 @@ class User {
   bool admin;
   User({
     this.nombreCompleto,
-    this.correo, this.contrasena,
+    this.correo,
+    this.contrasena,
     this.rut,
-    this.delivery,
-    this.tienda,
-    this.admin
+    this.delivery = false,
+    this.tienda = false,
+    this.admin = false
   });
 }

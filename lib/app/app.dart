@@ -1,9 +1,10 @@
+import 'package:diefpc/screens/createScreen.dart';
 import 'package:diefpc/screens/home.dart';
 import 'package:diefpc/states/login_state.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:diefpc/screens/cambiarContrasena.dart';
-import 'package:diefpc/screens/cambiarNombre.dart';
+import 'package:diefpc/screens/cambiarCorreo.dart';
 import 'package:diefpc/screens/login.dart';
 
 
@@ -24,7 +25,11 @@ class MyApp extends StatelessWidget {
           "/":(BuildContext context){
             var state = Provider.of<LoginState>(context);
             if(state.isLoggedIn()){
-              return HomeScreen();
+              if(state.isCreate()){
+                return HomeScreen();
+              }else{
+                return CreateScreen();
+              }
             }else{
               return LoginScreen();
             }
@@ -152,5 +157,5 @@ void goToCambioContrasena(BuildContext context){
 void goToCambioNombre(BuildContext context){
   Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => CambioNombreScreen()));
+      MaterialPageRoute(builder: (context) => CambioCorreoScreen()));
 }

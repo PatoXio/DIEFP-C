@@ -25,7 +25,7 @@ class HomeScreen extends StatelessWidget {
     name = _user.displayName;
     elTiempo = _elTiempo();
     return Scaffold(
-      drawer: Text( 'Hola perro ql bastardo y la ctm uwu' ),
+      //drawer: Text( 'Hola perro ql bastardo y la ctm uwu' ),
       appBar: AppBar(
         title: Text( '¡Bienvenido!' ),
         actions: <Widget>[
@@ -42,21 +42,29 @@ class HomeScreen extends StatelessWidget {
           SizedBox(
             height: 5,
           ),
-          Card(
-              child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    ListTile(
-                      leading: Icon(Icons.account_box, size: 45,),
-                      title: Text("Hola, ${name.split(" ")[0]}.",
-                        style: TextStyle(
-                          fontSize: 30,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      subtitle: Text("$elTiempo"),
-                    )
-                  ]
+          Container(
+              margin: EdgeInsets.only( top: screenHeight / 100 ),
+              padding: EdgeInsets.only( left: 10, right: 10 ),
+              child:Card(
+                  child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        ListTile(
+                          leading: Icon(Icons.account_box, size: 45,),
+                          title: Text("Hola, ${name.split(" ")[0]}.",
+                            style: TextStyle(
+                              fontSize: 30,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          subtitle: Text("$elTiempo",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold
+                              )
+                          ),
+                        )
+                      ]
+                  )
               )
           )
         ],
@@ -66,8 +74,9 @@ class HomeScreen extends StatelessWidget {
             goToMenu(context);
           },
           label: Text( "Menú",
-          style: TextStyle(
-            fontSize: 30,
+            style: TextStyle(
+              fontSize: 30,
+              fontWeight: FontWeight.bold
           ),)
       ),
     );
@@ -82,16 +91,16 @@ class HomeScreen extends StatelessWidget {
     DateTime now = DateTime.now();
 
     if(now.hour >= 6 && now.hour <=12){
-      return "Buenos Dias,";
+      return "Buenos Dias";
     }else{
       if(now.hour >= 12 && now.hour <=19){
-        return "Buenas Tardes,";
+        return "Buenas Tardes";
       }else{
         if(now.hour >= 19 && now.hour <= 24){
-          return "Buenas Noches,";
+          return "Buenas Noches";
         }else{
           if(now.hour < 6){
-            return "!AL QUE MADRUGA DIOS LO AYUDA! \tRecuerda dormir temprano,";
+            return "!AL QUE MADRUGA DIOS LO AYUDA! \tRecuerda dormir temprano";
           }
         }
       }

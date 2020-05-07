@@ -9,14 +9,17 @@ class LoginState with ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   SharedPreferences _prefs;
   DocumentSnapshot document;
+  FirebaseUser _user;
 
+  bool _isCreate = false;
   bool _loggedIn = false;
   bool _loading = true;
-  FirebaseUser _user;
 
   LoginState(){
     loginState();
   }
+
+  bool isCreate() => _isCreate;
 
   bool isLoggedIn() => _loggedIn;
 
@@ -33,7 +36,11 @@ class LoginState with ChangeNotifier {
     if (_user != null) {
       _prefs.setBool("isLoggedIn", true);
       _loggedIn = true;
-      notifyListeners( );
+      document = await _getDocument(_user.uid);
+      if(document["Rut"] != null){
+        _isCreate = true;
+      }
+      notifyListeners();
       _createUser(_user);
     } else {
       notifyListeners( );
@@ -68,6 +75,16 @@ class LoginState with ChangeNotifier {
       "nombre": _user.displayName,
       "email": _user.email,
     });
+  }
+  
+  Future<DocumentSnapshot> _getDocument(String id) async{
+    DocumentSnapshot document;
+    document = await Firestore.instance
+        .collection("usuarios")
+        .document(id)
+        .get();
+    
+    return document;
   }
 
   void loginState() async {

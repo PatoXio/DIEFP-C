@@ -37,9 +37,9 @@ class _LoginScreenState extends State<LoginScreen> {
       body: SingleChildScrollView(
         child: Stack(
           children: <Widget>[
-            _user == Provider.of<LoginState>(context).currentUser()
-            ? loginCard( context )
-            : singUpCard( context ),
+            _user == null
+                ? loginCard(context)
+                : loginCard(context),
             pageTitle(),
           ],
         ),
