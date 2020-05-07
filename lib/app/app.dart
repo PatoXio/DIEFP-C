@@ -15,25 +15,26 @@ class MyApp extends StatelessWidget {
     // hacer uso de las facilidades de Material Design puede omitirce esto pero
     // no podran hacer uso de estos widgets de material.dart
     return ChangeNotifierProvider<LoginState>(
-      builder: (BuildContext context) => LoginState(),
+      builder: (BuildContext context) => LoginState( ),
       child: MaterialApp(
         title: "DIEFP-C",
         debugShowCheckedModeBanner: false,
-          theme: ThemeData.light(),
+        theme: ThemeData.light( ),
 //        theme: ThemeData.dark(),
         routes: {
-          "/":(BuildContext context){
-            var state = Provider.of<LoginState>(context);
-            if(state.isLoggedIn()){
-              if(state.isCreate()){
-                return HomeScreen();
-              }else{
-                return CreateScreen();
-              }
-            }else{
-              return LoginScreen();
+          // ignore: missing_return
+          "/": (BuildContext context) {
+            var state = Provider.of<LoginState>( context );
+            if (state.isLoggedIn() && state.isComplete( )) {
+              return HomeScreen();
             }
-        }
+            if (state.isLoggedIn())
+              if(!state.isComplete())
+                return CreateScreen();
+            if (!state.isLoggedIn( ) && !state.isComplete( )) {
+              return LoginScreen( );
+            }
+          }
         },
       ),
     );

@@ -11,6 +11,7 @@ class LoginState with ChangeNotifier {
   DocumentSnapshot document;
   FirebaseUser _user;
 
+  bool _isComplete = false;
   bool _isCreate = false;
   bool _loggedIn = false;
   bool _loading = true;
@@ -18,6 +19,8 @@ class LoginState with ChangeNotifier {
   LoginState(){
     loginState();
   }
+
+  bool isComplete() => _isComplete;
 
   bool isCreate() => _isCreate;
 
@@ -27,23 +30,42 @@ class LoginState with ChangeNotifier {
 
   FirebaseUser currentUser() => _user;
 
+  void Complete(){
+    _isComplete = true;
+  }
+
   void login() async {
     _loading = true;
-    notifyListeners( );
+    notifyListeners();
 
     _user = await _handleSignIn();
-
     if (_user != null) {
       _prefs.setBool("isLoggedIn", true);
       _loggedIn = true;
-      document = await _getDocument(_user.uid);
-      if(document["Rut"] != null){
-        _isCreate = true;
-      }
+      _loading = false;
       notifyListeners();
-      _createUser(_user);
+      _loading = true;
+      notifyListeners();
+      document = await _getDocument(_user.uid);
+      if(!document.exists){
+        _loading = true;
+        _createUser(_user);
+        _isCreate = true;
+        _loading = false;
+        notifyListeners();
+      }else {
+        _isCreate = true;
+        _loading = false;
+        notifyListeners();
+      }
     } else {
-      notifyListeners( );
+      _loggedIn = false;
+      _loading = false;
+      notifyListeners();
+    }
+    if(document.data["Rut"] != null){
+      _isComplete = true;
+      notifyListeners();
     }
   }
   void logout() {
@@ -83,7 +105,7 @@ class LoginState with ChangeNotifier {
         .collection("usuarios")
         .document(id)
         .get();
-    
+
     return document;
   }
 

@@ -102,17 +102,24 @@ class _LoginScreenState extends State<LoginScreen> {
                   SizedBox(
                     height: 20,
                   ),
-                  FlatButton(
-                    child: Text( "Entrar con una cuenta google" ),
-                    color: Colors.blue,
-                    textColor: Colors.white,
-                    padding: EdgeInsets.only(
-                        left: 38, right: 38, top: 15, bottom: 15 ),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular( 5 ) ),
-                    onPressed: () {
-                      Provider.of<LoginState>(context).login();
+                  Consumer<LoginState>(
+                    builder: (BuildContext context, LoginState value, Widget child){
+                      if(value.isLoading()){
+                        return CircularProgressIndicator();
+                      }else return child;
                     },
+                    child: FlatButton(
+                      child: Text( "Entrar con una cuenta google" ),
+                      color: Colors.blue,
+                      textColor: Colors.white,
+                      padding: EdgeInsets.only(
+                          left: 38, right: 38, top: 15, bottom: 15 ),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular( 5 ) ),
+                      onPressed: () {
+                        Provider.of<LoginState>(context).login();
+                      },
+                    ),
                   ),
                   SizedBox(
                     height: 20,

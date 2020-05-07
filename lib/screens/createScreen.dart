@@ -7,6 +7,8 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:diefpc/models/usuario.dart';
 
+import 'login.dart';
+
 TextEditingController _rutController = TextEditingController();
 
 void onChangedApplyFormat(String text){
@@ -91,95 +93,118 @@ class _CreateScreenState extends State<CreateScreen> {
                 elevation: 8,
                 child: Padding(
                   padding: const EdgeInsets.all( 30.0 ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: <Widget>[
-                      Align(
-                        alignment: Alignment.topLeft,
-                        child: Text(
-                          "Completar datos importantes",
-                          style: TextStyle(
-                            color: Colors.blue,
-                            fontSize: 28,
-                            fontWeight: FontWeight.w600,
+                  child: Consumer<LoginState>(
+                    builder: (BuildContext context, LoginState value, child){
+                      if(value.isLoading())
+                        return CircularProgressIndicator();
+                      else
+                        return child;
+                    },
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: <Widget>[
+                        Align(
+                          alignment: Alignment.topLeft,
+                          child: Text(
+                            "Completar datos importantes",
+                            style: TextStyle(
+                              color: Colors.blue,
+                              fontSize: 28,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ),
-                      ),
-                      SizedBox(
-                        height: 15,
-                      ),
-                      TextFormField(
-                        maxLength: 12,
-                        decoration: InputDecoration(
-                          labelText: "Rut",
+                        SizedBox(
+                          height: 15,
                         ),
-                        controller: _rutController,
-                        onChanged: (String value){
-                          onChangedApplyFormat(value);
-                          model.rut = value;
-                          },
-                        validator: RUTValidator(validationErrorText: 'Ingrese un RUT válido').validator,
-                      ),
-                      SizedBox(
-                        height: 15,
-                      ),
-                      SwitchListTile(
-                        title: Text( '¿Usted es Delivery?' ),
-                        value: isSwitchDelivery,
-                        activeTrackColor: Colors.lightGreenAccent,
-                        activeColor: Colors.green,
-                        secondary: const Icon( Icons.directions_bike ),
-                        onChanged: (bool newValue) {
-                          setState((){
-                            isSwitchDelivery = newValue;
-                            isSwitchTienda = false;
-                          } );
-                          },
-                      ),
-                      SizedBox(
-                        height: 15,
-                      ),
-                      SwitchListTile(
-                        title: Text( '¿Usted es una Farmacia?' ),
-                        value: isSwitchTienda,
-                        activeTrackColor: Colors.lightGreenAccent,
-                        activeColor: Colors.green,
-                        secondary: const Icon( Icons.local_hospital ),
-                        onChanged: (bool newValue) {
-                          setState((){
-                            isSwitchTienda = newValue;
-                            isSwitchDelivery = false;
-                          } );
-                          },
-                      ),
-                      SizedBox(
-                        height: 15,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: <Widget>[
-                          Expanded(
-                            child: Container( ),
+                        TextFormField(
+                          maxLength: 12,
+                          decoration: InputDecoration(
+                            labelText: "Rut",
                           ),
-                          FlatButton(
-                            child: Text( "Completar\n\tRegistro" ),
-                            color: Colors.blue,
-                            textColor: Colors.white,
-                            padding: EdgeInsets.only(
-                                left: 38, right: 38, top: 15, bottom: 15 ),
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular( 5 ) ),
-                            onPressed: () {
-                              if(_formKey.currentState.validate()){
-                                model.rut = RUTValidator.formatFromText(model.rut);
-                                _createUser(_user, model.rut, model.delivery, model.tienda);
-                                Provider.of<LoginState>(context).login();
-                              }
+                          controller: _rutController,
+                          onChanged: (String value){
+                            onChangedApplyFormat(value);
+                            model.rut = value;
                             },
-                          ),
-                        ],
-                      ),
-                    ],
+                          validator: RUTValidator(validationErrorText: 'Ingrese un RUT válido').validator,
+                        ),
+                        SizedBox(
+                          height: 15,
+                        ),
+                        SwitchListTile(
+                          title: Text( '¿Usted es Delivery?' ),
+                          value: isSwitchDelivery,
+                          activeTrackColor: Colors.lightGreenAccent,
+                          activeColor: Colors.green,
+                          secondary: const Icon( Icons.directions_bike ),
+                          onChanged: (bool newValue) {
+                            setState((){
+                              isSwitchDelivery = newValue;
+                              isSwitchTienda = false;
+                            } );
+                            },
+                        ),
+                        SizedBox(
+                          height: 15,
+                        ),
+                        SwitchListTile(
+                          title: Text( '¿Usted es una Farmacia?' ),
+                          value: isSwitchTienda,
+                          activeTrackColor: Colors.lightGreenAccent,
+                          activeColor: Colors.green,
+                          secondary: const Icon( Icons.local_hospital ),
+                          onChanged: (bool newValue) {
+                            setState((){
+                              isSwitchTienda = newValue;
+                              isSwitchDelivery = false;
+                            } );
+                            },
+                        ),
+                        SizedBox(
+                          height: 15,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: <Widget>[
+                            Expanded(
+                              child: Container( ),
+                            ),
+                            FlatButton(
+                              child: Text( "Atrás" ),
+                              color: Colors.blue,
+                              textColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular( 15 ) ),
+                              onPressed: () {
+                                Provider.of<LoginState>(context).logout();
+                              }
+                            ),
+                            SizedBox(
+                              width: 20,
+                            ),
+                            FlatButton(
+                              child: Text( "Completar\n\tRegistro" ),
+                              color: Colors.blue,
+                              textColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular( 15 ) ),
+                              onPressed: () {
+                                if(_formKey.currentState.validate()){
+                                  model.rut = RUTValidator.formatFromText(model.rut);
+                                  if(_user.email.compareTo("patricio.igtr@gmail.com")==0)
+                                    _createAdmin(_user, model.rut, isSwitchDelivery, isSwitchTienda);
+                                  else
+                                    _createUser(_user, model.rut, isSwitchDelivery, isSwitchTienda);
+                                  Provider.of<LoginState>(context).Complete();
+                                  Provider.of<LoginState>(context).login();
+                                }
+                              },
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -204,11 +229,26 @@ class _CreateScreenState extends State<CreateScreen> {
     Firestore.instance
         .collection('usuarios')
         .document(_user.uid)
-        .setData({
+        .updateData({
+      "nombre": _user.displayName,
+      "email": _user.email,
       "Rut": rut,
       "Delivery": delivery,
       "Tienda": tienda,
       "Admin": false,
+    });
+  }
+  void _createAdmin(FirebaseUser _user, String rut, bool delivery, bool tienda){
+    Firestore.instance
+        .collection('usuarios')
+        .document(_user.uid)
+        .updateData({
+      "nombre": _user.displayName,
+      "email": _user.email,
+      "Rut": rut,
+      "Delivery": delivery,
+      "Tienda": tienda,
+      "Admin": true,
     });
   }
 }

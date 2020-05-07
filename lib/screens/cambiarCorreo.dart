@@ -95,7 +95,7 @@ class _CambioCorreoScreenState extends State<CambioCorreoScreen> {
                                 borderRadius: BorderRadius.circular( 15 ) ),
                             onPressed: () {
                               if(_formKey.currentState.validate()){
-                                _changePassword(confCorr);
+                                _changeCorreo(confCorr);
                               }
                             },
                           ),
@@ -123,7 +123,7 @@ class _CambioCorreoScreenState extends State<CambioCorreoScreen> {
         )
     );
   }
-  Future<String> _changePassword(String correo) async{
+  Future<String> _changeCorreo(String correo) async{
     //Create an instance of the current user.
     user = await FirebaseAuth.instance.currentUser();
 
