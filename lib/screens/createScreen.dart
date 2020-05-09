@@ -78,6 +78,7 @@ class _CreateScreenState extends State<CreateScreen> {
 
   Widget singUpCard(BuildContext context) {
     _user = Provider.of<LoginState>(context).currentUser();
+    var isComplete = Provider.of<LoginState>(context).isComplete();
     return Form(
         key: _formKey,
         child: Column(
@@ -97,7 +98,11 @@ class _CreateScreenState extends State<CreateScreen> {
                       if(value.isLoading())
                         return CircularProgressIndicator();
                       else
-                        return child;
+                        if(isComplete == false)
+                          return child;
+                        else
+                          goToMenu(context);
+
                     },
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -253,5 +258,10 @@ class _CreateScreenState extends State<CreateScreen> {
       "Tienda": tienda,
       "Admin": true,
     });
+  }
+  void goToMenu(BuildContext context) {
+    Navigator.push(
+        context,
+        MaterialPageRoute( builder: (context) => MenuScreen( ) ) );
   }
 }

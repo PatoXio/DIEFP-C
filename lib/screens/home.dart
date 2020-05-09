@@ -20,6 +20,7 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var _user = Provider.of<LoginState>(context).currentUser();
+    var isComplete = Provider.of<LoginState>(context).isComplete();
     screenHeight = MediaQuery
         .of( context )
         .size
@@ -73,7 +74,7 @@ class HomeScreen extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton.extended(
           onPressed: () {
-            if(Provider.of<LoginState>(context).isComplete() == false){
+            if(isComplete == false){
               Navigator.push(
                   context,
                   MaterialPageRoute( builder: (context) => CreateScreen()));
