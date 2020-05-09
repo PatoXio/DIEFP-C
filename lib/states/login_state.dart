@@ -7,9 +7,11 @@ import 'package:shared_preferences/shared_preferences.dart' show SharedPreferenc
 class LoginState with ChangeNotifier {
   final GoogleSignIn _googleSignIn = GoogleSignIn( );
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  
   SharedPreferences _prefs;
   DocumentSnapshot document;
   FirebaseUser _user;
+  List<DocumentSnapshot> _carrito;
 
   bool _isComplete = false;
   bool _isCreate = false;
@@ -20,7 +22,11 @@ class LoginState with ChangeNotifier {
     loginState();
   }
 
-  bool isComplete() => _isComplete;
+  bool isComplete(){
+    createState();
+    return _isComplete;
+
+  }
 
   bool isCreate() => _isCreate;
 
@@ -30,9 +36,10 @@ class LoginState with ChangeNotifier {
 
   FirebaseUser currentUser() => _user;
 
-  void Complete(){
-    _isComplete = true;
-  }
+  DocumentSnapshot getDocument() => document;
+  
+  List<DocumentSnapshot> getCarrito() => _carrito;
+
 
   void login() async {
     _loading = true;
@@ -63,8 +70,14 @@ class LoginState with ChangeNotifier {
       _loading = false;
       notifyListeners();
     }
+    print(document.data["Rut"]);
     if(document.data["Rut"] != null){
+      _prefs.setBool("isCreated", true);
       _isComplete = true;
+      print(_isComplete);
+      _loading = true;
+      _carrito = await _getListDocument(_user.uid);
+      _loading = false;
       notifyListeners();
     }
   }
@@ -109,11 +122,33 @@ class LoginState with ChangeNotifier {
     return document;
   }
 
+  Future<List<DocumentSnapshot>> _getListDocument(String id) async{
+    List<DocumentSnapshot> listDocument;
+    listDocument = (await Firestore.instance
+        .collection("usuarios")
+        .document(id)
+        .collection("Carrito").getDocuments()).documents;
+
+    return listDocument;
+  }
+
   void loginState() async {
     _prefs = await SharedPreferences.getInstance();
     if(_prefs.containsKey("isLoggedIn")){
       _user = await _auth.currentUser();
       _loggedIn = _user != null;
+      _loading = false;
+      notifyListeners();
+    }else{
+      _loading = false;
+      notifyListeners();
+    }
+  }
+  void createState() async {
+    _prefs = await SharedPreferences.getInstance();
+    if(_prefs.containsKey("isCreated")){
+      _user = await _auth.currentUser();
+      _isComplete = (await _getDocument(_user.uid)).data["Rut"] != null ;
       _loading = false;
       notifyListeners();
     }else{

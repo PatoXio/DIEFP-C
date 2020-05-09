@@ -1,9 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:diefpc/app/app.dart';
+import 'package:diefpc/screens/Menu.dart';
+import 'package:diefpc/screens/home.dart';
 import 'package:diefpc/states/login_state.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:dart_rut_validator/dart_rut_validator.dart' show RUTValidator;
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:diefpc/models/usuario.dart';
 
@@ -36,7 +38,6 @@ class _CreateScreenState extends State<CreateScreen> {
 
   @override
   Widget build(BuildContext context) {
-    var isCreate = Provider.of<LoginState>(context).isCreate();
     screenHeight = MediaQuery
         .of( context )
         .size
@@ -45,9 +46,7 @@ class _CreateScreenState extends State<CreateScreen> {
       body: SingleChildScrollView(
         child: Stack(
           children: <Widget>[
-            isCreate == false
-                ? singUpCard( context )
-                : singUpCard( context ),
+            singUpCard(context),
             pageTitle(),
           ],
         ),
@@ -55,7 +54,7 @@ class _CreateScreenState extends State<CreateScreen> {
     );
   }
 
-  Widget pageTitle() {
+  Widget pageTitle(){
     return Container(
       margin: EdgeInsets.only( top: 50 ),
       child: Row(
@@ -177,7 +176,7 @@ class _CreateScreenState extends State<CreateScreen> {
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular( 15 ) ),
                               onPressed: () {
-                                Provider.of<LoginState>(context).logout();
+                                Navigator.pop(context);
                               }
                             ),
                             SizedBox(
@@ -195,9 +194,13 @@ class _CreateScreenState extends State<CreateScreen> {
                                   if(_user.email.compareTo("patricio.igtr@gmail.com")==0)
                                     _createAdmin(_user, model.rut, isSwitchDelivery, isSwitchTienda);
                                   else
-                                    _createUser(_user, model.rut, isSwitchDelivery, isSwitchTienda);
-                                  Provider.of<LoginState>(context).Complete();
-                                  Provider.of<LoginState>(context).login();
+                                    if(isSwitchDelivery == false && isSwitchTienda == false){
+                                      _createUser(_user, model.rut, isSwitchDelivery, isSwitchTienda);
+                                    }
+                                  Provider.of<LoginState>(context).isComplete();
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(builder: (context) =>HomeScreen()));
                                 }
                               },
                             ),

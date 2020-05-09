@@ -25,14 +25,11 @@ class MyApp extends StatelessWidget {
           // ignore: missing_return
           "/": (BuildContext context) {
             var state = Provider.of<LoginState>( context );
-            if (state.isLoggedIn() && state.isComplete( )) {
+            if (state.isLoggedIn()){
               return HomeScreen();
             }
-            if (state.isLoggedIn())
-              if(!state.isComplete())
-                return CreateScreen();
-            if (!state.isLoggedIn( ) && !state.isComplete( )) {
-              return LoginScreen( );
+            else{
+              return LoginScreen();
             }
           }
         },
