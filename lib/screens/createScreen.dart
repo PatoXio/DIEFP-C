@@ -102,7 +102,6 @@ class _CreateScreenState extends State<CreateScreen> {
                           return child;
                         else
                           goToMenu(context);
-
                     },
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
