@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:diefpc/models/usuario.dart';
 import 'package:diefpc/states/login_state.dart';
 import 'package:flutter/material.dart';
 import 'package:diefpc/app/app.dart';
@@ -24,6 +23,7 @@ class CarritoCompras extends StatefulWidget{
 }
 
 class _CarritoComprasState extends State<CarritoCompras> {
+  List<String> selec;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -45,10 +45,14 @@ class _CarritoComprasState extends State<CarritoCompras> {
   }
   Widget _queyList(BuildContext context) {
     var listDocuments = Provider.of<LoginState>(context).getCarrito();
-    return ListView.builder(
-        itemCount: listDocuments.length,
-        itemBuilder: (BuildContext ctxt, int index) => buildBody(ctxt, index)
-    );
+    if (listDocuments != null) {
+      return ListView.builder(
+          itemCount: listDocuments.length,
+          itemBuilder: (BuildContext context, int index) => buildBody(context, index)
+      );
+    } else{
+      return Text("No posees productos en tu carrito");
+    }
   }
   Widget buildBody(BuildContext ctxt, int index) {
     var listDocuments = Provider.of<LoginState>(context).getCarrito();
@@ -64,11 +68,28 @@ class _CarritoComprasState extends State<CarritoCompras> {
             tooltip: 'Producto',
           ),
           title: Text(listDocuments[index].data["Nombre"]),
-          subtitle: Text("mg ${listDocuments[index].data["mg"].toString()}"),
+          subtitle: TextProducto(context, listDocuments[index].data.keys.toList(), listDocuments[index].data.values.toList()),
           //trailing: Icon(Icons.more_vert),
           isThreeLine: true,
         ),
       ),
     );
+  }
+  Widget TextProducto(BuildContext context, List listaKeys, List listaValues){
+    int i = 0;
+    String info;
+    if (listaKeys!=null){
+      while(i<listaKeys.length){
+        if(i==1){
+          info = "${listaKeys[i].toString()}: ${listaValues[i].toString()}";
+        }
+        if(i>1){
+          info = info + "\n${listaKeys[i].toString()}: ${listaValues[i].toString()}";
+        }
+        i=i+1;
+      }
+    }else
+      info = "Este producto no posee datos";
+    return Text("$info");
   }
 }

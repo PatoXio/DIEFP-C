@@ -94,6 +94,7 @@ class _CreateScreenState extends State<CreateScreen> {
                 child: Padding(
                   padding: const EdgeInsets.all( 30.0 ),
                   child: Consumer<LoginState>(
+                    // ignore: missing_return
                     builder: (BuildContext context, LoginState value, child){
                       if(value.isLoading())
                         return CircularProgressIndicator();
