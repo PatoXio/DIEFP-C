@@ -1,6 +1,6 @@
 import 'package:diefpc/screens/Menu.dart';
 import 'package:diefpc/states/login_state.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+//import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:diefpc/app/app.dart';
@@ -9,8 +9,9 @@ import 'package:provider/provider.dart';
 
 import 'createScreen.dart';
 
+// ignore: must_be_immutable
 class HomeScreen extends StatelessWidget {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  //final FirebaseAuth _auth = FirebaseAuth.instance;
   double screenHeight;
   String name;
   String elTiempo;
@@ -92,7 +93,7 @@ class HomeScreen extends StatelessWidget {
               if (isComplete == false) {
                 Navigator.push(context,
                     MaterialPageRoute(builder: (context) => CreateScreen()));
-              } else
+              }else
                 goToMenu(context);
             },
           label: Text('Menú', style: TextStyle(fontSize: 30),),
@@ -107,6 +108,7 @@ class HomeScreen extends StatelessWidget {
         context, MaterialPageRoute(builder: (context) => MenuScreen()));
   }
 
+  // ignore: missing_return
   String _elTiempo() {
     DateTime now = DateTime.now();
 

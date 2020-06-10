@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:diefpc/app/app.dart';
+//import 'package:diefpc/app/app.dart';
 import 'package:diefpc/screens/Menu.dart';
 import 'package:diefpc/screens/home.dart';
 import 'package:diefpc/states/login_state.dart';
@@ -9,7 +9,7 @@ import 'package:dart_rut_validator/dart_rut_validator.dart' show RUTValidator;
 import 'package:provider/provider.dart';
 import 'package:diefpc/models/usuario.dart';
 
-import 'login.dart';
+//import 'login.dart';
 
 TextEditingController _rutController = TextEditingController();
 

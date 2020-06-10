@@ -1,4 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+//import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:diefpc/states/login_state.dart';
 import 'package:flutter/material.dart';
 import 'package:diefpc/app/app.dart';
@@ -65,7 +65,7 @@ class _CarritoComprasState extends State<CarritoCompras> {
           leading: IconButton(
             icon: Icon(Icons.local_hospital),
             iconSize: 40,
-            tooltip: 'Producto',
+            tooltip: 'Producto', onPressed: () {  },
           ),
           title: Text(listDocuments[index].data["Nombre"]),
           subtitle: TextProducto(context, listDocuments[index].data.keys.toList(), listDocuments[index].data.values.toList()),
@@ -75,6 +75,7 @@ class _CarritoComprasState extends State<CarritoCompras> {
       ),
     );
   }
+  // ignore: non_constant_identifier_names
   Widget TextProducto(BuildContext context, List listaKeys, List listaValues){
     int i = 0;
     String info;

@@ -123,6 +123,7 @@ class _CambioContrasenaScreenState extends State<CambioContrasenaScreen> {
         )
     );
   }
+  // ignore: missing_return
   Future<String> _changePassword(String password) async{
     //Create an instance of the current user.
     user = await FirebaseAuth.instance.currentUser();
