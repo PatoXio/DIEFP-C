@@ -18,6 +18,9 @@
             <option value="D:/SRC/flutter/.pub-cache/hosted/pub.dartlang.org/firebase_core_web-0.1.1+2/android" />
             <option value="D:/SRC/flutter/.pub-cache/hosted/pub.dartlang.org/google_sign_in-4.4.4/android" />
             <option value="D:/SRC/flutter/.pub-cache/hosted/pub.dartlang.org/google_sign_in_web-0.9.1/android" />
+            <option value="D:/SRC/flutter/.pub-cache/hosted/pub.dartlang.org/shared_preferences-0.5.7+1/android" />
+            <option value="D:/SRC/flutter/.pub-cache/hosted/pub.dartlang.org/shared_preferences_macos-0.0.1+8/android" />
+            <option value="D:/SRC/flutter/.pub-cache/hosted/pub.dartlang.org/shared_preferences_web-0.1.2+5/android" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

@@ -1,6 +1,6 @@
 import 'package:diefpc/app/app.dart';
-import 'package:diefpc/screens/login.dart';
-import 'package:dart_rut_validator/dart_rut_validator.dart' show RUTValidator;
+//import 'package:diefpc/screens/login.dart';
+//import 'package:dart_rut_validator/dart_rut_validator.dart' show RUTValidator;
 import 'package:flutter/material.dart';
 
 //Punto de entrada para su aplicación

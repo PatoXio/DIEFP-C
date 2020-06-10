@@ -123,6 +123,7 @@ class _CambioCorreoScreenState extends State<CambioCorreoScreen> {
         )
     );
   }
+  // ignore: missing_return
   Future<String> _changeCorreo(String correo) async{
     //Create an instance of the current user.
     user = await FirebaseAuth.instance.currentUser();
