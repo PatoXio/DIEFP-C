@@ -23,12 +23,16 @@ dependencies:
   cloud_firestore: ^0.13.5
   dart_rut_validator: ^1.0.0
   google_sign_in: ^4.4.4
+  mailer: ^3.0.4
   firebase_auth: ^0.16.0
   google_maps_flutter: ^0.5.28+1
+  flutter_phoenix: ^0.1.0
   geocoder: ^0.1.2
+  url_launcher: ^5.4.11
   location: ^3.0.2
   great_circle_distance: ^1.0.1
   flutter_bloc: ^0.18.3
+  flutter_email_sender: ^3.0.1
   equatable: ^0.2.6
   flutter_polyline_points: ^0.2.1
   # The following adds the Cupertino Icons font to your application.

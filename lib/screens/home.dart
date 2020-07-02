@@ -7,6 +7,7 @@ import 'package:diefpc/app/app.dart';
 import 'dart:core';
 import 'package:provider/provider.dart';
 
+import 'MenuTienda.dart';
 import 'createScreen.dart';
 
 // ignore: must_be_immutable
@@ -20,9 +21,12 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     var _user = Provider.of<LoginState>(context).currentUser();
     var isComplete = Provider.of<LoginState>(context).isComplete();
+    var rol = Provider.of<LoginState>(context).getRol();
+    //print(isComplete);
     screenHeight = MediaQuery.of(context).size.height;
     name = _user.displayName;
     elTiempo = _elTiempo();
+
     return Scaffold(
         //drawer: Text( 'Hola perro ql bastardo y la ctm uwu' ),
         appBar: AppBar(
@@ -64,48 +68,85 @@ class HomeScreen extends StatelessWidget {
                           subtitle: Text("$elTiempo",
                               style: TextStyle(fontWeight: FontWeight.bold)),
                         ),
-                      ])),
-                  /*Card(
-                      child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: <Widget>[
                         ListTile(
                           leading: Icon(
-                            Icons.account_box,
+                            _selectIcon(rol),
                             size: 45,
                           ),
                           title: Text(
-                            "Hola, ${name.split(" ")[0]}.",
+                            "Tu rol de Usuario es: $rol.",
                             style: TextStyle(
-                              fontSize: 30,
+                              fontSize: 20,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          subtitle: Text("$elTiempo",
-                              style: TextStyle(fontWeight: FontWeight.bold)),
                         ),
-                      ])),*/
+                      ])),
                 ])),
+            SizedBox(
+              height: 5,
+            ),
+            Consumer<LoginState>(
+              // ignore: missing_return
+              builder: (BuildContext context, LoginState value, child){
+                if(value.isLoading())
+                  return CircularProgressIndicator();
+                else
+                  return _boton(context, isComplete, rol);
+              },
+            ),
           ],
         ),
-        floatingActionButton: FloatingActionButton.extended(
-            onPressed: () {
-              if (isComplete == false) {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => CreateScreen()));
-              }else
-                goToMenu(context);
-            },
-          label: Text('Menú', style: TextStyle(fontSize: 30),),
-          icon: Icon(Icons.widgets, size: 40,),
-          backgroundColor: Colors.blue,
-        )
     );
   }
+   _selectIcon(String rol){
+    if (rol.compareTo("Delivery") == 0)
+      return Icons.directions_bike;
+    else
+      if(rol.compareTo("Tienda") == 0)
+        return Icons.local_hospital;
+      else
+        return Icons.supervised_user_circle;
+  }
 
-  void goToMenu(BuildContext context) {
+  Widget _boton(BuildContext context, bool isComplete, String rol){
+    if(isComplete == false) {
+      return FloatingActionButton.extended(
+        onPressed: () {
+          Navigator.push( context,
+              MaterialPageRoute( builder: (context) => CreateScreen( ) ) );
+        },
+        label: Text("Completar\nDatos", style: TextStyle(fontSize: 20)),
+        icon: Icon( Icons.widgets, size: 40, ),
+        backgroundColor: Colors.blue,
+      );
+    }
+    else
+      return FloatingActionButton.extended(
+        onPressed: () {
+          if(rol.compareTo("Normal") == 0)
+            goToMenuUsuario(context);
+          else
+            if(rol.compareTo("Delivery") == 0)
+              goToMenuUsuario(context);
+            else
+              goToMenuTienda(context);
+        },
+        label: Text( "Menú", style: TextStyle( fontSize: 20 ) ),
+        icon: Icon( Icons.widgets, size: 40, ),
+        backgroundColor: Colors.blue,
+      );
+
+  }
+
+  void goToMenuUsuario(BuildContext context) {
     Navigator.push(
         context, MaterialPageRoute(builder: (context) => MenuScreen()));
+  }
+
+  void goToMenuTienda(BuildContext context) {
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => MenuScreenTienda()));
   }
 
   // ignore: missing_return

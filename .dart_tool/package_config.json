@@ -140,6 +140,18 @@
       "languageVersion": "2.0"
     },
     {
+      "name": "flutter_email_sender",
+      "rootUri": "file:///D:/SRC/flutter/.pub-cache/hosted/pub.dartlang.org/flutter_email_sender-3.0.1",
+      "packageUri": "lib/",
+      "languageVersion": "2.6"
+    },
+    {
+      "name": "flutter_phoenix",
+      "rootUri": "file:///D:/SRC/flutter/.pub-cache/hosted/pub.dartlang.org/flutter_phoenix-0.1.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.1"
+    },
+    {
       "name": "flutter_plugin_android_lifecycle",
       "rootUri": "file:///D:/SRC/flutter/.pub-cache/hosted/pub.dartlang.org/flutter_plugin_android_lifecycle-1.0.7",
       "packageUri": "lib/",
@@ -218,6 +230,12 @@
       "languageVersion": "2.3"
     },
     {
+      "name": "intl",
+      "rootUri": "file:///D:/SRC/flutter/.pub-cache/hosted/pub.dartlang.org/intl-0.16.1",
+      "packageUri": "lib/",
+      "languageVersion": "2.5"
+    },
+    {
       "name": "js",
       "rootUri": "file:///D:/SRC/flutter/.pub-cache/hosted/pub.dartlang.org/js-0.6.1+1",
       "packageUri": "lib/",
@@ -242,6 +260,18 @@
       "languageVersion": "2.1"
     },
     {
+      "name": "logging",
+      "rootUri": "file:///D:/SRC/flutter/.pub-cache/hosted/pub.dartlang.org/logging-0.11.4",
+      "packageUri": "lib/",
+      "languageVersion": "2.0"
+    },
+    {
+      "name": "mailer",
+      "rootUri": "file:///D:/SRC/flutter/.pub-cache/hosted/pub.dartlang.org/mailer-3.0.4",
+      "packageUri": "lib/",
+      "languageVersion": "2.2"
+    },
+    {
       "name": "matcher",
       "rootUri": "file:///D:/SRC/flutter/.pub-cache/hosted/pub.dartlang.org/matcher-0.12.6",
       "packageUri": "lib/",
@@ -252,6 +282,12 @@
       "rootUri": "file:///D:/SRC/flutter/.pub-cache/hosted/pub.dartlang.org/meta-1.1.8",
       "packageUri": "lib/",
       "languageVersion": "1.12"
+    },
+    {
+      "name": "mime",
+      "rootUri": "file:///D:/SRC/flutter/.pub-cache/hosted/pub.dartlang.org/mime-0.9.6+3",
+      "packageUri": "lib/",
+      "languageVersion": "2.0"
     },
     {
       "name": "path",
@@ -272,6 +308,12 @@
       "languageVersion": "2.1"
     },
     {
+      "name": "platform_detect",
+      "rootUri": "file:///D:/SRC/flutter/.pub-cache/hosted/pub.dartlang.org/platform_detect-1.4.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.4"
+    },
+    {
       "name": "plugin_platform_interface",
       "rootUri": "file:///D:/SRC/flutter/.pub-cache/hosted/pub.dartlang.org/plugin_platform_interface-1.0.2",
       "packageUri": "lib/",
@@ -280,6 +322,12 @@
     {
       "name": "provider",
       "rootUri": "file:///D:/SRC/flutter/.pub-cache/hosted/pub.dartlang.org/provider-2.0.1+1",
+      "packageUri": "lib/",
+      "languageVersion": "2.0"
+    },
+    {
+      "name": "pub_semver",
+      "rootUri": "file:///D:/SRC/flutter/.pub-cache/hosted/pub.dartlang.org/pub_semver-1.4.4",
       "packageUri": "lib/",
       "languageVersion": "2.0"
     },
@@ -374,6 +422,30 @@
       "languageVersion": "2.0"
     },
     {
+      "name": "url_launcher",
+      "rootUri": "file:///D:/SRC/flutter/.pub-cache/hosted/pub.dartlang.org/url_launcher-5.4.11",
+      "packageUri": "lib/",
+      "languageVersion": "2.1"
+    },
+    {
+      "name": "url_launcher_macos",
+      "rootUri": "file:///D:/SRC/flutter/.pub-cache/hosted/pub.dartlang.org/url_launcher_macos-0.0.1+7",
+      "packageUri": "lib/",
+      "languageVersion": "2.1"
+    },
+    {
+      "name": "url_launcher_platform_interface",
+      "rootUri": "file:///D:/SRC/flutter/.pub-cache/hosted/pub.dartlang.org/url_launcher_platform_interface-1.0.7",
+      "packageUri": "lib/",
+      "languageVersion": "2.1"
+    },
+    {
+      "name": "url_launcher_web",
+      "rootUri": "file:///D:/SRC/flutter/.pub-cache/hosted/pub.dartlang.org/url_launcher_web-0.1.2",
+      "packageUri": "lib/",
+      "languageVersion": "2.2"
+    },
+    {
       "name": "validators",
       "rootUri": "file:///D:/SRC/flutter/.pub-cache/hosted/pub.dartlang.org/validators-2.0.0+1",
       "packageUri": "lib/",
@@ -392,7 +464,7 @@
       "languageVersion": "2.6"
     }
   ],
-  "generated": "2020-06-10T14:24:05.583867Z",
+  "generated": "2020-07-01T14:06:36.730473Z",
   "generator": "pub",
   "generatorVersion": "2.9.0-8.2.beta"
 }

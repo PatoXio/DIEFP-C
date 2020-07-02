@@ -12,7 +12,9 @@ class LoginState with ChangeNotifier {
   DocumentSnapshot document;
   FirebaseUser _user;
   List<DocumentSnapshot> _carrito;
+  List<DocumentSnapshot> _productos;
 
+  String _rol = 'Normal';
   bool _isComplete = false;
   bool _isCreate = false;
   bool _loggedIn = false;
@@ -22,17 +24,13 @@ class LoginState with ChangeNotifier {
     loginState();
   }
 
-  bool isComplete(){
-    createState();
-    return _isComplete;
-
-  }
-
   bool isCreate() => _isCreate;
 
   bool isLoggedIn() => _loggedIn;
 
   bool isLoading() => _loading;
+
+  String getRol() => _rol;
 
   FirebaseUser currentUser() => _user;
 
@@ -40,6 +38,16 @@ class LoginState with ChangeNotifier {
   
   List<DocumentSnapshot> getCarrito() => _carrito;
 
+  List<DocumentSnapshot> getProductos() => _productos;
+
+  bool isComplete(){
+    createState();
+    return _isComplete;
+  }
+
+  Future<void> actualizarProductos() async {
+    _productos = await _getListDocumentProducto(_user.uid);
+  }
 
   void login() async {
     _loading = true;
@@ -76,7 +84,9 @@ class LoginState with ChangeNotifier {
       _isComplete = true;
       print(_isComplete);
       _loading = true;
-      _carrito = await _getListDocument(_user.uid);
+      _carrito = await _getListDocumentCarrito(_user.uid);
+      _rol = await _getRol(_user.uid, _rol);
+      _productos = await _getListDocumentProducto(_user.uid);
       _loading = false;
       notifyListeners();
     }
@@ -122,12 +132,33 @@ class LoginState with ChangeNotifier {
     return document;
   }
 
-  Future<List<DocumentSnapshot>> _getListDocument(String id) async{
+  Future<String> _getRol(String uid, String _rol) async {
+    DocumentSnapshot document = await _getDocument(uid);
+    if(document.data["Delivery"] == true)
+      return "Delivery";
+    else
+      if(document.data["Tienda"] == true)
+        return "Tienda";
+      else
+        return _rol;
+  }
+
+  Future<List<DocumentSnapshot>> _getListDocumentCarrito(String id) async{
     List<DocumentSnapshot> listDocument;
     listDocument = (await Firestore.instance
         .collection("usuarios")
         .document(id)
         .collection("Carrito").getDocuments()).documents;
+
+    return listDocument;
+  }
+
+  Future<List<DocumentSnapshot>> _getListDocumentProducto(String id) async{
+    List<DocumentSnapshot> listDocument;
+    listDocument = (await Firestore.instance
+        .collection("usuarios")
+        .document(id)
+        .collection("Productos").getDocuments()).documents;
 
     return listDocument;
   }
