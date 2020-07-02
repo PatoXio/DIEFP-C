@@ -411,9 +411,9 @@
     },
     {
       "name": "test_api",
-      "rootUri": "file:///D:/SRC/flutter/.pub-cache/hosted/pub.dartlang.org/test_api-0.2.15",
+      "rootUri": "file:///D:/SRC/flutter/.pub-cache/hosted/pub.dartlang.org/test_api-0.2.16",
       "packageUri": "lib/",
-      "languageVersion": "2.4"
+      "languageVersion": "2.7"
     },
     {
       "name": "typed_data",
@@ -464,7 +464,7 @@
       "languageVersion": "2.6"
     }
   ],
-  "generated": "2020-07-01T14:06:36.730473Z",
+  "generated": "2020-07-02T02:35:48.732585Z",
   "generator": "pub",
-  "generatorVersion": "2.9.0-8.2.beta"
+  "generatorVersion": "2.9.0-14.1.beta"
 }

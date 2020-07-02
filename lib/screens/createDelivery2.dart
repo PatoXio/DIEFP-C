@@ -263,6 +263,7 @@ class _CreateDelivery2State extends State<CreateDelivery2> {
     var rng = new Random();
       return rng.nextInt(100000000);
   }
+
   Future<void> sendEmail(int codigoVerificacion, String correo) async {
     String username = 'Patricio.igtr@gmail.com';
     String password = 'Raideon133';
