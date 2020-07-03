@@ -40,11 +40,6 @@ class _ProductosTiendaState extends State<ProductosTienda> {
                 configMenu(context);
               }
           ),
-          IconButton(icon: Icon(Icons.home),
-          tooltip: 'Menú',
-          onPressed: (){
-            goToHomeScreen(context);
-          },)
         ],
       ),
       body:

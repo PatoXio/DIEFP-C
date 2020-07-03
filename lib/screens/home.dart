@@ -10,19 +10,25 @@ import 'package:provider/provider.dart';
 import 'MenuTienda.dart';
 import 'createScreen.dart';
 
+class HomeScreen extends StatefulWidget {
+  @override
+  _HomeScreenState createState() => _HomeScreenState();
+}
 // ignore: must_be_immutable
-class HomeScreen extends StatelessWidget {
+class _HomeScreenState extends State<HomeScreen> {
   //final FirebaseAuth _auth = FirebaseAuth.instance;
   double screenHeight;
   String name;
   String elTiempo;
-
+  @override
+  void initState(){
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     var _user = Provider.of<LoginState>(context).currentUser();
     var isComplete = Provider.of<LoginState>(context).isComplete();
-    var rol = Provider.of<LoginState>(context).getRol();
-    //print(isComplete);
+    String rol = Provider.of<LoginState>(context).getRol();
     screenHeight = MediaQuery.of(context).size.height;
     name = _user.displayName;
     elTiempo = _elTiempo();
@@ -74,7 +80,7 @@ class HomeScreen extends StatelessWidget {
                             size: 45,
                           ),
                           title: Text(
-                            "Tu rol de Usuario es: $rol.",
+                            "Tu rol de Usuario es: ${_rol(rol)}.",
                             style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
@@ -110,7 +116,7 @@ class HomeScreen extends StatelessWidget {
   }
 
   Widget _boton(BuildContext context, bool isComplete, String rol){
-    if(isComplete == false) {
+    if(Provider.of<LoginState>(context).isComplete() == false) {
       return FloatingActionButton.extended(
         onPressed: () {
           Navigator.push( context,
@@ -124,13 +130,13 @@ class HomeScreen extends StatelessWidget {
     else
       return FloatingActionButton.extended(
         onPressed: () {
-          if(rol.compareTo("Normal") == 0)
-            goToMenuUsuario(context);
+          if(rol.compareTo("Tienda") == 0)
+            goToMenuTienda(context);
           else
             if(rol.compareTo("Delivery") == 0)
               goToMenuUsuario(context);
             else
-              goToMenuTienda(context);
+              goToMenuUsuario(context);
         },
         label: Text( "Menú", style: TextStyle( fontSize: 20 ) ),
         icon: Icon( Icons.widgets, size: 40, ),
@@ -147,6 +153,12 @@ class HomeScreen extends StatelessWidget {
   void goToMenuTienda(BuildContext context) {
     Navigator.push(
         context, MaterialPageRoute(builder: (context) => MenuScreenTienda()));
+  }
+
+  String _rol(String rol){
+    if(rol.compareTo("Normal") == 0)
+      return "Común";
+    return rol;
   }
 
   // ignore: missing_return

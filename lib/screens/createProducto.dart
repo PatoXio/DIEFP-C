@@ -80,7 +80,7 @@ class _CrearProductoState extends State<CrearProducto> {
 
   Widget singUpCard(BuildContext context) {
     _user = Provider.of<LoginState>(context).currentUser();
-    var isComplete = Provider.of<LoginState>(context).isComplete();
+    //var isComplete = Provider.of<LoginState>(context).isComplete();
     return Form(
         key: _formKey,
         child: Column(
@@ -137,6 +137,9 @@ class _CrearProductoState extends State<CrearProducto> {
                               return 'Por favor ingrese el codigo';
                             }
                           },
+                          keyboardType: TextInputType.number,
+                          inputFormatters: <TextInputFormatter>[
+                            WhitelistingTextInputFormatter.digitsOnly],
                           decoration: InputDecoration(
                             labelText: "Codigo",
                           ),
@@ -154,10 +157,12 @@ class _CrearProductoState extends State<CrearProducto> {
                               return 'Por favor ingrese el peso del producto';
                             }
                           },
+                          keyboardType: TextInputType.number,
+                          inputFormatters: <TextInputFormatter>[
+                            WhitelistingTextInputFormatter.digitsOnly],
                           decoration: InputDecoration(
                             labelText: "Peso en mg/u",
                           ),
-                          keyboardType: TextInputType.number,
                           onChanged: (String value){
                             modelProducto.peso = value;
                           },
@@ -172,6 +177,9 @@ class _CrearProductoState extends State<CrearProducto> {
                               return 'Por favor ingrese la cantidad de stock';
                             }
                           },
+                          keyboardType: TextInputType.number,
+                          inputFormatters: <TextInputFormatter>[
+                            WhitelistingTextInputFormatter.digitsOnly],
                           decoration: InputDecoration(
                             labelText: "Ingrese el stock",
                           ),
@@ -211,10 +219,13 @@ class _CrearProductoState extends State<CrearProducto> {
                                 if(_formKey.currentState.validate()) {
                                     _createProducto(_user,modelProducto.cantidad,modelProducto.nombre,modelProducto.codigo, modelProducto.peso);
                                   }
-                                  Navigator.push(
+                                  /*Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                          builder: (context) => ProductosTienda( ) ) );
+                                          builder: (context) => ProductosTienda()));
+                                Navigator.popAndPushNamed(
+                                    context,'');*/
+                                Navigator.pop(context);
                                 }
                             ),
                           ],

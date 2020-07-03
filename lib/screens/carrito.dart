@@ -22,7 +22,7 @@ class CarritoCompras extends StatefulWidget{
   _CarritoComprasState createState() => _CarritoComprasState();
 }
 
-class _CarritoComprasState extends State<CarritoCompras> {
+class _CarritoComprasState extends State<CarritoCompras>{
   List<String> selec;
   @override
   Widget build(BuildContext context) {
@@ -54,7 +54,7 @@ class _CarritoComprasState extends State<CarritoCompras> {
       return Text("No posees productos en tu carrito");
     }
   }
-  Widget buildBody(BuildContext ctxt, int index) {
+  Widget buildBody(BuildContext context, int index) {
     var listDocuments = Provider.of<LoginState>(context).getCarrito();
     double screenHeight = MediaQuery.of(context).size.height;
     return Container(

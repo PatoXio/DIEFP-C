@@ -82,11 +82,11 @@ class _MenuScreenTiendaState extends State<MenuScreenTienda> {
                     iconSize: 40,
                     tooltip: 'Locales',
                     onPressed: () {
-                      goToLocales(context);
+                      //goToLocales(context);
                     },
                   ),
-                  title: Text('Menú Locales'),
-                  subtitle: Text('Aquí puedes ver todos los locales cercanos'),
+                  title: Text('Historial de Compras'),
+                  subtitle: Text('Aquí puedes ver tu historial de ventas y revisar tus ganancias'),
                   //trailing: Icon(Icons.more_vert),
                   isThreeLine: true,
                 ),
@@ -102,7 +102,3 @@ void goToProductos(BuildContext context) {
       context, MaterialPageRoute(builder: (context) => ProductosTienda()));
 }
 
-void goToLocales(BuildContext context) {
-  Navigator.push(
-      context, MaterialPageRoute(builder: (context) => LocalesScreen()));
-}

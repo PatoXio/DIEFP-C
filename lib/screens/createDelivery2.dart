@@ -165,7 +165,7 @@ class _CreateDelivery2State extends State<CreateDelivery2> {
             onPressed: (){
               sendEmail(codigoVerificacion, _user.email);
             },
-            child: Text("Debido a que deben probarlo por los casos de prueba, al presionar se les enviara un correo sin necesidad de entrar a la página y validar sus documentos"),
+            child: Text("Presione aquí: Debido a que deben probarlo por los casos de prueba, al presionar se les enviara un correo sin necesidad de entrar a la página y validar sus documentos"),
           ),
         ),
         SizedBox(

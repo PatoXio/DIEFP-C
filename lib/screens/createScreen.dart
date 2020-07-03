@@ -46,6 +46,7 @@ class _CreateScreenState extends State<CreateScreen> {
   }
   @override
   Widget build(BuildContext context) {
+    Provider.of<LoginState>(context).isComplete();
     screenHeight = MediaQuery
         .of( context )
         .size
@@ -101,8 +102,7 @@ class _CreateScreenState extends State<CreateScreen> {
                 elevation: 8,
                 child: Padding(
                   padding: const EdgeInsets.all( 30.0 ),
-
-                    child: _column(context),
+                    child: _column(context, isComplete),
                 ),
               ),
             ),
@@ -123,13 +123,16 @@ class _CreateScreenState extends State<CreateScreen> {
     );
   }
 
-  Widget _column(BuildContext context){
-    if(checkBoxValue == true)
-      return _columnUser(context);
-    if(isSwitchDelivery == true)
-      return _columnDelivery(context);
-    if(isSwitchTienda == true)
-      return _columnTienda(context);
+  Widget _column(BuildContext context, bool isComplete){
+    if(isComplete == false) {
+      if (checkBoxValue == true)
+        return _columnUser( context );
+      if (isSwitchDelivery == true)
+        return _columnDelivery( context );
+      if (isSwitchTienda == true)
+        return _columnTienda( context );
+    }else
+      goBack(context);
   }
 
   Widget _columnDelivery(BuildContext context){
@@ -582,17 +585,41 @@ class _CreateScreenState extends State<CreateScreen> {
                   if(checkBoxValue == true){
                     _createUser(_user, model.rut, isSwitchDelivery, isSwitchTienda);
                   }
-                  Provider.of<LoginState>(context).isComplete();
-                  Provider.of<LoginState>(context).logout();
-                  Navigator.push(
-                      context,
-                      new MaterialPageRoute(builder: (context) =>MyApp()));
+                  _showDialog();
                 }
               },
             ),
           ],
         ),
       ],
+    );
+  }
+
+  void _showDialog() {
+    // flutter defined function
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          title: new Text("Cuenta registrada"),
+          content: new Text("Deberás volver a iniciar sesión."),
+          actions: <Widget>[
+            // usually buttons at the bottom of the dialog
+            new FlatButton(
+              child: new Text("Ok"),
+              onPressed: () {
+                Provider.of<LoginState>(context).isComplete();
+                Navigator.pop(context);
+                Provider.of<LoginState>(context).logout();
+                Navigator.push(
+                    context,
+                    new MaterialPageRoute(builder: (context) =>MyApp()));
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -666,5 +693,9 @@ class _CreateScreenState extends State<CreateScreen> {
     Navigator.push(
         context,
         new MaterialPageRoute(builder: (context) =>MyApp()));
+  }
+
+  void goBack(BuildContext context){
+    Navigator.pop(context);
   }
 }
