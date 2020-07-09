@@ -54,8 +54,6 @@ class _CambioCorreoScreenState extends State<CambioCorreoScreen> {
                         height: 15,
                       ),
                       TextFormField(
-                        maxLength: 8,
-                        obscureText: true,
                         decoration: InputDecoration(
                           labelText: "Nuevo Correo",
                         ),
@@ -64,8 +62,6 @@ class _CambioCorreoScreenState extends State<CambioCorreoScreen> {
                         },
                       ),
                       TextFormField(
-                        maxLength: 8,
-                        obscureText: true,
                         decoration: InputDecoration(
                           labelText: "Confirmar Correo",
                         ),
@@ -130,9 +126,9 @@ class _CambioCorreoScreenState extends State<CambioCorreoScreen> {
 
     //Pass in the password to updatePassword.
     user.updateEmail(correo).then((_){
-      return "La contraseña se cambio con exito";
+      return "El correo se cambio con exito";
     }).catchError((error){
-      return "La contraseña no se pudo cambiar:" + error.toString();
+      return "El correo no se pudo cambiar:" + error.toString();
       //This might happen, when the wrong password is in, the user isn't found, or if the user hasn't logged in recently.
     });
   }

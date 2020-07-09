@@ -164,6 +164,7 @@ class _CreateDelivery2State extends State<CreateDelivery2> {
           child: RaisedButton(
             onPressed: (){
               sendEmail(codigoVerificacion, _user.email);
+              _showAlert();
             },
             child: Text("Presione aquí: Debido a que deben probarlo por los casos de prueba, al presionar se les enviara un correo sin necesidad de entrar a la página y validar sus documentos"),
           ),
@@ -229,11 +230,7 @@ class _CreateDelivery2State extends State<CreateDelivery2> {
               onPressed: () {
                 if(_formKey.currentState.validate()) {
                     _createDelivery( _user, modelDelivery.codigoVerificacion, '11111111-1' );
-                    Provider.of<LoginState>(context).isComplete();
-                    Provider.of<LoginState>(context).logout();
-                    Navigator.push(
-                        context,
-                        new MaterialPageRoute(builder: (context) =>MyApp()));
+                    _showDialog();
                 }
               },
             ),
@@ -262,6 +259,56 @@ class _CreateDelivery2State extends State<CreateDelivery2> {
   int random() {
     var rng = new Random();
       return rng.nextInt(100000000);
+  }
+
+  void _showDialog() {
+    // flutter defined function
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          title: new Text("Cuenta registrada"),
+          content: new Text("Deberás volver a iniciar sesión."),
+          actions: <Widget>[
+            // usually buttons at the bottom of the dialog
+            new FlatButton(
+              child: new Text("Ok"),
+              onPressed: () {
+                //Provider.of<LoginState>(context).isComplete();
+                //Navigator.pop(context);
+                Provider.of<LoginState>(context).logout();
+                Navigator.push(
+                    context,
+                    new MaterialPageRoute(builder: (context) =>MyApp()));
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+  void _showAlert() {
+    // flutter defined function
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          title: new Text("Email enviado"),
+          content: new Text("Se ha enviado el código de verificación a su correo."),
+          actions: <Widget>[
+            // usually buttons at the bottom of the dialog
+            new FlatButton(
+              child: new Text("Ok"),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   Future<void> sendEmail(int codigoVerificacion, String correo) async {

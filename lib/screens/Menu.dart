@@ -67,7 +67,29 @@ class _MenuScreenState extends State<MenuScreen> {
                   //trailing: Icon(Icons.more_vert),
                   isThreeLine: true,
                 ),
-              ))
+              ),
+          ),
+          Container(
+            margin: EdgeInsets.only(top: screenHeight / 100),
+            padding: EdgeInsets.only(left: 10, right: 10),
+            child: Card(
+              child: ListTile(
+                leading: IconButton(
+                  icon: Icon(Icons.access_time),
+                  iconSize: 40,
+                  tooltip: 'Historial',
+                  onPressed: () {
+                    //goToCarrito(context);
+                  },
+                ),
+                title: Text('Historial de Compras'),
+                subtitle: Text(
+                    'Aquí puedes ver todas las compras que llevas antes de pagar'),
+                /*trailing: Icon(Icons.more_vert),
+                // isThreeLine: true,*/
+              ),
+            ),
+          ),
         ],
       ),
     );

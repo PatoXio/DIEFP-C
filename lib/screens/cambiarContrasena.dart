@@ -54,7 +54,6 @@ class _CambioContrasenaScreenState extends State<CambioContrasenaScreen> {
                         height: 15,
                       ),
                       TextFormField(
-                        maxLength: 8,
                         obscureText: true,
                         decoration: InputDecoration(
                           labelText: "Nueva Contraseña",
@@ -62,9 +61,13 @@ class _CambioContrasenaScreenState extends State<CambioContrasenaScreen> {
                         onChanged: (String value){
                           nuevaPass = value;
                         },
+                        validator: (String value){
+                          if(nuevaPass.length > 8){
+                            return "Las Contraseñas deben ser iguales";
+                          }else return null;
+                        },
                       ),
                       TextFormField(
-                        maxLength: 8,
                         obscureText: true,
                         decoration: InputDecoration(
                           labelText: "Confirmar Contraseña",

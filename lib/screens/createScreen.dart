@@ -609,8 +609,8 @@ class _CreateScreenState extends State<CreateScreen> {
             new FlatButton(
               child: new Text("Ok"),
               onPressed: () {
-                Provider.of<LoginState>(context).isComplete();
-                Navigator.pop(context);
+                //Provider.of<LoginState>(context).isComplete();
+                //Navigator.pop(context);
                 Provider.of<LoginState>(context).logout();
                 Navigator.push(
                     context,

@@ -161,6 +161,7 @@ class _CreateTienda1State extends State<CreateTienda1> {
           child: RaisedButton(
             onPressed: (){
               sendEmail(codigoVerificacion, _user.email);
+              _showAlert();
             },
             child: Text("Debido a que deben probarlo por los casos de prueba, al presionar se les enviara un correo sin necesidad de entrar a la página y validar sus documentos"),
           ),
@@ -226,17 +227,41 @@ class _CreateTienda1State extends State<CreateTienda1> {
               onPressed: () {
                 if(_formKey.currentState.validate()) {
                     _createTienda( _user, modelTienda.codigoVerificacion, '11111111-2' );
-                    Provider.of<LoginState>(context).isComplete();
-                    Provider.of<LoginState>(context).logout();
-                    Navigator.push(
-                        context,
-                        new MaterialPageRoute(builder: (context) =>MyApp()));
+                    _showDialog();
                 }
               },
             ),
           ],
         ),
       ],
+    );
+  }
+
+  void _showDialog() {
+    // flutter defined function
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          title: new Text("Cuenta registrada"),
+          content: new Text("Deberás volver a iniciar sesión."),
+          actions: <Widget>[
+            // usually buttons at the bottom of the dialog
+            new FlatButton(
+              child: new Text("Ok"),
+              onPressed: () {
+                //Provider.of<LoginState>(context).isComplete();
+                //Navigator.pop(context);
+                Provider.of<LoginState>(context).logout();
+                Navigator.push(
+                    context,
+                    new MaterialPageRoute(builder: (context) =>MyApp()));
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -289,5 +314,27 @@ class _CreateTienda1State extends State<CreateTienda1> {
         print( 'Problem: ${p.code}: ${p.msg}' );
       }
     }
+  }
+  void _showAlert() {
+    // flutter defined function
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          title: new Text("Email enviado"),
+          content: new Text("Se ha enviado el código de verificación a su correo."),
+          actions: <Widget>[
+            // usually buttons at the bottom of the dialog
+            new FlatButton(
+              child: new Text("Ok"),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 }

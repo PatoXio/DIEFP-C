@@ -85,7 +85,7 @@ class _MenuScreenTiendaState extends State<MenuScreenTienda> {
                       //goToLocales(context);
                     },
                   ),
-                  title: Text('Historial de Compras'),
+                  title: Text('Historial de Ventas'),
                   subtitle: Text('Aquí puedes ver tu historial de ventas y revisar tus ganancias'),
                   //trailing: Icon(Icons.more_vert),
                   isThreeLine: true,
