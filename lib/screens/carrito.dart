@@ -26,12 +26,11 @@ class _CarritoComprasState extends State<CarritoCompras>{
   final _saved = Set<String>();
   double screenlong;
   double screenHeight;
-  final _select = Set<String>();
 
   @override
   Widget build(BuildContext context) {
     screenlong = MediaQuery.of(context).size.longestSide;
-    screenlong = MediaQuery.of(context).size.height;
+    screenHeight = MediaQuery.of(context).size.height;
     Provider.of<LoginState>(context).actualizarCarrito();
     final ScrollController _scrollController = ScrollController();
     return Scaffold(
@@ -92,7 +91,11 @@ class _CarritoComprasState extends State<CarritoCompras>{
                   ),
                 Row(
                     children: <Widget> [
+                      Divider(
+                        indent: screenlong / 70,
+                      ),
                       FloatingActionButton.extended(
+                        heroTag: "btn1",
                         onPressed: () {
                           //borrarDelCarrito();
                           },
@@ -103,6 +106,7 @@ class _CarritoComprasState extends State<CarritoCompras>{
                         indent: screenlong / 7,
                       ),
                       FloatingActionButton.extended(
+                        heroTag: "btn2",
                         onPressed: () {
                         },
                         label: Text("Comprar", style: TextStyle(fontSize: 20)),
