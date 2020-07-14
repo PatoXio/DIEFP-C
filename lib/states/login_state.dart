@@ -45,10 +45,6 @@ class LoginState with ChangeNotifier {
     return _isComplete;
   }
 
-  Future<void> actualizarCarrito() async {
-    _carrito = await _getListDocumentCarrito(_user.uid);
-  }
-
   Future<void> actualizarProductos() async {
     _productos = await _getListDocumentProducto(_user.uid);
   }

@@ -1,4 +1,7 @@
 <code_scheme name="Default" version="173">
+  <codeStyleSettings language="Dart">
+    <option name="SPACE_WITHIN_METHOD_CALL_PARENTHESES" value="true" />
+  </codeStyleSettings>
   <codeStyleSettings language="XML">
     <indentOptions>
       <option name="CONTINUATION_INDENT_SIZE" value="4" />

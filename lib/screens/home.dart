@@ -87,19 +87,6 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           ),
                         ),
-                        ListTile(
-                          leading: Icon(
-                            Icons.email,
-                            size: 45,
-                          ),
-                          title: Text(
-                            "Correo: ${_user.email}.",
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
                       ])),
                 ])),
             SizedBox(
