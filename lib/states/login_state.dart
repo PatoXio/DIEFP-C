@@ -121,7 +121,12 @@ class LoginState with ChangeNotifier {
       "email": _user.email,
     });
   }
-  
+
+  Future<void> actualizarCarrito() async {
+    _carrito = await _getListDocumentCarrito(_user.uid);
+  }
+
+
   Future<DocumentSnapshot> _getDocument(String id) async{
     DocumentSnapshot document;
     document = await Firestore.instance
