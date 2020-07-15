@@ -1,8 +1,13 @@
-//import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:wasm';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:diefpc/states/login_state.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:diefpc/app/app.dart';
 import 'package:provider/provider.dart';
+
+import 'ComprarCarrito.dart';
 
 /*class CarritoScreen extends StatefulWidget {
   static Route<dynamic> route() {
@@ -26,13 +31,12 @@ class _CarritoComprasState extends State<CarritoCompras>{
   final _saved = Set<String>();
   double screenlong;
   double screenHeight;
-  final _select = Set<String>();
   @override
   Widget build(BuildContext context) {
+    FirebaseUser _user = Provider.of<LoginState>(context).currentUser();
     screenlong = MediaQuery.of(context).size.longestSide;
     screenHeight = MediaQuery.of(context).size.height;
     Provider.of<LoginState>(context).actualizarCarrito();
-    final ScrollController _scrollController = ScrollController();
     return Scaffold(
       appBar: AppBar(
         title: Text("Carrito de Pedidos"),
@@ -74,10 +78,10 @@ class _CarritoComprasState extends State<CarritoCompras>{
             Container(
               height: screenHeight / 1.3,
               child: Card(
-                elevation: 5,
+                //elevation: 5,
                 margin: EdgeInsets.all(10),
                 semanticContainer: true,
-                color: Colors.transparent,
+                //color: Colors.transparent,
                 child: Theme(
                   data: ThemeData(
                     highlightColor: Colors.blue, //Does not work
@@ -94,7 +98,7 @@ class _CarritoComprasState extends State<CarritoCompras>{
                   FloatingActionButton.extended(
                     heroTag: "boton1",
                     onPressed: () {
-                      //borrarDelCarrito();
+                      borrarDelCarrito(_saved, _user);
                     },
                     label: Text("Eliminar", style: TextStyle(fontSize: 20)),
                     backgroundColor: Colors.red,
@@ -105,6 +109,7 @@ class _CarritoComprasState extends State<CarritoCompras>{
                   FloatingActionButton.extended(
                     heroTag: "boton2",
                     onPressed: () {
+                      goToComprarCarrito(context);
                     },
                     label: Text("Comprar", style: TextStyle(fontSize: 20)),
                     backgroundColor: Colors.blue,
@@ -142,7 +147,6 @@ class _CarritoComprasState extends State<CarritoCompras>{
 
 
   Widget _queyList(BuildContext context) {
-    bool selected = false;
     var listDocuments = Provider.of<LoginState>(context).getCarrito();
     if (listDocuments != null) {
       return ListView.builder(
@@ -156,7 +160,8 @@ class _CarritoComprasState extends State<CarritoCompras>{
   }
   Widget buildBody(BuildContext context, int index) {
     var listDocuments = Provider.of<LoginState>(context).getCarrito();
-    double screenHeight = MediaQuery.of(context).size.height;
+    var _user = Provider.of<LoginState>(context).currentUser();
+    revisarCarrrito(listDocuments,_user.uid);
     return Card(
         child:
         ListTile(
@@ -179,16 +184,81 @@ class _CarritoComprasState extends State<CarritoCompras>{
     String info;
     if (listaKeys!=null){
       while(i<listaKeys.length){
-        if(i==1){
-          info = "${listaKeys[i].toString()}: ${listaValues[i].toString()}";
-        }
-        if(i>1){
-          info = info + "\n${listaKeys[i].toString()}: ${listaValues[i].toString()}";
+        if (listaKeys[i].toString( ).compareTo( "Tienda" ) != 0) {
+          if (i == 1) {
+            info = "${listaKeys[i].toString( )}: ${listaValues[i].toString( )}";
+          }
+          if (i > 1) {
+            info = info +"\n${listaKeys[i].toString( )}: ${listaValues[i].toString( )}";
+          }
         }
         i=i+1;
       }
     }else
       info = "Este producto no posee datos";
     return Text("$info");
+  }
+
+  void borrarDelCarrito(Set<String> _saved, FirebaseUser _user){
+    int largo = _saved.length;
+    int i;
+    try {
+      for (i = 0; i < largo; i++) {
+        Firestore.instance
+            .collection( 'usuarios' )
+            .document( _user.uid )
+            .collection( 'Carrito' ).document( _saved.elementAt( i ) )
+            .delete( );
+      }
+      _saved.clear();
+    }catch (error) {
+      return _showAlert( 'Ocurrió un error al borrar los productos' );
+    }
+    return _showAlert( "Se borraron los productos" );
+  }
+  void _showAlert(String notify) {
+    // flutter defined function
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          title: new Text("Aviso"),
+          content: new Text(notify),
+          actions: <Widget>[
+            // usually buttons at the bottom of the dialog
+            new FlatButton(
+              child: new Text("Ok"),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+  void goToComprarCarrito(BuildContext context){
+    Navigator.push(
+        context,
+        MaterialPageRoute( builder: (context) => ComprarCarrito()));
+  }
+
+  void revisarCarrrito(List<DocumentSnapshot> listDocuments, String uid) {
+    int length;
+    int i;
+    if(listDocuments.length > 0){
+      length = listDocuments.length;
+      for(i=0;i<length;i++){
+        if(listDocuments.elementAt(i).data["Cantidad"] == null){
+          Firestore.instance
+              .collection('usuarios')
+              .document(uid)
+              .collection('Carrito')
+              .document(listDocuments.elementAt(i).documentID)
+              .updateData({"Cantidad": '1'});
+        }
+      }
+    }
   }
 }

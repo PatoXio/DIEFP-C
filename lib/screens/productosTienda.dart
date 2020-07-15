@@ -8,19 +8,6 @@ import 'package:provider/provider.dart';
 import 'createProducto.dart';
 import 'home.dart';
 
-/*class CarritoScreen extends StatefulWidget {
-  static Route<dynamic> route() {
-    return MaterialPageRoute(
-      builder: (context) => CarritoScreen( ),
-    );
-  }
-
-  @override
-  State<StatefulWidget> createState() {
-    // TODO: implement createState
-    throw UnimplementedError();
-  }
-}*/
 class ProductosTienda extends StatefulWidget{
   @override
   _ProductosTiendaState createState() => _ProductosTiendaState();
@@ -111,13 +98,15 @@ class _ProductosTiendaState extends State<ProductosTienda> {
     String info;
     if (listaKeys!=null){
       while(i<listaKeys.length){
-        if(i==1){
-          info = "${listaKeys[i].toString()}: ${listaValues[i].toString()}";
+        if (listaKeys[i].toString().compareTo("Tienda")!=0) {
+          if (i == 1) {
+            info = "${listaKeys[i].toString( )}: ${listaValues[i].toString( )}";
+          }
+          if (i > 1) {
+            info = info +"\n${listaKeys[i].toString( )}: ${listaValues[i].toString( )}";
+          }
         }
-        if(i>1){
-          info = info + "\n${listaKeys[i].toString()}: ${listaValues[i].toString()}";
-        }
-        i=i+1;
+          i=i+1;
       }
     }else
       info = "Este producto no posee datos";

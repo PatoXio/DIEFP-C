@@ -25,6 +25,7 @@ dependencies:
   google_sign_in: ^4.4.4
   mailer: ^3.0.4
   firebase_auth: ^0.16.0
+  flutter_counter: ^1.0.3
   google_maps_flutter: ^0.5.28+1
   flutter_phoenix: ^0.1.0
   geocoder: ^0.1.2

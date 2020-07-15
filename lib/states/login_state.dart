@@ -13,6 +13,7 @@ class LoginState with ChangeNotifier {
   FirebaseUser _user;
   List<DocumentSnapshot> _carrito;
   List<DocumentSnapshot> _productos;
+  List<DocumentSnapshot> _productosTienda;
 
   String _rol = 'Normal';
   bool _isComplete = false;
@@ -40,13 +41,23 @@ class LoginState with ChangeNotifier {
 
   List<DocumentSnapshot> getProductos() => _productos;
 
+  List<DocumentSnapshot> getProductosTienda() => _productosTienda;
+
   bool isComplete(){
     createState();
     return _isComplete;
   }
 
+  Future<void> actualizarCarrito() async {
+    _carrito = await _getListDocumentCarrito(_user.uid);
+  }
+
   Future<void> actualizarProductos() async {
     _productos = await _getListDocumentProducto(_user.uid);
+  }
+
+  Future<void> verProductosTienda(String id) async {
+    _productosTienda = await _getListDocumentProducto(id);
   }
 
   void login() async {
@@ -121,12 +132,7 @@ class LoginState with ChangeNotifier {
       "email": _user.email,
     });
   }
-
-  Future<void> actualizarCarrito() async {
-    _carrito = await _getListDocumentCarrito(_user.uid);
-  }
-
-
+  
   Future<DocumentSnapshot> _getDocument(String id) async{
     DocumentSnapshot document;
     document = await Firestore.instance
