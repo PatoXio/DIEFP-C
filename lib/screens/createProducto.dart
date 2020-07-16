@@ -253,14 +253,22 @@ class _CrearProductoState extends State<CrearProducto> {
   }
 
   void _createProducto(FirebaseUser _user, String cantidad, String nombre, String codigo, String peso){
+    String reference;
+
+    reference = Firestore.instance
+        .collection('usuarios')
+        .document(_user.uid).path;
     Firestore.instance
         .collection('usuarios')
         .document(_user.uid)
-        .collection('Productos').document(codigo).setData({
+        .collection('Productos')
+        .document(codigo)
+        .setData({
       "Cantidad": cantidad,
       "Codigo": codigo,
       "Mg/u": peso,
       "Nombre": nombre,
+      "Tienda": _user.uid,
     });
   }
   void goToHomeScreen(BuildContext context) {

@@ -1,7 +1,10 @@
+import 'package:diefpc/screens/seguimientoCompra.dart';
 import 'package:flutter/material.dart';
 import 'package:diefpc/screens/carrito.dart';
 import 'package:diefpc/app/app.dart';
 import 'package:diefpc/screens/buscarLocales.dart';
+
+import 'historialComprasUser.dart';
 
 class MenuScreen extends StatefulWidget {
   @override
@@ -79,12 +82,33 @@ class _MenuScreenState extends State<MenuScreen> {
                   iconSize: 40,
                   tooltip: 'Historial',
                   onPressed: () {
-                    //goToCarrito(context);
+                    goToHistorialCompras(context);
                   },
                 ),
                 title: Text('Historial de Compras'),
                 subtitle: Text(
                     'Aquí puedes ver todas las compras que llevas antes de pagar'),
+                /*trailing: Icon(Icons.more_vert),
+                // isThreeLine: true,*/
+              ),
+            ),
+          ),
+          Container(
+            margin: EdgeInsets.only(top: screenHeight / 100),
+            padding: EdgeInsets.only(left: 10, right: 10),
+            child: Card(
+              child: ListTile(
+                leading: IconButton(
+                  icon: Icon(Icons.map),
+                  iconSize: 40,
+                  tooltip: 'Seguimiento',
+                  onPressed: () {
+                    goToSeguimiento(context);
+                  },
+                ),
+                title: Text('Seguimiento Compras'),
+                subtitle: Text(
+                    'Aquí puedes ver los pedidos que vienen en camino'),
                 /*trailing: Icon(Icons.more_vert),
                 // isThreeLine: true,*/
               ),
@@ -96,6 +120,12 @@ class _MenuScreenState extends State<MenuScreen> {
   }
 }
 
+void goToSeguimiento(BuildContext context){
+  Navigator.push(
+      context,
+      MaterialPageRoute( builder: (context) => Seguimiento()));
+}
+
 void goToCarrito(BuildContext context) {
   Navigator.push(
       context, MaterialPageRoute(builder: (context) => CarritoCompras()));
@@ -104,4 +134,8 @@ void goToCarrito(BuildContext context) {
 void goToLocales(BuildContext context) {
   Navigator.push(
       context, MaterialPageRoute(builder: (context) => LocalesScreen()));
+}
+void goToHistorialCompras(BuildContext context) {
+  Navigator.push(
+      context, MaterialPageRoute(builder: (context) => HistorialCompras()));
 }

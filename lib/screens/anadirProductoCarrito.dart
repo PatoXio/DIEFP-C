@@ -195,14 +195,14 @@ class AnadirProcutoCarrito extends StatelessWidget {
   // ignore: non_constant_identifier_names
   Widget TextProducto(BuildContext context, List listaKeys, List listaValues){
     int i = 0;
-    String info;
+    String info = '';
     if (listaKeys!=null){
       while(i<listaKeys.length){
         if (listaKeys[i].toString( ).compareTo( "Tienda" ) != 0) {
           if (i == 1)
             info = "${listaKeys[i].toString( )}: ${listaValues[i].toString( )}";
           if (i > 1)
-            info = info +"\n${listaKeys[i].toString( )}: ${listaValues[i].toString( )}";
+            info = info +"${listaKeys[i].toString( )}: ${listaValues[i].toString( )}\n";
         }
         i=i+1;
       }

@@ -1,4 +1,5 @@
 //import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:diefpc/screens/seguimientoCompra.dart';
 import 'package:flutter_counter/flutter_counter.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:diefpc/states/login_state.dart';
@@ -60,15 +61,15 @@ class _ListTileItemState extends State<ListTileItem> {
   }
   Widget TextProducto(BuildContext context, List listaKeys, List listaValues){
     int i = 0;
-    String info;
+    String info = '';
     if (listaKeys!=null) {
       while (i < listaKeys.length) {
         if (listaKeys[i].toString( ).compareTo( "Tienda" ) != 0) {
           if (i == 1) {
-            info = "${listaKeys[i].toString( )}: ${listaValues[i].toString( )}";
+            info = "${listaKeys[i].toString( )}: ${listaValues[i].toString( )}\n";
           }
           if (i > 1) {
-            info = info +"\n${listaKeys[i].toString( )}: ${listaValues[i].toString( )}";
+            info = info +"${listaKeys[i].toString( )}: ${listaValues[i].toString( )}\n";
           }
         }
         i = i + 1;
@@ -239,6 +240,7 @@ class _ComprarCarritoState extends State<ComprarCarrito> {
                     FloatingActionButton.extended(
                       heroTag: "boton2c",
                       onPressed: () {
+                        goToSeguimiento(context, _user.uid, carrito);
                       },
                       label: Text("Pagar", style: TextStyle(fontSize: 15)),
                       backgroundColor: Colors.blue,
@@ -286,10 +288,62 @@ class _ComprarCarritoState extends State<ComprarCarrito> {
     return 1000;
   }
 
-  void goToCreateProducto(BuildContext context){
+  void goToSeguimiento(BuildContext context, String uid, List<DocumentSnapshot> carrito){
+    DateTime fecha = DateTime.now();
+    int i;
+    int j;
+    int x;
+    String pivot;
+    int cont = 0;
+    final _saved = Set<String>();
+    final _deleted = Set<String>();
+
+    if(carrito != null){
+      for(i=0;i<carrito.length;i++) {
+        pivot = carrito.elementAt( i ).data["Tienda"].toString( );
+        if (_deleted.contains( pivot ) == false){
+          _saved.add(i.toString());
+          for (j = i + 1; j < carrito.length; j++) {
+            if (pivot.compareTo( carrito.elementAt( j ).data["Tienda"].toString( ) ) == 0) {
+              _saved.add(j.toString());
+            }
+          }
+          for(x=0;x<_saved.length;x++){
+            Firestore.instance
+                .collection('usuarios')
+                .document(uid)
+                .collection('Historial')
+                .document("$fecha:${carrito.elementAt(x).data["Tienda"]}")
+                .setData({
+              "Fecha": fecha,
+              "Pendiente": true,
+              "Entregado": false,
+              "Tienda": carrito.elementAt(x).data["Tienda"]});
+
+            Firestore.instance
+                .collection('usuarios')
+                .document(uid)
+                .collection('Historial')
+                .document("$fecha:${carrito.elementAt(x).data["Tienda"]}")
+                .collection('ComprasRealizada')
+                .document('Producto:$fecha:$cont')
+                .setData(carrito.elementAt(x).data);
+
+            Firestore.instance
+                .collection('usuarios')
+                .document(uid).collection('Carrito')
+                .document(carrito.elementAt(x).documentID)
+                .delete();
+          }
+          _deleted.add(_saved.first);
+          _saved.clear();
+          cont++;
+        }
+      }
+    }
     Navigator.push(
         context,
-        MaterialPageRoute( builder: (context) => CrearProducto()));
+        MaterialPageRoute( builder: (context) => Seguimiento()));
   }
 
   void goToCarrito(BuildContext context) {
