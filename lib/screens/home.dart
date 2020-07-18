@@ -45,6 +45,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   configMenu(context);
                 }),
           ],
+          leading: new IconButton(
+            icon: new Icon(Icons.home, color: Colors.blue),
+          ),
         ),
         body: Column(
           children: <Widget>[
@@ -81,6 +84,19 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                           title: Text(
                             "Tu rol de Usuario es: ${_rol(rol)}.",
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        ListTile(
+                          leading: Icon(
+                            Icons.email,
+                            size: 45,
+                          ),
+                          title: Text(
+                            "Correo: ${_user.email}.",
                             style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,

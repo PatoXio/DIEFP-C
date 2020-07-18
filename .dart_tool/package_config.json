@@ -2,6 +2,12 @@
   "configVersion": 2,
   "packages": [
     {
+      "name": "analog_clock",
+      "rootUri": "file:///D:/SRC/flutter/.pub-cache/hosted/pub.dartlang.org/analog_clock-0.0.4",
+      "packageUri": "lib/",
+      "languageVersion": "2.1"
+    },
+    {
       "name": "async",
       "rootUri": "file:///D:/SRC/flutter/.pub-cache/hosted/pub.dartlang.org/async-2.4.1",
       "packageUri": "lib/",
@@ -68,6 +74,12 @@
       "languageVersion": "2.1"
     },
     {
+      "name": "date_format",
+      "rootUri": "file:///D:/SRC/flutter/.pub-cache/hosted/pub.dartlang.org/date_format-1.0.8",
+      "packageUri": "lib/",
+      "languageVersion": "2.0"
+    },
+    {
       "name": "english_words",
       "rootUri": "file:///D:/SRC/flutter/.pub-cache/hosted/pub.dartlang.org/english_words-3.1.5",
       "packageUri": "lib/",
@@ -128,6 +140,12 @@
       "languageVersion": "2.0"
     },
     {
+      "name": "flappy_search_bar",
+      "rootUri": "file:///D:/SRC/flutter/.pub-cache/hosted/pub.dartlang.org/flappy_search_bar-1.4.1",
+      "packageUri": "lib/",
+      "languageVersion": "2.1"
+    },
+    {
       "name": "flutter",
       "rootUri": "file:///D:/SRC/flutter/packages/flutter",
       "packageUri": "lib/",
@@ -136,6 +154,12 @@
     {
       "name": "flutter_bloc",
       "rootUri": "file:///D:/SRC/flutter/.pub-cache/hosted/pub.dartlang.org/flutter_bloc-0.18.3",
+      "packageUri": "lib/",
+      "languageVersion": "2.0"
+    },
+    {
+      "name": "flutter_counter",
+      "rootUri": "file:///D:/SRC/flutter/.pub-cache/hosted/pub.dartlang.org/flutter_counter-1.0.3",
       "packageUri": "lib/",
       "languageVersion": "2.0"
     },
@@ -162,6 +186,12 @@
       "rootUri": "file:///D:/SRC/flutter/.pub-cache/hosted/pub.dartlang.org/flutter_polyline_points-0.2.1",
       "packageUri": "lib/",
       "languageVersion": "2.1"
+    },
+    {
+      "name": "flutter_staggered_grid_view",
+      "rootUri": "file:///D:/SRC/flutter/.pub-cache/hosted/pub.dartlang.org/flutter_staggered_grid_view-0.3.0",
+      "packageUri": "lib/",
+      "languageVersion": "1.19"
     },
     {
       "name": "flutter_test",
@@ -464,7 +494,7 @@
       "languageVersion": "2.6"
     }
   ],
-  "generated": "2020-07-02T02:35:48.732585Z",
+  "generated": "2020-07-17T11:04:14.448269Z",
   "generator": "pub",
   "generatorVersion": "2.9.0-14.1.beta"
 }

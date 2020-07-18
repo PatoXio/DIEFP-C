@@ -7,12 +7,18 @@ import 'package:shared_preferences/shared_preferences.dart' show SharedPreferenc
 class LoginState with ChangeNotifier {
   final GoogleSignIn _googleSignIn = GoogleSignIn( );
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  
+
+  String _nombreTienda;
   SharedPreferences _prefs;
   DocumentSnapshot document;
+  DocumentSnapshot _producto;
   FirebaseUser _user;
   List<DocumentSnapshot> _carrito;
   List<DocumentSnapshot> _productos;
+  List<DocumentSnapshot> _productosTienda;
+  List<DocumentSnapshot> _historial;
+  List<DocumentSnapshot> _historialPendiente;
+  List<DocumentSnapshot> _historialProductos;
 
   String _rol = 'Normal';
   bool _isComplete = false;
@@ -35,18 +41,58 @@ class LoginState with ChangeNotifier {
   FirebaseUser currentUser() => _user;
 
   DocumentSnapshot getDocument() => document;
-  
+
+  DocumentSnapshot getProducto() => _producto;
+
   List<DocumentSnapshot> getCarrito() => _carrito;
 
+  String getNombreTienda() => _nombreTienda;
+
+  List<DocumentSnapshot> getHistorial() => _historial;
+
   List<DocumentSnapshot> getProductos() => _productos;
+
+  List<DocumentSnapshot> getProductosTienda() => _productosTienda;
+
+  List<DocumentSnapshot> getHistorialPendientes() => _historialPendiente;
+
+  List<DocumentSnapshot> getHistorialProductos() => _historialProductos;
 
   bool isComplete(){
     createState();
     return _isComplete;
   }
 
+  Future<void> nombreTienda(String idTienda,) async {
+    DocumentSnapshot snapshot = await Firestore.instance.collection('usuarios').document(idTienda).get();
+    _nombreTienda = snapshot.data["Nombre"];
+  }
+
+  Future<void> actualizarHistorialProductos(String idDocument) async {
+    _historialProductos = await _getListDocumentHistorialProductos(idDocument);
+  }
+
+  Future<void> actualizarHistorial() async{
+    _historial = await _getListDocumentHistorial(_user.uid);
+    _historialPendiente = await _getListDocumentHistorialPendientes(_user.uid);
+  }
+
+  Future<void> actualizarCarrito() async {
+    _carrito = await _getListDocumentCarrito(_user.uid);
+  }
+
   Future<void> actualizarProductos() async {
+    _loading = true;
     _productos = await _getListDocumentProducto(_user.uid);
+    _loading = false;
+  }
+
+  Future<void> actualizarProducto(String id) async{
+    _producto = await _getDocumentSnapshot(id);
+  }
+
+  Future<void> verProductosTienda(String id) async {
+    _productosTienda = await _getListDocumentProducto(id);
   }
 
   void login() async {
@@ -87,6 +133,8 @@ class LoginState with ChangeNotifier {
       _carrito = await _getListDocumentCarrito(_user.uid);
       _rol = await _getRol(_user.uid, _rol);
       _productos = await _getListDocumentProducto(_user.uid);
+      _historial = await _getListDocumentHistorial(_user.uid);
+      _historialPendiente = await _getListDocumentHistorialPendientes(_user.uid);
       _loading = false;
       notifyListeners();
     }
@@ -159,6 +207,50 @@ class LoginState with ChangeNotifier {
         .collection("usuarios")
         .document(id)
         .collection("Productos").getDocuments()).documents;
+
+    return listDocument;
+  }
+
+  Future<DocumentSnapshot> _getDocumentSnapshot(String id) async{
+    Future<DocumentSnapshot> Document;
+    Document = (await Firestore.instance
+        .collection("usuarios")
+        .document(_user.uid)
+        .collection("Productos").document(id)).get();
+
+    return Document;
+  }
+
+  Future<List<DocumentSnapshot>> _getListDocumentHistorial(String id) async{
+    List<DocumentSnapshot> listDocument;
+    listDocument = (await Firestore.instance
+        .collection("usuarios")
+        .document(id)
+        .collection("Historial")
+        .getDocuments()).documents;
+
+    return listDocument;
+  }
+  Future<List<DocumentSnapshot>> _getListDocumentHistorialProductos(String idDocument) async{
+    List<DocumentSnapshot> listDocument;
+    listDocument = (await Firestore.instance
+        .collection("usuarios")
+        .document(_user.uid)
+        .collection("Historial")
+        .document(idDocument)
+        .collection('ComprasRealizada')
+        .getDocuments()).documents;
+
+    return listDocument;
+  }
+  Future<List<DocumentSnapshot>> _getListDocumentHistorialPendientes(String id) async{
+    List<DocumentSnapshot> listDocument;
+    listDocument = (await Firestore.instance
+        .collection("usuarios")
+        .document(id)
+        .collection("Historial")
+        .where("Entregado", isEqualTo: false)
+        .getDocuments()).documents;
 
     return listDocument;
   }

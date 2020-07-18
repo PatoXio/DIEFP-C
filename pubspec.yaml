@@ -23,11 +23,15 @@ dependencies:
   cloud_firestore: ^0.13.5
   dart_rut_validator: ^1.0.0
   google_sign_in: ^4.4.4
+  date_format: ^1.0.8
   mailer: ^3.0.4
+  analog_clock: ^0.0.1
   firebase_auth: ^0.16.0
+  flutter_counter: ^1.0.3
   google_maps_flutter: ^0.5.28+1
   flutter_phoenix: ^0.1.0
   geocoder: ^0.1.2
+  flappy_search_bar: 1.4.1
   url_launcher: ^5.4.11
   location: ^3.0.2
   great_circle_distance: ^1.0.1

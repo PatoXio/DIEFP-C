@@ -171,6 +171,26 @@ class _CrearProductoState extends State<CrearProducto> {
                           height: 15,
                         ),
                         TextFormField(
+                          maxLength: 9,
+                          validator: (value){
+                            if(value.isEmpty){
+                              return 'Por favor ingrese el precio del producto';
+                            }
+                          },
+                          keyboardType: TextInputType.number,
+                          inputFormatters: <TextInputFormatter>[
+                            WhitelistingTextInputFormatter.digitsOnly],
+                          decoration: InputDecoration(
+                            labelText: "Precio en pesos",
+                          ),
+                          onChanged: (String value){
+                            modelProducto.precio = value;
+                          },
+                        ),
+                        SizedBox(
+                          height: 15,
+                        ),
+                        TextFormField(
                           maxLength: 30,
                           validator: (value){
                             if(value.isEmpty){
@@ -217,7 +237,7 @@ class _CrearProductoState extends State<CrearProducto> {
                                   borderRadius: BorderRadius.circular( 15 ) ),
                               onPressed: () {
                                 if(_formKey.currentState.validate()) {
-                                    _createProducto(_user,modelProducto.cantidad,modelProducto.nombre,modelProducto.codigo, modelProducto.peso);
+                                    _createProducto(_user,modelProducto.cantidad,modelProducto.nombre,modelProducto.codigo, modelProducto.peso, modelProducto.precio);
                                   }
                                   /*Navigator.push(
                                       context,
@@ -252,15 +272,24 @@ class _CrearProductoState extends State<CrearProducto> {
     );
   }
 
-  void _createProducto(FirebaseUser _user, String cantidad, String nombre, String codigo, String peso){
+  void _createProducto(FirebaseUser _user, String cantidad, String nombre, String codigo, String peso, String precio){
+    String reference;
+
+    reference = Firestore.instance
+        .collection('usuarios')
+        .document(_user.uid).path;
     Firestore.instance
         .collection('usuarios')
         .document(_user.uid)
-        .collection('Productos').document(codigo).setData({
-      "Cantidad": cantidad,
+        .collection('Productos')
+        .document(codigo)
+        .setData({
+      "Stock": cantidad,
       "Codigo": codigo,
       "Mg/u": peso,
       "Nombre": nombre,
+      "Precio": precio,
+      "Tienda": _user.uid,
     });
   }
   void goToHomeScreen(BuildContext context) {

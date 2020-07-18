@@ -1,8 +1,11 @@
+import 'package:diefpc/app/app.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
+
+import 'anadirProductoCarrito.dart';
 
 const double CAMERA_ZOOM = 16;
 const double CAMERA_TILT = 80;
@@ -16,6 +19,9 @@ class LocalesScreen extends StatefulWidget{
 }
 
 class _LocalesScreenState extends State<LocalesScreen> {
+  String tiendaTest = "TiendaTest";
+  double screenlong;
+  double screenHeight;
   Completer<GoogleMapController> _controller = Completer();
   Set<Marker> _markers = Set<Marker>();
 // para mis rutas dibujadas en el mapa
@@ -77,6 +83,8 @@ class _LocalesScreenState extends State<LocalesScreen> {
   }
   @override
   Widget build(BuildContext context) {
+    screenlong = MediaQuery.of(context).size.longestSide;
+    screenHeight = MediaQuery.of(context).size.height;
     CameraPosition initialCameraPosition = CameraPosition(
         zoom: CAMERA_ZOOM,
         tilt: CAMERA_TILT,
@@ -93,23 +101,134 @@ class _LocalesScreenState extends State<LocalesScreen> {
       );
     }
     return Scaffold(
-      body: Stack(
-        children: <Widget>[
-          GoogleMap(
-              myLocationEnabled: true,
-              compassEnabled: true,
-              tiltGesturesEnabled: false,
-              markers: _markers,
-              polylines: _polylines,
-              mapType: MapType.normal,
-              initialCameraPosition: initialCameraPosition,
-              onMapCreated: (GoogleMapController controller) {
-                _controller.complete(controller);
-                // mi mapa ha terminado de ser creado;
-                // estoy listo para mostrar los pines en el mapa
-                showPinsOnMap();
-              })
+      appBar: AppBar(
+        title: Text("Tiendas"),
+        actions: <Widget>[
+          IconButton(icon: Icon(Icons.list),
+              tooltip: 'Configuración',
+              onPressed: (){
+                configMenu(context);
+              }
+          ),
         ],
+      ),
+      body: Container(
+        margin: EdgeInsets.only(top: screenHeight / 100),
+        padding: EdgeInsets.only(left: 10, right: 10),
+        child: Column(
+          children: <Widget>[
+            Container(
+              height: screenHeight / 2,
+              child: Card(
+                //elevation: 5,
+                margin: EdgeInsets.all(10),
+                semanticContainer: true,
+                color: Colors.transparent,
+                child: GoogleMap(
+                    myLocationEnabled: true,
+                    compassEnabled: true,
+                    tiltGesturesEnabled: false,
+                    markers: _markers,
+                    polylines: _polylines,
+                    mapType: MapType.normal,
+                    initialCameraPosition: initialCameraPosition,
+                    onMapCreated: (GoogleMapController controller) {
+                      _controller.complete(controller);
+                      // mi mapa ha terminado de ser creado;
+                      // estoy listo para mostrar los pines en el mapa
+                      showPinsOnMap();
+                    }),
+              ),
+            ),
+            Container(
+              height: screenHeight / 2.6,
+              child: Card(
+                //elevation: 10,
+                margin: EdgeInsets.all(10),
+                semanticContainer: true,
+                //color: Colors.transparent,
+                child: Theme(
+                  data: ThemeData(
+                    highlightColor: Colors.blue, //Does not work
+                  ),
+                  child: Scrollbar(
+                    //isAlwaysShown: true,
+                        child: ListView(
+                            children: <Widget> [
+                              Card(
+                                elevation: 5,
+                                child: ListTile(
+                                  leading: IconButton(
+                                    icon: Icon(Icons.local_hospital),
+                                    iconSize: 50,
+                                    tooltip: 'Productos', onPressed: () {
+                                  },
+                                  ),
+                                  title: Text("_nombreTienda1", style: TextStyle(fontSize: 20, color: Colors.black)),
+                                  subtitle: Text("\n_distancia", style: TextStyle(fontSize: 16.5, color: Colors.black)),
+                                  trailing: FloatingActionButton.extended(
+                                    heroTag: "boton1",
+                                    onPressed: () {
+                                      goProductosTest(tiendaTest);
+                                    },
+                                    label: Text("Ir", style: TextStyle(fontSize: 20)),
+                                    backgroundColor: Colors.blue,
+                                  ),
+                                  isThreeLine: true,
+                                )
+                              ),
+                              Card(
+                                elevation: 5,
+                                child: ListTile(
+                                  leading: IconButton(
+                                    icon: Icon(Icons.local_hospital),
+                                    iconSize: 50,
+                                    tooltip: 'Productos', onPressed: () {
+                                  },
+                                  ),
+                                  title: Text("_nombreTienda2", style: TextStyle(fontSize: 20, color: Colors.black)),
+                                  subtitle: Text("\n_distancia", style: TextStyle(fontSize: 16.5, color: Colors.black)),
+                                  trailing: FloatingActionButton.extended(
+                                    heroTag: "boton2",
+                                    onPressed: () {
+                                      goProductosTest(tiendaTest);
+                                    },
+                                    label: Text("Ir", style: TextStyle(fontSize: 20)),
+                                    backgroundColor: Colors.blue,
+                                  ),
+                                  isThreeLine: true,
+                                ),
+                              ),
+                              Card(
+                                elevation: 5,
+                                child: ListTile(
+                                  leading: IconButton(
+                                    icon: Icon(Icons.local_hospital),
+                                    iconSize: 50,
+                                    tooltip: 'Productos', onPressed: () {
+                                  },
+                                  ),
+                                  title: Text("_nombreTienda3", style: TextStyle(fontSize: 20, color: Colors.black)),
+                                  subtitle: Text("\n_distancia", style: TextStyle(fontSize: 16.5, color: Colors.black)),
+                                  trailing: FloatingActionButton.extended(
+                                    heroTag: "boton3",
+                                    onPressed: () {
+                                      goProductosTest(tiendaTest);
+                                    },
+                                    label: Text("Ir", style: TextStyle(fontSize: 20)),
+                                    backgroundColor: Colors.blue,
+                                  ),
+                                  isThreeLine: true,
+                                ),
+                              ),
+                            ],
+                        ),
+                      ),
+                  ),
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }
@@ -193,5 +312,9 @@ class _LocalesScreenState extends State<LocalesScreen> {
           icon: sourceIcon
       ));
     });
+  }
+  void goProductosTest(String test){
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => AnadirProcutoCarrito(tiendaTest)));
   }
 }
