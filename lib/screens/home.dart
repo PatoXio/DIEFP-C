@@ -45,6 +45,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   configMenu(context);
                 }),
           ],
+          leading: new IconButton(
+            icon: new Icon(Icons.home, color: Colors.blue),
+          ),
         ),
         body: Column(
           children: <Widget>[

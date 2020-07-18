@@ -15,8 +15,7 @@ class AnadirProcutoCarrito extends StatelessWidget {
   double screenlong;
   double screenHeight;
   int carritoLength;
-  final _saved = Set<String>();
-
+  var _saved = Set<String>();
   AnadirProcutoCarrito(String idTienda){
     this.idTienda = idTienda;
   }

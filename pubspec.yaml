@@ -31,6 +31,7 @@ dependencies:
   google_maps_flutter: ^0.5.28+1
   flutter_phoenix: ^0.1.0
   geocoder: ^0.1.2
+  flappy_search_bar: 1.4.1
   url_launcher: ^5.4.11
   location: ^3.0.2
   great_circle_distance: ^1.0.1

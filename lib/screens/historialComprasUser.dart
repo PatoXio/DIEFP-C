@@ -1,34 +1,17 @@
-import 'dart:wasm';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:diefpc/states/login_state.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:diefpc/app/app.dart';
 import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
+import 'historialProductosUser.dart';
 
-import 'ComprarCarrito.dart';
-
-/*class CarritoScreen extends StatefulWidget {
-  static Route<dynamic> route() {
-    return MaterialPageRoute(
-      builder: (context) => CarritoScreen( ),
-    );
-  }
-
-  @override
-  State<StatefulWidget> createState() {
-    // TODO: implement createState
-    throw UnimplementedError();
-  }
-}*/
 class HistorialCompras extends StatefulWidget{
   @override
   _HistorialComprasState createState() => _HistorialComprasState();
 }
 
 class _HistorialComprasState extends State<HistorialCompras>{
-  final _saved = Set<String>();
   List<DocumentSnapshot> listDocuments;
   double screenlong;
   double screenHeight;
@@ -94,28 +77,42 @@ class _HistorialComprasState extends State<HistorialCompras>{
   Widget buildBody(BuildContext context, int index) {
      List<DocumentSnapshot> listDocuments = Provider.of<LoginState>(context).getHistorial();
      String idTienda = listDocuments[index].data["Tienda"];
+     String fecha = DateFormat('yyyy-MM-dd – kk:mm').format(DateTime.parse(listDocuments[index].data["Fecha"].toString()));
      Provider.of<LoginState>(context).nombreTienda(idTienda);
      String nombre = Provider.of<LoginState>(context).getNombreTienda();
+     String idDocument = listDocuments[index].documentID;
      return Card(
-      child:
-      ListTile(
+      child: ListTile(
         leading: IconButton(
-          icon: Icon(Icons.local_hospital),
-          iconSize: 40,
+          icon: Icon(Icons.shop_two, size: 40,),
+          iconSize: 20,
           tooltip: 'Productos', onPressed: () {
         },
         ),
-        title: Text(listDocuments[index].data["Fecha"]),
-        subtitle: Text("$nombre"),
-        //trailing: _iconTravel(listDocuments[index].documentID),
+        title: Text("$fecha"),
+        subtitle: Text("Tienda: $nombre\n"
+            "Total Pagado: ${listDocuments[index].data["Total Pagado"].toString()}\n"
+            "Medio de Pago: ${listDocuments[index].data["Medio de Pago"]}"),
+        trailing: FloatingActionButton(
+          heroTag: "hero$index",
+          child: Text("Ver"),
+          onPressed: () {
+            goToComprasHechas(
+                context,
+                idTienda,
+                idDocument,
+                listDocuments[index].data["Total Pagado"].toString(),
+                listDocuments[index].data["Costo de Envío"].toString());
+          },
+          ),
         isThreeLine: true,
     )
     );
   }
 
-  void goToComprarCarrito(BuildContext context){
+  void goToComprasHechas(BuildContext context, String idTienda, String idDocument, String totalPagado, String costoEnvio){
     Navigator.push(
         context,
-        MaterialPageRoute( builder: (context) => ComprarCarrito()));
+        MaterialPageRoute( builder: (context) => new HistorialProductos(idTienda, idDocument, totalPagado, costoEnvio)));
   }
 }

@@ -1,3 +1,4 @@
+import 'package:diefpc/screens/home.dart';
 import 'package:diefpc/screens/seguimientoCompra.dart';
 import 'package:flutter/material.dart';
 import 'package:diefpc/screens/carrito.dart';
@@ -28,6 +29,15 @@ class _MenuScreenState extends State<MenuScreen> {
                 configMenu(context);
               }),
         ],
+        leading: new IconButton(
+          icon: new Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => HomeScreen()),
+            );
+            },
+        ),
       ),
       body: Column(
         children: <Widget>[

@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:diefpc/app/app.dart';
+import 'package:diefpc/screens/Menu.dart';
+import 'package:diefpc/screens/historialProductosUser.dart';
 import 'package:diefpc/states/login_state.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
@@ -143,12 +145,29 @@ class _ListTileHistoryState extends State<ListTileHistory> {
       return Container(
         child: Column(
           children: [
-            Text( "Pedido ${widget.index+1}", style: TextStyle(
-              fontSize: 25, color: Colors.blue, fontWeight: FontWeight.bold, ), ),
+            FloatingActionButton.extended(
+              heroTag: "hero${widget.index}",
+              label: Text("Pedido ${widget.index+1}",
+                  style: TextStyle(
+                      fontSize: 15,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold
+                  )
+              ),
+              onPressed: (){
+                Navigator.push(
+                    context,
+                    MaterialPageRoute( builder: (context) => HistorialProductos(
+                        listDocuments[widget.index].data["Tienda"],
+                        "${listDocuments[widget.index].data["Fecha"]}:${listDocuments[widget.index].data["Tienda"]}",
+                        listDocuments[widget.index].data["Total Pagado"].toString(),
+                        listDocuments[widget.index].data["Costo de Envío"].toString()
+                    )));
+        },
+      ),
             Container(
               height: screenHeight / 3.5,
               child: Card(
-                //elevation: 5,
                 margin: EdgeInsets.all( 10 ),
                 semanticContainer: true,
                 color: Colors.transparent,
@@ -269,18 +288,13 @@ class _ListTileHistoryState extends State<ListTileHistory> {
       return Container(
           child: Column(
             children: [
-              Text( "Pedido ${widget.index+1} Entregado",
-                  style: TextStyle(
-                      fontSize: 0,
-                      color: Colors.blue,
-                      fontWeight: FontWeight.bold
-                  )
-              ),
-            ],
+              Text("Pedido ${widget.index+1} Entregado")
+            ]
           )
       );
     }
   }
+
   void showPinsOnMap() {
 // obtener un LatLng para la ubicación de origen
     // del objeto LocationData currentLocation
@@ -361,6 +375,15 @@ class _SeguimientoState extends State<Seguimiento> {
               }
           ),
         ],
+          leading: new IconButton(
+            icon: new Icon(Icons.arrow_back),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => MenuScreen()),
+              );
+            },
+          ),
       ),
       body: Container(
         margin: EdgeInsets.only(top: screenHeight / 100),

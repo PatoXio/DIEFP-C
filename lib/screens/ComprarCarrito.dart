@@ -90,8 +90,10 @@ class _ListTileItemState extends State<ListTileItem> {
 class _ComprarCarritoState extends State<ComprarCarrito> {
   double screenlong;
   double screenHeight;
+  int costoTotal;
   String medioDePago = 'WebPay';
   List<DocumentSnapshot> carrito;
+
   @override
   Widget build(BuildContext context) {
     final _user = Provider.of<LoginState>(context).currentUser();
@@ -99,6 +101,7 @@ class _ComprarCarritoState extends State<ComprarCarrito> {
     screenHeight = MediaQuery.of(context).size.height;
     Provider.of<LoginState>(context).actualizarCarrito();
     carrito = Provider.of<LoginState>(context).getCarrito();
+    costoTotal = _totalCosto(carrito, _costoEnvio(), _user.uid );
     return Scaffold(
       appBar: AppBar(
         title: Text("Productos De La Tienda"),
@@ -289,7 +292,7 @@ class _ComprarCarritoState extends State<ComprarCarrito> {
   }
 
   void goToSeguimiento(BuildContext context, String uid, List<DocumentSnapshot> carrito){
-    DateTime fecha = DateTime.now();
+    String fecha = DateTime.now().toString();
     int i;
     int j;
     int x;
@@ -318,6 +321,9 @@ class _ComprarCarritoState extends State<ComprarCarrito> {
               "Fecha": fecha,
               "Pendiente": true,
               "Entregado": false,
+              "Medio de Pago": medioDePago,
+              "Total Pagado": costoTotal,
+              "Costo de Envío": _costoEnvio(),
               "Tienda": carrito.elementAt(x).data["Tienda"]});
 
             Firestore.instance
