@@ -1,9 +1,11 @@
 import 'package:diefpc/screens/home.dart';
 import 'package:diefpc/screens/seguimientoCompra.dart';
+import 'package:diefpc/states/login_state.dart';
 import 'package:flutter/material.dart';
 import 'package:diefpc/screens/carrito.dart';
 import 'package:diefpc/app/app.dart';
 import 'package:diefpc/screens/buscarLocales.dart';
+import 'package:provider/provider.dart';
 
 import 'historialComprasUser.dart';
 
@@ -72,6 +74,7 @@ class _MenuScreenState extends State<MenuScreen> {
                     iconSize: 40,
                     tooltip: 'Locales',
                     onPressed: () {
+                      Provider.of<LoginState>(context).actualizarTiendas();
                       goToLocales(context);
                     },
                   ),

@@ -1,8 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:diefpc/app/app.dart';
+import 'package:diefpc/states/login_state.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'dart:async';
 
 import 'anadirProductoCarrito.dart';
@@ -22,6 +25,7 @@ class _LocalesScreenState extends State<LocalesScreen> {
   String tiendaTest = "TiendaTest";
   double screenlong;
   double screenHeight;
+  Stream<QuerySnapshot> _query;
   Completer<GoogleMapController> _controller = Completer();
   Set<Marker> _markers = Set<Marker>();
 // para mis rutas dibujadas en el mapa
@@ -100,137 +104,95 @@ class _LocalesScreenState extends State<LocalesScreen> {
           bearing: CAMERA_BEARING
       );
     }
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Tiendas"),
-        actions: <Widget>[
-          IconButton(icon: Icon(Icons.list),
-              tooltip: 'Configuración',
-              onPressed: (){
-                configMenu(context);
-              }
-          ),
-        ],
-      ),
-      body: Container(
-        margin: EdgeInsets.only(top: screenHeight / 100),
-        padding: EdgeInsets.only(left: 10, right: 10),
-        child: Column(
-          children: <Widget>[
-            Container(
-              height: screenHeight / 2,
-              child: Card(
-                //elevation: 5,
-                margin: EdgeInsets.all(10),
-                semanticContainer: true,
-                color: Colors.transparent,
-                child: GoogleMap(
-                    myLocationEnabled: true,
-                    compassEnabled: true,
-                    tiltGesturesEnabled: false,
-                    markers: _markers,
-                    polylines: _polylines,
-                    mapType: MapType.normal,
-                    initialCameraPosition: initialCameraPosition,
-                    onMapCreated: (GoogleMapController controller) {
-                      _controller.complete(controller);
-                      // mi mapa ha terminado de ser creado;
-                      // estoy listo para mostrar los pines en el mapa
-                      showPinsOnMap();
-                    }),
+
+    return Consumer(
+      builder: (BuildContext context, LoginState state, Widget child){
+        _query = Provider.of<LoginState>(context).getTiendas();
+        return Scaffold(
+          appBar: AppBar(
+            title: Text("Tiendas"),
+            actions: <Widget>[
+              IconButton(icon: Icon(Icons.list),
+                  tooltip: 'Configuración',
+                  onPressed: (){
+                    configMenu(context);
+                  }
               ),
-            ),
-            Container(
-              height: screenHeight / 2.6,
-              child: Card(
-                //elevation: 10,
-                margin: EdgeInsets.all(10),
-                semanticContainer: true,
-                //color: Colors.transparent,
-                child: Theme(
-                  data: ThemeData(
-                    highlightColor: Colors.blue, //Does not work
-                  ),
-                  child: Scrollbar(
-                    //isAlwaysShown: true,
-                        child: ListView(
-                            children: <Widget> [
-                              Card(
-                                elevation: 5,
-                                child: ListTile(
-                                  leading: IconButton(
-                                    icon: Icon(Icons.local_hospital),
-                                    iconSize: 50,
-                                    tooltip: 'Productos', onPressed: () {
-                                  },
-                                  ),
-                                  title: Text("_nombreTienda1", style: TextStyle(fontSize: 20, color: Colors.black)),
-                                  subtitle: Text("\n_distancia", style: TextStyle(fontSize: 16.5, color: Colors.black)),
-                                  trailing: FloatingActionButton.extended(
-                                    heroTag: "boton1",
-                                    onPressed: () {
-                                      goProductosTest(tiendaTest);
-                                    },
-                                    label: Text("Ir", style: TextStyle(fontSize: 20)),
-                                    backgroundColor: Colors.blue,
-                                  ),
-                                  isThreeLine: true,
-                                )
-                              ),
-                              Card(
-                                elevation: 5,
-                                child: ListTile(
-                                  leading: IconButton(
-                                    icon: Icon(Icons.local_hospital),
-                                    iconSize: 50,
-                                    tooltip: 'Productos', onPressed: () {
-                                  },
-                                  ),
-                                  title: Text("_nombreTienda2", style: TextStyle(fontSize: 20, color: Colors.black)),
-                                  subtitle: Text("\n_distancia", style: TextStyle(fontSize: 16.5, color: Colors.black)),
-                                  trailing: FloatingActionButton.extended(
-                                    heroTag: "boton2",
-                                    onPressed: () {
-                                      goProductosTest(tiendaTest);
-                                    },
-                                    label: Text("Ir", style: TextStyle(fontSize: 20)),
-                                    backgroundColor: Colors.blue,
-                                  ),
-                                  isThreeLine: true,
-                                ),
-                              ),
-                              Card(
-                                elevation: 5,
-                                child: ListTile(
-                                  leading: IconButton(
-                                    icon: Icon(Icons.local_hospital),
-                                    iconSize: 50,
-                                    tooltip: 'Productos', onPressed: () {
-                                  },
-                                  ),
-                                  title: Text("_nombreTienda3", style: TextStyle(fontSize: 20, color: Colors.black)),
-                                  subtitle: Text("\n_distancia", style: TextStyle(fontSize: 16.5, color: Colors.black)),
-                                  trailing: FloatingActionButton.extended(
-                                    heroTag: "boton3",
-                                    onPressed: () {
-                                      goProductosTest(tiendaTest);
-                                    },
-                                    label: Text("Ir", style: TextStyle(fontSize: 20)),
-                                    backgroundColor: Colors.blue,
-                                  ),
-                                  isThreeLine: true,
-                                ),
-                              ),
-                            ],
-                        ),
-                      ),
+            ],
+          ),
+          body: Container(
+            margin: EdgeInsets.only(top: screenHeight / 100),
+            padding: EdgeInsets.only(left: 10, right: 10),
+            child: Column(
+              children: <Widget>[
+                Container(
+                  height: screenHeight / 2,
+                  child: Card(
+                    //elevation: 5,
+                    margin: EdgeInsets.all(10),
+                    semanticContainer: true,
+                    color: Colors.transparent,
+                    child: GoogleMap(
+                        myLocationEnabled: true,
+                        compassEnabled: true,
+                        tiltGesturesEnabled: false,
+                        markers: _markers,
+                        polylines: _polylines,
+                        mapType: MapType.normal,
+                        initialCameraPosition: initialCameraPosition,
+                        onMapCreated: (GoogleMapController controller) {
+                          _controller.complete(controller);
+                          // mi mapa ha terminado de ser creado;
+                          // estoy listo para mostrar los pines en el mapa
+                          showPinsOnMap();
+                        }),
                   ),
                 ),
-              ),
-          ],
-        ),
-      ),
-    );
+                Container(
+                  height: screenHeight / 2.6,
+                  child: Card(
+                    //elevation: 10,
+                    margin: EdgeInsets.all(10),
+                    semanticContainer: true,
+                    //color: Colors.transparent,
+                    child: Theme(
+                      data: ThemeData(
+                        highlightColor: Colors.blue, //Does not work
+                      ),
+                      child: Scrollbar(
+                        //isAlwaysShown: true,
+                        child: StreamBuilder<QuerySnapshot>(
+                          stream: _query,
+                          builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                            if (snapshot.hasError)
+                              return new Text('Error: ${snapshot.error}');
+                            switch (snapshot.connectionState) {
+                              case ConnectionState.waiting: return CircularProgressIndicator();
+                              default:
+                                return new ListView(
+                                  children: snapshot.data.documents.map((DocumentSnapshot document) {
+                                    return Card(
+                                      child: new ListTile(
+                                        title: new Text(document.data['nombre']),
+                                          subtitle: new Text("Distancia: < 1 metro"),
+                                        trailing: FloatingActionButton.extended(heroTag: "hero+${document.data["Nombre"]}", onPressed: (){goProductosTest(document.documentID);}, label: Text("Ver")),
+                                      ),
+                                    );
+                                  }).toList(),
+                                );
+                            }
+                          },
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      }
+      );
   }
   void showPinsOnMap() {
 // obtener un LatLng para la ubicación de origen
@@ -313,8 +275,8 @@ class _LocalesScreenState extends State<LocalesScreen> {
       ));
     });
   }
-  void goProductosTest(String test){
+  void goProductosTest(String tienda){
     Navigator.push(
-        context, MaterialPageRoute(builder: (context) => AnadirProcutoCarrito(tiendaTest)));
+        context, MaterialPageRoute(builder: (context) => AnadirProcutoCarrito(idTienda: tienda)));
   }
 }

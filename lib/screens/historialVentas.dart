@@ -31,7 +31,7 @@ class _HistorialVentasState extends State<HistorialVentas> {
   Widget build(BuildContext context) {
     return Consumer<LoginState>(
       builder: (BuildContext context, LoginState state, Widget child) {
-        _user = Provider.of<LoginState>( context ).currentUser( );
+        _user = Provider.of<LoginState>( context ).currentUser();
         _query = Firestore.instance
             .collection( 'usuarios' )
             .document( _user.uid )

@@ -439,6 +439,6 @@ class _SeguimientoState extends State<Seguimiento> {
   }*/
   void goProductosTest(String test){
     Navigator.push(
-        context, MaterialPageRoute(builder: (context) => AnadirProcutoCarrito(tiendaTest)));
+        context, MaterialPageRoute(builder: (context) => AnadirProcutoCarrito(idTienda: tiendaTest)));
   }
 }

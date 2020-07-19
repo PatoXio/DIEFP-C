@@ -15,6 +15,7 @@ class LoginState with ChangeNotifier {
   FirebaseUser _user;
   List<DocumentSnapshot> _carrito;
   List<DocumentSnapshot> _productos;
+  Stream<QuerySnapshot> _tiendas;
   List<DocumentSnapshot> _productosTienda;
   List<DocumentSnapshot> _historial;
   List<DocumentSnapshot> _historialPendiente;
@@ -52,6 +53,8 @@ class LoginState with ChangeNotifier {
 
   List<DocumentSnapshot> getProductos() => _productos;
 
+  Stream<QuerySnapshot> getTiendas() => _tiendas;
+
   List<DocumentSnapshot> getProductosTienda() => _productosTienda;
 
   List<DocumentSnapshot> getHistorialPendientes() => _historialPendiente;
@@ -75,6 +78,10 @@ class LoginState with ChangeNotifier {
   Future<void> actualizarHistorial() async{
     _historial = await _getListDocumentHistorial(_user.uid);
     _historialPendiente = await _getListDocumentHistorialPendientes(_user.uid);
+  }
+  
+  Future<void> actualizarTiendas() async{
+    _tiendas = await _getListDocumentTiendas();
   }
 
   Future<void> actualizarCarrito() async {
@@ -177,6 +184,16 @@ class LoginState with ChangeNotifier {
         .get();
 
     return document;
+  }
+
+  Future<Stream<QuerySnapshot>> _getListDocumentTiendas() async{
+    Stream<QuerySnapshot> listDocument;
+    listDocument = await Firestore.instance
+        .collection('usuarios')
+        .where("Tienda", isEqualTo: true)
+        .snapshots();
+
+    return listDocument;
   }
 
   Future<String> _getRol(String uid, String _rol) async {

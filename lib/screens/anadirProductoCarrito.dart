@@ -11,12 +11,12 @@ import 'createProducto.dart';
 import 'home.dart';
 
 class AnadirProcutoCarrito extends StatelessWidget {
-  String idTienda;
   double screenlong;
+  String idTienda;
   double screenHeight;
   int carritoLength;
   var _saved = Set<String>();
-  AnadirProcutoCarrito(String idTienda){
+  AnadirProcutoCarrito( {String idTienda}){
     this.idTienda = idTienda;
   }
 
