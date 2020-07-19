@@ -82,9 +82,7 @@ class LoginState with ChangeNotifier {
   }
 
   Future<void> actualizarProductos() async {
-    _loading = true;
     _productos = await _getListDocumentProducto(_user.uid);
-    _loading = false;
   }
 
   Future<void> actualizarProducto(String id) async{
@@ -97,6 +95,7 @@ class LoginState with ChangeNotifier {
 
   void login() async {
     _loading = true;
+    _producto = null;
     notifyListeners();
 
     _user = await _handleSignIn();
@@ -278,5 +277,9 @@ class LoginState with ChangeNotifier {
       _loading = false;
       notifyListeners();
     }
+  }
+
+  void borrarProducto() {
+    _producto = null;
   }
 }

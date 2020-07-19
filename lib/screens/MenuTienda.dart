@@ -4,6 +4,8 @@ import 'package:diefpc/screens/carrito.dart';
 import 'package:diefpc/app/app.dart';
 import 'package:diefpc/screens/buscarLocales.dart';
 
+import 'historialVentas.dart';
+
 class MenuScreenTienda extends StatefulWidget {
   @override
   _MenuScreenTiendaState createState() => _MenuScreenTiendaState();
@@ -80,9 +82,9 @@ class _MenuScreenTiendaState extends State<MenuScreenTienda> {
                   leading: IconButton(
                     icon: Icon(Icons.history),
                     iconSize: 40,
-                    tooltip: 'Locales',
+                    tooltip: 'Historial Ventas',
                     onPressed: () {
-                      //goToLocales(context);
+                      goToHistorialVentas(context);
                     },
                   ),
                   title: Text('Historial de Ventas'),
@@ -100,5 +102,10 @@ class _MenuScreenTiendaState extends State<MenuScreenTienda> {
 void goToProductos(BuildContext context) {
   Navigator.push(
       context, MaterialPageRoute(builder: (context) => ProductosTienda()));
+}
+
+void goToHistorialVentas(BuildContext context) {
+  Navigator.push(
+      context, MaterialPageRoute(builder: (context) => HistorialVentas()));
 }
 

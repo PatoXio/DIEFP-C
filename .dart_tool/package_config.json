@@ -32,6 +32,18 @@
       "languageVersion": "2.0"
     },
     {
+      "name": "charts_common",
+      "rootUri": "file:///D:/SRC/flutter/.pub-cache/hosted/pub.dartlang.org/charts_common-0.9.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.3"
+    },
+    {
+      "name": "charts_flutter",
+      "rootUri": "file:///D:/SRC/flutter/.pub-cache/hosted/pub.dartlang.org/charts_flutter-0.9.0",
+      "packageUri": "lib/",
+      "languageVersion": "1.23"
+    },
+    {
       "name": "clock",
       "rootUri": "file:///D:/SRC/flutter/.pub-cache/hosted/pub.dartlang.org/clock-1.0.1",
       "packageUri": "lib/",
@@ -202,6 +214,12 @@
     {
       "name": "flutter_web_plugins",
       "rootUri": "file:///D:/SRC/flutter/packages/flutter_web_plugins",
+      "packageUri": "lib/",
+      "languageVersion": "2.0"
+    },
+    {
+      "name": "font_awesome_flutter",
+      "rootUri": "file:///D:/SRC/flutter/.pub-cache/hosted/pub.dartlang.org/font_awesome_flutter-8.8.1",
       "packageUri": "lib/",
       "languageVersion": "2.0"
     },
@@ -494,7 +512,7 @@
       "languageVersion": "2.6"
     }
   ],
-  "generated": "2020-07-17T11:04:14.448269Z",
+  "generated": "2020-07-19T09:19:19.705507Z",
   "generator": "pub",
   "generatorVersion": "2.9.0-14.1.beta"
 }

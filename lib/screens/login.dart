@@ -19,6 +19,7 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   double screenHeight;
   User model;
+  var _user;
   // Set intial mode to login
   @override
   initState() {
@@ -28,7 +29,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    var _user = Provider.of<LoginState>(context).currentUser();
+    _user = Provider.of<LoginState>(context).currentUser();
     screenHeight = MediaQuery
         .of( context )
         .size
