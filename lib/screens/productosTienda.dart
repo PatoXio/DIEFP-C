@@ -1,12 +1,9 @@
-//import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:diefpc/states/login_state.dart';
-import 'package:english_words/english_words.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:diefpc/app/app.dart';
 import 'package:provider/provider.dart';
-
 import 'ModificarProducto.dart';
 import 'createProducto.dart';
 import 'home.dart';
@@ -42,98 +39,99 @@ class _ProductosTiendaState extends State<ProductosTienda> {
         ],
       ),
       body:
-      Container(
-        margin: EdgeInsets.only(top: screenHeight / 100),
-        padding: EdgeInsets.only(left: 10, right: 10),
-        child: Column(
-            children: <Widget> [
-              FloatingActionButton.extended(
-                heroTag: "hero1",
-                splashColor: Colors.blueAccent,
-                onPressed: () {
-                  goToCreateProducto(context);
-                },
-                label: Text(
-                  "Agregar Producto",
-                  style: TextStyle(fontSize: 20.0),
+      Scrollbar(
+        child: Container(
+          margin: EdgeInsets.only(top: screenHeight / 100),
+          padding: EdgeInsets.only(left: 10, right: 10),
+          child: Column(
+              children: <Widget> [
+                FloatingActionButton.extended(
+                  heroTag: "hero1",
+                  splashColor: Colors.blueAccent,
+                  onPressed: () {
+                    goToCreateProducto(context);
+                  },
+                  label: Text(
+                    "Agregar Producto",
+                    style: TextStyle(fontSize: 20.0),
+                  ),
                 ),
-              ),
-              Row(
-                children: <Widget> [
-                  Divider(
-                    indent: screenlong / 65,
-                  ),
-                  Card(
-                      child:
-                      Text(" Productos ",
-                        style: _styleText(),
-                      )),
-                  Divider(
-                    indent: screenlong / 4.6,
-                  ),
-                  Card(
-                      child:
-                      Text(" Seleccionar ",
-                          style: _styleText())),
-                ],
-              ),
-              Container(
-                height: screenHeight / 1.4,
-                child: Card(
-                  //elevation: 5,
-                  margin: EdgeInsets.all(10),
-                  semanticContainer: true,
-                  //color: Colors.transparent,
-                  child: Theme(
-                    data: ThemeData(
-                      highlightColor: Colors.blue, //Does not work
+                Row(
+                  children: <Widget> [
+                    Divider(
+                      indent: screenlong / 65,
                     ),
-                    child: Scrollbar(
-                        child: _queyList(context)),
+                    Card(
+                        child:
+                        Text(" Productos ",
+                          style: _styleText(),
+                        )),
+                    Divider(
+                      indent: screenlong / 4.6,
+                    ),
+                    Card(
+                        child:
+                        Text(" Seleccionar ",
+                            style: _styleText())),
+                  ],
+                ),
+                Container(
+                  height: screenHeight / 1.4,
+                  child: Card(
+                    //elevation: 5,
+                    margin: EdgeInsets.all(10),
+                    semanticContainer: true,
+                    //color: Colors.transparent,
+                    child: Theme(
+                      data: ThemeData(
+                        highlightColor: Colors.blue, //Does not work
+                      ),
+                      child: Scrollbar(
+                          child: _queyList(context)),
+                    ),
                   ),
                 ),
-              ),
-              Row(
-                children: [
-                  Divider(
-                    indent: screenlong / 50,
-                  ),
-                  FloatingActionButton.extended(
-                    heroTag: "hero2",
-                    backgroundColor: Colors.red,
-                    onPressed: () {
-                      if(_eliminar.isNotEmpty)
-                        eliminarProductos(_user.uid, _eliminar);
-                      else
-                        _showAlert("Debes seleccionar productos para eliminar");
+                Row(
+                  children: [
+                    Divider(
+                      indent: screenlong / 50,
+                    ),
+                    FloatingActionButton.extended(
+                      heroTag: "hero2",
+                      backgroundColor: Colors.red,
+                      onPressed: () {
+                        if(_eliminar.isNotEmpty)
+                          eliminarProductos(_user.uid, _eliminar);
+                        else
+                          _showAlert("Debes seleccionar productos para eliminar");
 
-                    },
-                    label: Text(
-                      "Eliminar",
-                      style: TextStyle(fontSize: 20.0),
+                      },
+                      label: Text(
+                        "Eliminar",
+                        style: TextStyle(fontSize: 20.0),
+                      ),
                     ),
-                  ),
-                  Divider(
-                    indent: screenlong /9,
-                  ),
-                  FloatingActionButton.extended(
-                    heroTag: "hero3",
-                    onPressed: () {
-                      if(_modificar.isNotEmpty){
-                        goToModificar(context, _modificar);
-                       // Provider.of<LoginState>(context).actualizarProductos();
-                      }else
-                        _showAlert("Debes seleccionar productos para modificar");
-                    },
-                    label: Text(
-                      "Modificar",
-                      style: TextStyle(fontSize: 20.0),
+                    Divider(
+                      indent: screenlong /9,
                     ),
-                  ),
-                ],
-              )
-            ]
+                    FloatingActionButton.extended(
+                      heroTag: "hero3",
+                      onPressed: () {
+                        if(_modificar != null){
+                          goToModificar(context);
+                        }else
+                          _showAlert("Debes seleccionar productos para modificar");
+                      },
+                      label: Text(
+                        "Modificar",
+                        style: TextStyle(fontSize: 20.0),
+                      ),
+                    ),
+                  ],
+                )
+              ]
     ),
+        ),
       ),
     );
   }
@@ -213,6 +211,7 @@ class _ProductosTiendaState extends State<ProductosTienda> {
             onPressed: () {
               _eliminar.remove( id );
               _modificar = id;
+              Provider.of<LoginState>(context).actualizarProducto(_modificar);
               state = true;
             } );
       }else{
@@ -233,6 +232,7 @@ class _ProductosTiendaState extends State<ProductosTienda> {
           iconSize: 30,
           tooltip: 'Normal', onPressed: (){
         _modificar=null;
+        Provider.of<LoginState>(context).actualizarProducto(_modificar);
         state = false;
       });
       else
@@ -295,9 +295,9 @@ class _ProductosTiendaState extends State<ProductosTienda> {
       },
     );
   }
-  void goToModificar(BuildContext context, String modificar) {
+  void goToModificar(BuildContext context) {
     Navigator.push(
         context,
-        MaterialPageRoute( builder: (context) => new ModificarProducto(modificar: modificar)));
+        MaterialPageRoute( builder: (context) => new ModificarProducto()));
   }
 }

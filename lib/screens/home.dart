@@ -1,6 +1,5 @@
 import 'package:diefpc/screens/Menu.dart';
 import 'package:diefpc/states/login_state.dart';
-//import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:diefpc/app/app.dart';
@@ -19,18 +18,23 @@ class _HomeScreenState extends State<HomeScreen> {
   //final FirebaseAuth _auth = FirebaseAuth.instance;
   double screenHeight;
   String name;
+  String rol;
+  var _user;
+  var isComplete;
   String elTiempo;
+  String email;
   @override
   void initState(){
     super.initState();
   }
   @override
   Widget build(BuildContext context) {
-    var _user = Provider.of<LoginState>(context).currentUser();
-    var isComplete = Provider.of<LoginState>(context).isComplete();
-    String rol = Provider.of<LoginState>(context).getRol();
+    _user = Provider.of<LoginState>(context).currentUser();
+    isComplete = Provider.of<LoginState>(context).isComplete();
+    rol = Provider.of<LoginState>(context).getRol();
     screenHeight = MediaQuery.of(context).size.height;
     name = _user.displayName;
+    email = _user.email;
     elTiempo = _elTiempo();
 
     return Scaffold(
@@ -47,6 +51,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
           leading: new IconButton(
             icon: new Icon(Icons.home, color: Colors.blue),
+            onPressed: (){},
           ),
         ),
         body: Column(
@@ -96,7 +101,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             size: 45,
                           ),
                           title: Text(
-                            "Correo: ${_user.email}.",
+                            "Correo: $email.",
                             style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
