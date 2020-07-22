@@ -46,7 +46,7 @@ class _ProductosTiendaState extends State<ProductosTienda> {
           child: Column(
               children: <Widget> [
                 FloatingActionButton.extended(
-                  heroTag: "hero1",
+                  heroTag: "boton1",
                   splashColor: Colors.blueAccent,
                   onPressed: () {
                     goToCreateProducto(context);
@@ -97,7 +97,7 @@ class _ProductosTiendaState extends State<ProductosTienda> {
                       indent: screenlong / 50,
                     ),
                     FloatingActionButton.extended(
-                      heroTag: "hero2",
+                      heroTag: "boton2",
                       backgroundColor: Colors.red,
                       onPressed: () {
                         if(_eliminar.isNotEmpty)
@@ -187,8 +187,11 @@ class _ProductosTiendaState extends State<ProductosTienda> {
           if (i == 1) {
             info = "${listaKeys[i].toString( )}: ${listaValues[i].toString( )}\n";
           }
-          if (i > 1) {
-            info = info +"${listaKeys[i].toString( )}: ${listaValues[i].toString( )}\n";
+          if (i > 2) {
+            if(listaKeys[i].toString().compareTo("nombreTienda")!=0)
+              info = info +"${listaKeys[i].toString( )}: ${listaValues[i].toString( )}\n";
+            else
+              info = info +"Tienda: ${listaValues[i].toString( )}\n";
           }
         }
           i=i+1;

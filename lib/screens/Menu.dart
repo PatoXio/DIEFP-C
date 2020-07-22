@@ -56,7 +56,7 @@ class _MenuScreenState extends State<MenuScreen> {
                     goToCarrito(context);
                   },
                 ),
-                title: Text('Menú Pedidos'),
+                title: Text('Carrito de Compras'),
                 subtitle: Text(
                     'Aquí puedes ver todas las compras que llevas antes de pagar'),
                 /*trailing: Icon(Icons.more_vert),

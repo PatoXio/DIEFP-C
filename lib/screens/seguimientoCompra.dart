@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:diefpc/app/app.dart';
 import 'package:diefpc/screens/Menu.dart';
 import 'package:diefpc/screens/historialProductosUser.dart';
@@ -8,7 +7,6 @@ import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:flutter/material.dart';
-import 'package:date_format/date_format.dart';
 import 'dart:async';
 import 'package:analog_clock/analog_clock.dart';
 import 'package:provider/provider.dart';
@@ -101,10 +99,9 @@ class _ListTileHistoryState extends State<ListTileHistory> {
   }
   @override
   Widget build(BuildContext context) {
-
+    Provider.of<LoginState>(context).actualizarHistorial();
     screenlong = MediaQuery.of( context ).size.longestSide;
     screenHeight = MediaQuery.of( context ).size.height;
-    Provider.of<LoginState>( context ).actualizarHistorial( );
     var listDocuments = Provider.of<LoginState>( context ).getHistorialPendientes( );
     DateTime horaActual = DateTime.now();
 
@@ -124,7 +121,7 @@ class _ListTileHistoryState extends State<ListTileHistory> {
       );
     }
     if(listDocuments.elementAt(widget.index).data["Pendiente"] == true){
-      _tiempoDeEntrega = "Tu pedido se está preparando";
+      _tiempoDeEntrega = "Su pedido se está preparando";
       _difTiempos = "Indefinidos";
     }else{
       if(listDocuments.elementAt(widget.index).data["HoraEntrega"] != null){
@@ -163,12 +160,13 @@ class _ListTileHistoryState extends State<ListTileHistory> {
                         listDocuments[widget.index].data["Total Pagado"].toString(),
                         listDocuments[widget.index].data["Costo de Envío"].toString()
                     )));
-        },
+                },
       ),
             Container(
-              height: screenHeight / 3.5,
+              height: screenHeight / 2,
               child: Card(
-                margin: EdgeInsets.all( 10 ),
+                //elevation: 5,
+                margin: EdgeInsets.all(10),
                 semanticContainer: true,
                 color: Colors.transparent,
                 child: GoogleMap(
@@ -180,11 +178,11 @@ class _ListTileHistoryState extends State<ListTileHistory> {
                     mapType: MapType.normal,
                     initialCameraPosition: initialCameraPosition,
                     onMapCreated: (GoogleMapController controller) {
-                      _controller.complete( controller );
+                      _controller.complete(controller);
                       // mi mapa ha terminado de ser creado;
                       // estoy listo para mostrar los pines en el mapa
                       showPinsOnMap();
-                    } ),
+                    }),
               ),
             ),
             Container(
@@ -362,6 +360,7 @@ class _SeguimientoState extends State<Seguimiento> {
   String tiendaTest = "TiendaTest";
   @override
   Widget build(BuildContext context) {
+    Provider.of<LoginState>(context).actualizarHistorial();
     screenlong = MediaQuery.of( context ).size.longestSide;
     screenHeight = MediaQuery.of( context ).size.height;
     return Scaffold(
@@ -396,7 +395,7 @@ class _SeguimientoState extends State<Seguimiento> {
   }
 
   Widget _queryList(BuildContext context) {
-    Provider.of<LoginState>(context).actualizarHistorial();
+    //Provider.of<LoginState>(context).actualizarHistorial();
     var listDocuments = Provider.of<LoginState>(context).getHistorialPendientes();
     if (listDocuments != null) {
       int historialLength = listDocuments.length;
@@ -415,7 +414,7 @@ class _SeguimientoState extends State<Seguimiento> {
     }
   }
 
-  /*void setPolylines() async {   List<PointLatLng> result = await
+ /* void setPolylines() async {   List<PointLatLng> result = await
   polylinePoints?.getRouteBetweenCoordinates(
       googleAPIKey,
       destinationLocation.latitude,

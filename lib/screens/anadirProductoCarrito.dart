@@ -15,19 +15,18 @@ class AnadirProcutoCarrito extends StatelessWidget {
   String idTienda;
   double screenHeight;
   int carritoLength;
+  List<DocumentSnapshot> carrito;
   var _saved = Set<String>();
   AnadirProcutoCarrito( {String idTienda}){
     this.idTienda = idTienda;
   }
-
   @override
   Widget build(BuildContext context) {
     FirebaseUser _user = Provider.of<LoginState>(context).currentUser();
     screenlong = MediaQuery.of(context).size.longestSide;
     screenHeight = MediaQuery.of(context).size.height;
-    Provider.of<LoginState>(context).verProductosTienda(idTienda);
     Provider.of<LoginState>(context).actualizarCarrito();
-    var carrito = Provider.of<LoginState>(context).getCarrito();
+    carrito = Provider.of<LoginState>(context).getCarrito();
     if(carrito != null)
       carritoLength = carrito.length;
     else
@@ -97,7 +96,9 @@ class AnadirProcutoCarrito extends StatelessWidget {
                     FloatingActionButton.extended(
                       heroTag: "boton1",
                       onPressed: () {
-                        AnadirAlCarrito(context, _saved, _user, idTienda);
+                        if(_saved.length!=0)
+                          AnadirAlCarrito(context, _saved, _user, idTienda);
+                        else return _showAlert(context, "Debes elegir productos para agregarlos.");
                       },
                       label: Text("Añadir al\nCarrito (${_saved.length})", style: TextStyle(fontSize: 15)),
                       backgroundColor: Colors.blue,
@@ -158,38 +159,41 @@ class AnadirProcutoCarrito extends StatelessWidget {
           ),
           title: Text(listDocuments[index].data["Nombre"]),
           subtitle: TextProducto(context, listDocuments[index].data.keys.toList(), listDocuments[index].data.values.toList()),
-          trailing: _iconTravel(listDocuments[index].documentID, context),
+          trailing: _iconTravel(listDocuments[index].documentID, context, listDocuments[index].data["Nombre"]),
           isThreeLine: true,
         ),
       ),
     );
   }
 
-  IconButton _iconTravel(String id, BuildContext context) {
+  IconButton _iconTravel(String id, BuildContext context, String nombre) {
     final alreadySaved = _saved.contains(id);
-    if(idIntoCarrito(id, context) == true)
+    if(idIntoCarrito(context, nombre) == true){
       return IconButton(
-          icon: Icon(Icons.clear),
-          color: Colors.red,
+          icon: Icon(Icons.indeterminate_check_box),
+          color: Colors.blue,
           iconSize: 25,
           tooltip: 'Ya añadido', onPressed: (){
             _showAlertExist(context);
       });
-    if(alreadySaved)
-      return IconButton(
-          icon: Icon(Icons.indeterminate_check_box),
-          color: Colors.red,
-          iconSize: 25,
-          tooltip: 'Deleter', onPressed: (){
-        _saved.remove(id);
-      });
-    else
-      return IconButton(
-          icon: Icon(Icons.check_box_outline_blank),
-          iconSize: 25,
-          tooltip: 'Checker', onPressed: (){
-        _saved.add(id);
-      });
+    }else{
+      if(alreadySaved){
+        return IconButton(
+            icon: Icon(Icons.indeterminate_check_box),
+            color: Colors.red,
+            iconSize: 25,
+            tooltip: 'Deleter', onPressed: (){
+          _saved.remove(id);
+        });
+      }else{
+        return IconButton(
+            icon: Icon(Icons.check_box_outline_blank),
+            iconSize: 25,
+            tooltip: 'Checker', onPressed: (){
+          _saved.add(id);
+        });
+      }
+    }
   }
   // ignore: non_constant_identifier_names
   Widget TextProducto(BuildContext context, List listaKeys, List listaValues){
@@ -197,11 +201,15 @@ class AnadirProcutoCarrito extends StatelessWidget {
     String info = '';
     if (listaKeys!=null){
       while(i<listaKeys.length){
-        if (listaKeys[i].toString( ).compareTo( "Tienda" ) != 0) {
+        if (listaKeys[i].toString( ).compareTo( "Tienda" ) != 0 && listaKeys[i].toString( ).compareTo( "Codigo" ) != 0) {
           if (i == 1)
-            info = "${listaKeys[i].toString( )}: ${listaValues[i].toString( )}";
-          if (i > 1)
-            info = info +"${listaKeys[i].toString( )}: ${listaValues[i].toString( )}\n";
+            info = "${listaKeys[i].toString( )}: ${listaValues[i].toString( )}\n";
+          if (i >= 2) {
+            if(listaKeys[i].toString().compareTo("nombreTienda")!=0)
+              info = info +"${listaKeys[i].toString( )}: ${listaValues[i].toString( )}\n";
+            else
+              info = info +"Tienda: ${listaValues[i].toString( )}\n";
+          }
         }
         i=i+1;
       }
@@ -219,29 +227,36 @@ class AnadirProcutoCarrito extends StatelessWidget {
   void AnadirAlCarrito(BuildContext context, Set<String> _saved, FirebaseUser _user, String idTienda){
     int largo = _saved.length;
     int i;
-    Future<DocumentSnapshot>  producto;
+    if(carrito.isNotEmpty) {
+      if (carrito.first.data["Tienda"].compareTo( idTienda ) != 0) {
+        _showAlertBorrarCarrito(context, _saved, _user, carrito.first.data["Tienda"]);
+        return;
+        }
+      }
     try {
       for (i = 0; i < largo; i++) {
         Firestore.instance
             .collection( 'usuarios' )
-            .document(idTienda)
+            .document( idTienda )
             .collection( 'Productos' )
-            .document(_saved.elementAt(i))
-            .get()
-            // ignore: missing_return
-            .then((DocumentSnapshot ds){
+            .document( _saved.elementAt( i ) )
+            .get( )
+        // ignore: missing_return
+            .then( (DocumentSnapshot ds) {
               Firestore.instance
                   .collection( 'usuarios' )
                   .document( _user.uid )
-                  .collection('Carrito').add(ds.data);
+                  .collection( 'Carrito' )
+                  .add( ds.data );
             });
       }
-      _saved.clear();
-    }catch (error) {
-      return _showAlert(context,'Ocurrió un error al agregar los productos' );
+      _saved.clear( );
+    } catch (error) {
+      return _showAlert( context, 'Ocurrió un error al agregar los productos' );
     }
-    return _showAlert(context, "Se agregaron los productos" );
+    return _showAlert( context, "Se agregaron los productos" );
   }
+
   void goToCarrito(BuildContext context) {
     Navigator.push(
         context, MaterialPageRoute(builder: (context) => CarritoCompras()));
@@ -268,6 +283,46 @@ class AnadirProcutoCarrito extends StatelessWidget {
       },
     );
   }
+
+  void _showAlertBorrarCarrito(BuildContext context, Set<String> _saved, FirebaseUser _user, String idTienda) {
+    int i;
+    int largo = _saved.length;
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          title: new Text("Aviso"),
+          content: new Text("Al seleccionar un producto de otra tienda borraras los productos de tu carrito actual\n¿Estás seguro?"),
+          actions: <Widget>[
+            // usually buttons at the bottom of the dialog
+            new FlatButton(
+              child: new Text("SI"),
+              onPressed: () {
+                print(idTienda);
+                for(i=0;i<carritoLength;i++) {
+                  Firestore.instance
+                      .collection( 'usuarios' )
+                      .document( _user.uid ).collection( 'Carrito' )
+                      .document(carrito[i].documentID)
+                      .delete( );
+                }
+                Navigator.pop(context);
+              },
+            ),
+            new FlatButton(
+              child: new Text("NO"),
+              onPressed: () {
+                _saved.clear();
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   void _showAlertExist(BuildContext context) {
     // flutter defined function
     showDialog(
@@ -290,8 +345,14 @@ class AnadirProcutoCarrito extends StatelessWidget {
       },
     );
   }
-  bool idIntoCarrito(String id, BuildContext context) {
-    List<DocumentSnapshot> carrito = Provider.of<LoginState>(context).getCarrito();
-    return carrito.contains(id);
+  bool idIntoCarrito(BuildContext context, String nombre) {
+    int i;
+    if(carritoLength>0){
+      for (i = 0; i < carritoLength; i++) {
+        if (carrito[i].data["Nombre"].compareTo(nombre) == 0)
+          return true;
+      }
+    }
+      return false;
     }
 }

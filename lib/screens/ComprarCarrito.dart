@@ -28,9 +28,12 @@ class _ListTileItemState extends State<ListTileItem> {
   int count = 1;
   @override
   Widget build(BuildContext context) {
-    var _user = Provider.of<LoginState>(context).currentUser();
+    FirebaseUser _user = Provider.of<LoginState>(context).currentUser();
     var listDocuments = Provider.of<LoginState>(context).getCarrito();
     Provider.of<LoginState>(context).actualizarCarrito();
+    if(listDocuments[widget.index].data["Cantidad"] != null){
+      count = int.parse(listDocuments[widget.index].data["Cantidad"]);
+    }
     return ListTile(
         leading: IconButton(
           icon: Icon(Icons.local_hospital),
@@ -64,12 +67,14 @@ class _ListTileItemState extends State<ListTileItem> {
     String info = '';
     if (listaKeys!=null) {
       while (i < listaKeys.length) {
-        if (listaKeys[i].toString( ).compareTo( "Tienda" ) != 0) {
-          if (i == 1) {
+        if (listaKeys[i].toString( ).compareTo( "Tienda" ) != 0 && listaKeys[i].toString( ).compareTo( "Codigo" ) != 0) {
+          if (i == 1)
             info = "${listaKeys[i].toString( )}: ${listaValues[i].toString( )}\n";
-          }
-          if (i > 1) {
-            info = info +"${listaKeys[i].toString( )}: ${listaValues[i].toString( )}\n";
+          if (i >= 2) {
+            if(listaKeys[i].toString().compareTo("nombreTienda")!=0)
+              info = info +"${listaKeys[i].toString( )}: ${listaValues[i].toString( )}\n";
+            else
+              info = info +"Tienda: ${listaValues[i].toString( )}\n";
           }
         }
         i = i + 1;
@@ -92,19 +97,21 @@ class _ComprarCarritoState extends State<ComprarCarrito> {
   double screenHeight;
   int costoTotal;
   String medioDePago = 'WebPay';
+  FirebaseUser _user;
   List<DocumentSnapshot> carrito;
+  String nombre;
 
   @override
   Widget build(BuildContext context) {
-    final _user = Provider.of<LoginState>(context).currentUser();
     screenlong = MediaQuery.of(context).size.longestSide;
     screenHeight = MediaQuery.of(context).size.height;
+    _user = Provider.of<LoginState>(context).currentUser();
     Provider.of<LoginState>(context).actualizarCarrito();
     carrito = Provider.of<LoginState>(context).getCarrito();
     costoTotal = _totalCosto(carrito, _costoEnvio(), _user.uid );
     return Scaffold(
       appBar: AppBar(
-        title: Text("Productos De La Tienda"),
+        title: Text("Comprar Productos"),
         actions: <Widget>[
           IconButton(icon: Icon(Icons.list),
               tooltip: 'Configuración',
@@ -229,7 +236,7 @@ class _ComprarCarritoState extends State<ComprarCarrito> {
                       indent: screenlong / 90,
                     ),
                     FloatingActionButton.extended(
-                      heroTag: "boton1c",
+                      heroTag: "boton1",
                       onPressed: () {
                         Navigator.pop(context);
                       },
@@ -241,7 +248,7 @@ class _ComprarCarritoState extends State<ComprarCarrito> {
                       indent: screenlong / 4,
                     ),
                     FloatingActionButton.extended(
-                      heroTag: "boton2c",
+                      heroTag: "boton2",
                       onPressed: () {
                         goToSeguimiento(context, _user.uid, carrito);
                       },
@@ -255,9 +262,10 @@ class _ComprarCarritoState extends State<ComprarCarrito> {
   }
 
   Widget _queyList(BuildContext context) {
-    var listDocuments = Provider.of<LoginState>(context).getCarrito();
-    int carritoLength = listDocuments.length;
+    var listDocuments = carrito;
+    int carritoLength;
     if (listDocuments != null) {
+      carritoLength= listDocuments.length;
       return ListView(
         children: List.generate(carritoLength, (i) => new ListTileItem(index: i))
       );
@@ -280,7 +288,24 @@ class _ComprarCarritoState extends State<ComprarCarrito> {
     if (carrito.length>0) {
       length = carrito.length;
       for(i=0;i<length;i++){
+        if(carrito.elementAt(i).data["Precio"] != null && carrito.elementAt(i).data["Cantidad"] != null)
           suma = suma + (int.parse(carrito.elementAt(i).data["Precio"])*int.parse(carrito.elementAt(i).data["Cantidad"]));
+      }
+    }else
+      return 0;
+    return suma+costoEnvio;
+  }
+
+  int _totalCostoEnvio(List<DocumentSnapshot> carrito, int costoEnvio, String uid, String idTienda){
+    int length;
+    int i;
+    int suma = 0;
+    if (carrito.length>0) {
+      length = carrito.length;
+      for(i=0;i<length;i++){
+        if(carrito.elementAt(i).data["Precio"] != null)
+          if(carrito.elementAt(i).data["Tienda"].toString().compareTo(idTienda) == 0)
+            suma = suma + (int.parse(carrito.elementAt(i).data["Precio"])*int.parse(carrito.elementAt(i).data["Cantidad"]));
       }
     }else
       return 0;
@@ -291,59 +316,101 @@ class _ComprarCarritoState extends State<ComprarCarrito> {
     return 1000;
   }
 
-  void goToSeguimiento(BuildContext context, String uid, List<DocumentSnapshot> carrito){
-    String fecha = DateTime.now().toString();
+  void goToSeguimiento(BuildContext context, String uid, List<DocumentSnapshot> carrito) {
+    final _saved = Set<String>();
+    final _deleted = Set<String>();
+    DateTime fecha = DateTime.now();
+    String pivot;
     int i;
     int j;
     int x;
-    String pivot;
-    int cont = 0;
-    final _saved = Set<String>();
-    final _deleted = Set<String>();
-
-    if(carrito != null){
-      for(i=0;i<carrito.length;i++) {
-        pivot = carrito.elementAt( i ).data["Tienda"].toString( );
-        if (_deleted.contains( pivot ) == false){
-          _saved.add(i.toString());
+    if (carrito != null) {
+      for (i = 0; i < carrito.length; i++) {
+        pivot = carrito
+            .elementAt( i )
+            .data["Tienda"].toString( );
+        if (_deleted.contains( pivot ) == false) {
+          _saved.add( i.toString( ) );
           for (j = i + 1; j < carrito.length; j++) {
-            if (pivot.compareTo( carrito.elementAt( j ).data["Tienda"].toString( ) ) == 0) {
-              _saved.add(j.toString());
+            if (pivot.compareTo( carrito
+                .elementAt( j )
+                .data["Tienda"].toString( ) ) == 0) {
+              _saved.add( j.toString( ) );
             }
           }
-          for(x=0;x<_saved.length;x++){
+          for (x = 0; x < _saved.length; x++) {
+
             Firestore.instance
-                .collection('usuarios')
-                .document(uid)
-                .collection('Historial')
-                .document("$fecha:${carrito.elementAt(x).data["Tienda"]}")
-                .setData({
-              "Fecha": fecha,
+                .collection( 'usuarios' )
+                .document( uid )
+                .collection( 'Historial' )
+                .document( "$fecha:${carrito
+                .elementAt( x )
+                .data["Tienda"]}" )
+                .setData( {
+              "Fecha": fecha.toString(),
               "Pendiente": true,
               "Entregado": false,
               "Medio de Pago": medioDePago,
-              "Total Pagado": costoTotal,
-              "Costo de Envío": _costoEnvio(),
-              "Tienda": carrito.elementAt(x).data["Tienda"]});
+              "Total Pagado": _totalCostoEnvio( carrito, _costoEnvio( ), uid, carrito.elementAt( x ).data["Tienda"] ),
+              "Costo de Envío": _costoEnvio( ),
+              "Tienda": carrito.elementAt( x ).data["Tienda"],
+              "nombreTienda": carrito.elementAt( x ).data["nombreTienda"]});
+
+           Firestore.instance
+                .collection( 'usuarios' )
+                .document(carrito.elementAt( x ).data["Tienda"])
+                .collection( 'HistorialVentas' )
+                .document('Producto:$fecha:${carrito
+                .elementAt( x )
+                .data["Codigo"]}').setData({
+             "Fechas": fecha.toString(),
+             "Nombre": carrito.elementAt(x).data["Nombre"],
+             "day": fecha.day.toString(),
+             "month": fecha.month.toString(),
+             "Precio": (int.parse(carrito.elementAt( x ).data["Precio"])*int.parse(carrito.elementAt(x).data["Cantidad"])).toString(),
+           });
 
             Firestore.instance
-                .collection('usuarios')
-                .document(uid)
-                .collection('Historial')
-                .document("$fecha:${carrito.elementAt(x).data["Tienda"]}")
-                .collection('ComprasRealizada')
-                .document('Producto:$fecha:$cont')
-                .setData(carrito.elementAt(x).data);
+                .collection( 'usuarios' )
+                .document( uid )
+                .collection( 'Historial' )
+                .document( "$fecha:${carrito
+                .elementAt( x )
+                .data["Tienda"]}" )
+                .collection( 'ComprasRealizada' )
+                .document( 'Producto:$fecha:${carrito
+                .elementAt( x )
+                .data["Codigo"]}' )
+                .setData( carrito
+                .elementAt( x )
+                .data );
 
             Firestore.instance
-                .collection('usuarios')
-                .document(uid).collection('Carrito')
-                .document(carrito.elementAt(x).documentID)
-                .delete();
+                .collection( 'usuarios' )
+                .document( uid )
+                .collection( 'Historial' )
+                .document( "$fecha:${carrito
+                .elementAt( x )
+                .data["Tienda"]}" )
+                .collection( 'Pendientes' )
+                .document( 'Producto:$fecha:${carrito
+                .elementAt( x )
+                .data["Codigo"]}' )
+                .setData( carrito
+                .elementAt( x )
+                .data );
+
+            Firestore.instance
+                .collection( 'usuarios' )
+                .document( uid ).collection( 'Carrito' )
+                .document( carrito
+                .elementAt( x )
+                .documentID )
+                .delete( );
           }
-          _deleted.add(_saved.first);
-          _saved.clear();
-          cont++;
+          _deleted.add( _saved.first );
+          _saved.clear( );
         }
       }
     }
@@ -401,7 +468,6 @@ class _ComprarCarritoState extends State<ComprarCarrito> {
     );
   }*/
   bool idIntoCarrito(String id, BuildContext context) {
-    List<DocumentSnapshot> carrito = Provider.of<LoginState>(context).getCarrito();
     return carrito.contains(id);
     }
 }

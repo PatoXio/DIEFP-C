@@ -15,7 +15,7 @@ class HistorialVentas extends StatefulWidget {
 
 class _HistorialVentasState extends State<HistorialVentas> {
   PageController _controller;
-  int currentPage = DateTime.now().month;
+  int currentPage = DateTime.now().month-1;
   Stream<QuerySnapshot> _query;
   FirebaseUser _user;
 
@@ -34,10 +34,10 @@ class _HistorialVentasState extends State<HistorialVentas> {
         _user = Provider.of<LoginState>( context ).currentUser();
         _query = Firestore.instance
             .collection( 'usuarios' )
-            .document( _user.uid )
-            .collection( 'HistorialVentas' ).where(
-            "month", isEqualTo: "${currentPage + 1}" )
-            .snapshots( );
+            .document(_user.uid)
+            .collection('HistorialVentas')
+            .where( "month", isEqualTo: "${currentPage+1}")
+            .snapshots();
         return Scaffold(
           appBar: AppBar(
             title: Text( "Ventas del mes" ),

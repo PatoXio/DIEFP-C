@@ -273,14 +273,6 @@ class _CreateTienda1State extends State<CreateTienda1> {
       "codigoVerificacion": codigo,
       "Rut": rut
     });
-    Firestore.instance
-        .collection('usuarios')
-        .document(_user.uid)
-        .collection('Productos')
-        .document("ProductoFantasma").setData({
-      "Nombre": "fantasma",
-      "Extra": "fantasma|"
-    });
   }
 
   void goToHomeScreen(BuildContext context) {

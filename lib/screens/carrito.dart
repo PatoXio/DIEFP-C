@@ -13,14 +13,17 @@ class CarritoCompras extends StatefulWidget{
 
 class _CarritoComprasState extends State<CarritoCompras>{
   final _saved = Set<String>();
+  FirebaseUser _user;
+  List<DocumentSnapshot> listDocuments;
   double screenlong;
   double screenHeight;
   @override
   Widget build(BuildContext context) {
-    FirebaseUser _user = Provider.of<LoginState>(context).currentUser();
     screenlong = MediaQuery.of(context).size.longestSide;
     screenHeight = MediaQuery.of(context).size.height;
     Provider.of<LoginState>(context).actualizarCarrito();
+    listDocuments = Provider.of<LoginState>(context).getCarrito();
+    _user = Provider.of<LoginState>(context).currentUser();
     return Scaffold(
       appBar: AppBar(
         title: Text("Carrito de Pedidos"),
@@ -93,7 +96,10 @@ class _CarritoComprasState extends State<CarritoCompras>{
                   FloatingActionButton.extended(
                     heroTag: "boton2",
                     onPressed: () {
-                      goToComprarCarrito(context);
+                      if(listDocuments.length>0) {
+                        goToComprarCarrito( context );
+                      }else
+                        return _showAlert("Deben haber productos para comprar.");
                     },
                     label: Text("Comprar", style: TextStyle(fontSize: 20)),
                     backgroundColor: Colors.blue,
@@ -108,21 +114,23 @@ class _CarritoComprasState extends State<CarritoCompras>{
 
   IconButton _iconTravel(String id) {
     final alreadySaved = _saved.contains(id);
-    if(alreadySaved)
-      return IconButton(
-          icon: Icon(Icons.indeterminate_check_box),
-          color: Colors.red,
-          iconSize: 20,
-          tooltip: 'Deleter', onPressed: (){
-        _saved.remove(id);
-      });
-    else
-      return IconButton(
-          icon: Icon(Icons.check_box_outline_blank),
-          iconSize: 20,
-          tooltip: 'Checker', onPressed: (){
-        _saved.add(id);
-      });
+      if (alreadySaved) {
+        return IconButton(
+            icon: Icon( Icons.indeterminate_check_box ),
+            color: Colors.red,
+            iconSize: 20,
+            tooltip: 'Deleter',
+            onPressed: () {
+              _saved.remove( id );
+            } );
+      } else {
+        return IconButton(
+            icon: Icon( Icons.check_box_outline_blank ),
+            iconSize: 20,
+            tooltip: 'Checker', onPressed: () {
+          _saved.add( id );
+        } );
+      }
   }
 
   TextStyle _styleText(){
@@ -131,7 +139,6 @@ class _CarritoComprasState extends State<CarritoCompras>{
 
 
   Widget _queyList(BuildContext context) {
-    var listDocuments = Provider.of<LoginState>(context).getCarrito();
     if (listDocuments != null) {
       return ListView.builder(
           itemCount: listDocuments.length,
@@ -143,8 +150,6 @@ class _CarritoComprasState extends State<CarritoCompras>{
     }
   }
   Widget buildBody(BuildContext context, int index) {
-    var listDocuments = Provider.of<LoginState>(context).getCarrito();
-    var _user = Provider.of<LoginState>(context).currentUser();
     revisarCarrrito(listDocuments,_user.uid);
     return Card(
         child:
@@ -186,20 +191,24 @@ class _CarritoComprasState extends State<CarritoCompras>{
   void borrarDelCarrito(Set<String> _saved, FirebaseUser _user){
     int largo = _saved.length;
     int i;
-    try {
-      for (i = 0; i < largo; i++) {
-        Firestore.instance
-            .collection( 'usuarios' )
-            .document( _user.uid )
-            .collection( 'Carrito' )
-            .document( _saved.elementAt( i ) )
-            .delete( );
+    print(largo);
+    if(largo != 0) {
+      try {
+        for (i = 0; i < largo; i++) {
+          Firestore.instance
+              .collection( 'usuarios' )
+              .document( _user.uid )
+              .collection( 'Carrito' )
+              .document( _saved.elementAt( i ) )
+              .delete( );
+        }
+        _saved.clear( );
+      } catch (error) {
+        return _showAlert( 'Ocurrió un error al borrar los productos.' );
       }
-      _saved.clear();
-    }catch (error) {
-      return _showAlert( 'Ocurrió un error al borrar los productos' );
-    }
-    return _showAlert( "Se borraron los productos" );
+      return _showAlert( "Se borraron los productos." );
+    }else
+      return _showAlert("Debes seleccionar un producto para eliminarlo.");
   }
   void _showAlert(String notify) {
     // flutter defined function

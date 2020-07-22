@@ -19,6 +19,7 @@ class LoginState with ChangeNotifier {
   List<DocumentSnapshot> _productosTienda;
   List<DocumentSnapshot> _historial;
   List<DocumentSnapshot> _historialPendiente;
+  List<DocumentSnapshot> _pedidosPendientes;
   List<DocumentSnapshot> _historialProductos;
 
   String _rol = 'Normal';
@@ -59,6 +60,8 @@ class LoginState with ChangeNotifier {
 
   List<DocumentSnapshot> getHistorialPendientes() => _historialPendiente;
 
+  List<DocumentSnapshot> getPedidosPendientes() => _pedidosPendientes;
+
   List<DocumentSnapshot> getHistorialProductos() => _historialProductos;
 
   bool isComplete(){
@@ -66,9 +69,9 @@ class LoginState with ChangeNotifier {
     return _isComplete;
   }
 
-  Future<void> nombreTienda(String idTienda,) async {
+  Future<void> nombreTienda(String idTienda) async {
     DocumentSnapshot snapshot = await Firestore.instance.collection('usuarios').document(idTienda).get();
-    _nombreTienda = snapshot.data["Nombre"];
+    _nombreTienda = snapshot.data["nombre"];
   }
 
   Future<void> actualizarHistorialProductos(String idDocument) async {
@@ -78,6 +81,10 @@ class LoginState with ChangeNotifier {
   Future<void> actualizarHistorial() async{
     _historial = await _getListDocumentHistorial(_user.uid);
     _historialPendiente = await _getListDocumentHistorialPendientes(_user.uid);
+  }
+
+  Future<void> actualizarPendientes() async{
+    _pedidosPendientes = await _getListDocumentPedidosPendientes(_user.uid);
   }
   
   Future<void> actualizarTiendas() async{
@@ -141,6 +148,7 @@ class LoginState with ChangeNotifier {
       _productos = await _getListDocumentProducto(_user.uid);
       _historial = await _getListDocumentHistorial(_user.uid);
       _historialPendiente = await _getListDocumentHistorialPendientes(_user.uid);
+      _pedidosPendientes = await _getListDocumentPedidosPendientes(_user.uid);
       _loading = false;
       notifyListeners();
     }
@@ -267,6 +275,14 @@ class LoginState with ChangeNotifier {
         .collection("Historial")
         .where("Entregado", isEqualTo: false)
         .getDocuments()).documents;
+
+    return listDocument;
+  }
+
+  Future<List<DocumentSnapshot>> _getListDocumentPedidosPendientes(String id) async{
+    List<DocumentSnapshot> listDocument;
+
+
 
     return listDocument;
   }

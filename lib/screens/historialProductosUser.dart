@@ -59,12 +59,14 @@ class _ListTileItemState extends State<ListTileItem> {
     String info = '';
     if (listaKeys!=null){
       while(i<listaKeys.length){
-        if (listaKeys[i].toString().compareTo("Tienda")!=0 && listaKeys[i].toString().compareTo("Stock")!=0) {
-          if (i == 1) {
+        if (listaKeys[i].toString( ).compareTo( "Tienda" ) != 0 && listaKeys[i].toString( ).compareTo( "Codigo" ) != 0) {
+          if (i == 1)
             info = "${listaKeys[i].toString( )}: ${listaValues[i].toString( )}\n";
-          }
-          if (i > 1) {
-            info = info +"${listaKeys[i].toString( )}: ${listaValues[i].toString( )}\n";
+          if (i >= 2) {
+            if(listaKeys[i].toString().compareTo("nombreTienda")!=0)
+              info = info +"${listaKeys[i].toString( )}: ${listaValues[i].toString( )}\n";
+            else
+              info = info +"Tienda: ${listaValues[i].toString( )}\n";
           }
         }
         i=i+1;

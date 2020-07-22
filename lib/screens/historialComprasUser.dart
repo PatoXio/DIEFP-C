@@ -76,10 +76,7 @@ class _HistorialComprasState extends State<HistorialCompras>{
   }
   Widget buildBody(BuildContext context, int index) {
      List<DocumentSnapshot> listDocuments = Provider.of<LoginState>(context).getHistorial();
-     String idTienda = listDocuments[index].data["Tienda"];
      String fecha = DateFormat('yyyy-MM-dd – kk:mm').format(DateTime.parse(listDocuments[index].data["Fecha"].toString()));
-     Provider.of<LoginState>(context).nombreTienda(idTienda);
-     String nombre = Provider.of<LoginState>(context).getNombreTienda();
      String idDocument = listDocuments[index].documentID;
      return Card(
       child: ListTile(
@@ -90,16 +87,18 @@ class _HistorialComprasState extends State<HistorialCompras>{
         },
         ),
         title: Text("$fecha"),
-        subtitle: Text("Tienda: $nombre\n"
+        subtitle: Text("Tienda: ${listDocuments[index].data["nombreTienda"]}\n"
             "Total Pagado: ${listDocuments[index].data["Total Pagado"].toString()}\n"
-            "Medio de Pago: ${listDocuments[index].data["Medio de Pago"]}"),
+            "Medio de Pago: ${listDocuments[index].data["Medio de Pago"]}\n"
+            "Confirmada: ${listDocuments[index].data["Pendiente"] == true ? 'Aún no' : 'Si'}\n"
+            "Entrega: ${listDocuments[index].data["Entregado"] == true ? 'Entregado' : 'Pendiente'}"),
         trailing: FloatingActionButton(
           heroTag: "hero$index",
           child: Text("Ver"),
           onPressed: () {
             goToComprasHechas(
                 context,
-                idTienda,
+                listDocuments[index].data["Tienda"],
                 idDocument,
                 listDocuments[index].data["Total Pagado"].toString(),
                 listDocuments[index].data["Costo de Envío"].toString());

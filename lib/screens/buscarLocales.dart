@@ -175,7 +175,7 @@ class _LocalesScreenState extends State<LocalesScreen> {
                                       child: new ListTile(
                                         title: new Text(document.data['nombre']),
                                           subtitle: new Text("Distancia: < 1 metro"),
-                                        trailing: FloatingActionButton.extended(heroTag: "hero+${document.data["Nombre"]}", onPressed: (){goProductosTest(document.documentID);}, label: Text("Ver")),
+                                        trailing: FloatingActionButton.extended(heroTag: "hero+${document.data["nombre"]}", onPressed: (){goProductosTest(document.documentID);}, label: Text("Ver")),
                                       ),
                                     );
                                   }).toList(),
@@ -268,7 +268,8 @@ class _LocalesScreenState extends State<LocalesScreen> {
       // el truco es eliminar el marcador (por id)
       // y agregarlo nuevamente en la ubicación actualizada
       _markers.removeWhere(
-              (m) => m.markerId.toString() == 'sourcePin');                                                                    _markers.add(Marker(
+              (m) => m.markerId.toString() == 'sourcePin');
+      _markers.add(Marker(
           markerId: MarkerId('sourcePin'),
           position: pinPosition, // posición actualizada
           icon: sourceIcon
@@ -276,6 +277,7 @@ class _LocalesScreenState extends State<LocalesScreen> {
     });
   }
   void goProductosTest(String tienda){
+    Provider.of<LoginState>(context).verProductosTienda(tienda);
     Navigator.push(
         context, MaterialPageRoute(builder: (context) => AnadirProcutoCarrito(idTienda: tienda)));
   }

@@ -80,7 +80,6 @@ class _CrearProductoState extends State<CrearProducto> {
 
   Widget singUpCard(BuildContext context) {
     _user = Provider.of<LoginState>(context).currentUser();
-    //var isComplete = Provider.of<LoginState>(context).isComplete();
     return Form(
         key: _formKey,
         child: Column(
@@ -273,11 +272,8 @@ class _CrearProductoState extends State<CrearProducto> {
   }
 
   void _createProducto(FirebaseUser _user, String cantidad, String nombre, String codigo, String peso, String precio){
-    String reference;
+    String nombreTienda = Provider.of<LoginState>(context).getNombreTienda();
 
-    reference = Firestore.instance
-        .collection('usuarios')
-        .document(_user.uid).path;
     Firestore.instance
         .collection('usuarios')
         .document(_user.uid)
@@ -290,6 +286,7 @@ class _CrearProductoState extends State<CrearProducto> {
       "Nombre": nombre,
       "Precio": precio,
       "Tienda": _user.uid,
+      "nombreTienda": _user.displayName,
     });
   }
   void goToHomeScreen(BuildContext context) {

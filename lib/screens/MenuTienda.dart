@@ -1,8 +1,11 @@
+import 'package:diefpc/screens/pedidosPendientes.dart';
 import 'package:diefpc/screens/productosTienda.dart';
+import 'package:diefpc/states/login_state.dart';
 import 'package:flutter/material.dart';
 import 'package:diefpc/screens/carrito.dart';
 import 'package:diefpc/app/app.dart';
 import 'package:diefpc/screens/buscarLocales.dart';
+import 'package:provider/provider.dart';
 
 import 'historialVentas.dart';
 
@@ -42,6 +45,7 @@ class _MenuScreenTiendaState extends State<MenuScreenTienda> {
                   iconSize: 40,
                   tooltip: 'Pedidos',
                   onPressed: () {
+                    goToPedidosPendientes(context);
                   },
                 ),
                 title: Text('Pedidos Pendientes'),
@@ -108,4 +112,10 @@ void goToHistorialVentas(BuildContext context) {
   Navigator.push(
       context, MaterialPageRoute(builder: (context) => HistorialVentas()));
 }
+void goToPedidosPendientes(BuildContext context) {
+  Provider.of<LoginState>(context).actualizarPendientes();
+  Navigator.push(
+      context, MaterialPageRoute(builder: (context) => PedidosPendientes()));
+}
+
 
