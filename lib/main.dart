@@ -2,7 +2,6 @@ import 'package:diefpc/app/app.dart';
 //import 'package:diefpc/screens/login.dart';
 //import 'package:dart_rut_validator/dart_rut_validator.dart' show RUTValidator;
 import 'package:flutter/material.dart';
-import 'package:flutter_phoenix/flutter_phoenix.dart';
 
 //Punto de entrada para su aplicación
 void main() => runApp(MyApp());

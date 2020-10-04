@@ -13,18 +13,18 @@ class Delivery {
   bool delivery;
   bool tienda;
   bool admin;
-  Delivery({
-    this.nombreCompleto,
-    this.correo,
-    this.numero,
-    this.codigoInvitacion,
-    this.codigoVerificacion,
-    this.ciudad,
-    this.transporte,
-    this.contrasena,
-    this.rut,
-    this.delivery = true,
-    this.tienda = false,
-    this.admin = false
-  });
+
+  Delivery(
+      {this.nombreCompleto,
+      this.correo,
+      this.numero,
+      this.codigoInvitacion,
+      this.codigoVerificacion,
+      this.ciudad,
+      this.transporte,
+      this.contrasena,
+      this.rut,
+      this.delivery = true,
+      this.tienda = false,
+      this.admin = false});
 }
