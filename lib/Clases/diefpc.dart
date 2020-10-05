@@ -2,40 +2,40 @@ import 'ListUsuario.dart';
 import 'Usuario.dart';
 
 class DIEFPC {
-  String name;
-  ListUsuario listUsuario;
+  String _name;
+  ListUsuario _listUsuario;
 
   DIEFPC() {
-    name = "DIEFPC-C";
-    listUsuario = new ListUsuario();
+    _name = "DIEFPC-C";
+    _listUsuario = new ListUsuario();
   }
 
   DIEFPC.carga(ListUsuario listUsuario) {
-    name = "Diefp-C";
-    this.listUsuario = listUsuario;
+    _name = "Diefp-C";
+    this._listUsuario = listUsuario;
   }
 
   String getNombre() {
-    return name;
+    return _name;
   }
 
   ListUsuario getListUsuario() {
-    return listUsuario;
+    return _listUsuario;
   }
 
   Usuario getUsuario(String rut) {
-    if (listUsuario != null) {
-      return listUsuario.getUsuario(rut);
+    if (_listUsuario != null) {
+      return _listUsuario.getUsuario(rut);
     }
     return null;
   }
 
   void setListUsuario(ListUsuario listUsuario) {
-    this.listUsuario = listUsuario;
+    this._listUsuario = listUsuario;
   }
 
   void setUsuario(Usuario usuario) {
-    listUsuario.setUsuario(usuario);
+    _listUsuario.setUsuario(usuario);
   }
 
   bool cargarDatos() {

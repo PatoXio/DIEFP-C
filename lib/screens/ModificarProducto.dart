@@ -1,27 +1,15 @@
-
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:diefpc/Clases/Producto.dart';
 import 'package:diefpc/app/app.dart';
-import 'package:diefpc/models/producto.dart';
 //import 'package:diefpc/app/app.dart';
-import 'package:diefpc/screens/Menu.dart';
 import 'package:diefpc/screens/home.dart';
-import 'package:diefpc/screens/productosTienda.dart';
 import 'package:diefpc/states/login_state.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:dart_rut_validator/dart_rut_validator.dart' show RUTValidator;
 import 'package:flutter/services.dart';
-import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:provider/provider.dart';
-import 'package:diefpc/models/usuario.dart';
-import 'package:diefpc/models/delivery.dart';
-import 'package:diefpc/models/tienda.dart';
-import '../main.dart';
-import 'createDelivery1.dart';
-import 'createTienda1.dart';
-
 
 //import 'login.dart';
 
@@ -36,10 +24,7 @@ class ModificarProducto extends StatelessWidget {
   Widget build(BuildContext context) {
     _user = Provider.of<LoginState>(context).currentUser();
     producto = Provider.of<LoginState>(context).getProducto();
-    screenHeight = MediaQuery
-        .of( context )
-        .size
-        .height;
+    screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       body: SingleChildScrollView(
         child: Stack(
@@ -52,9 +37,9 @@ class ModificarProducto extends StatelessWidget {
     );
   }
 
-  Widget pageTitle(){
+  Widget pageTitle() {
     return Container(
-      margin: EdgeInsets.only( top: 50 ),
+      margin: EdgeInsets.only(top: 50),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
@@ -67,194 +52,231 @@ class ModificarProducto extends StatelessWidget {
           Text(
             "DIEFP-C",
             style: TextStyle(
-                fontSize: 34, color: Colors.blue, fontWeight: FontWeight.w400 ),
+                fontSize: 34, color: Colors.blue, fontWeight: FontWeight.w400),
           ),
         ],
       ),
     );
   }
 
-  Widget singUpCard(BuildContext context){
+  Widget singUpCard(BuildContext context) {
     return Center(
       child: Form(
           key: _formKey,
           child: Column(
             children: <Widget>[
               Container(
-                margin: EdgeInsets.only( top: screenHeight / 5 ),
-                padding: EdgeInsets.only( left: 10, right: 10 ),
+                margin: EdgeInsets.only(top: screenHeight / 5),
+                padding: EdgeInsets.only(left: 10, right: 10),
                 child: Card(
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular( 10 ),
+                    borderRadius: BorderRadius.circular(10),
                   ),
                   elevation: 8,
                   child: Padding(
-                    padding: const EdgeInsets.all( 30.0 ),
-                      child: Consumer(
-                        builder: (BuildContext context, LoginState value, Widget child){
-                          if(producto.data == null){
-                            return CircularProgressIndicator();
-                          }else return child;
-                        },
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: <Widget>[
-                            Align(
-                              alignment: Alignment.topLeft,
-                              child: Text(
-                                "Agregar Producto",
-                                style: TextStyle(
-                                  color: Colors.blue,
-                                  fontSize: 28,
-                                  fontWeight: FontWeight.w600,
-                                ),
+                    padding: const EdgeInsets.all(30.0),
+                    child: Consumer(
+                      builder: (BuildContext context, LoginState value,
+                          Widget child) {
+                        if (producto.data == null) {
+                          return CircularProgressIndicator();
+                        } else
+                          return child;
+                      },
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          Align(
+                            alignment: Alignment.topLeft,
+                            child: Text(
+                              "Agregar Producto",
+                              style: TextStyle(
+                                color: Colors.blue,
+                                fontSize: 28,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
-                            SizedBox(
-                              height: 15,
+                          ),
+                          SizedBox(
+                            height: 15,
+                          ),
+                          TextFormField(
+                            maxLength: 50,
+                            initialValue: producto.data["Nombre"],
+                            validator: (value) {
+                              if (value.isEmpty ||
+                                  producto.data["Nombre"]
+                                          .toString()
+                                          .compareTo(value) ==
+                                      0) {
+                                modelProducto
+                                    .setNombre(producto.data["Nombre"]);
+                              }
+                            },
+                            decoration: InputDecoration(
+                              labelText: "Nombre",
                             ),
-
-                            TextFormField(
-                              maxLength: 50,
-                              initialValue: producto.data["Nombre"],
-                              validator: (value){
-                                if(value.isEmpty || producto.data["Nombre"].toString().compareTo(value)==0){
-                                  modelProducto.nombre = producto.data["Nombre"];
-                                }
-                              },
-                              decoration: InputDecoration(
-                                labelText: "Nombre",
+                            onChanged: (String value) {
+                              modelProducto.setNombre(value);
+                            },
+                          ),
+                          SizedBox(
+                            height: 15,
+                          ),
+                          TextFormField(
+                            maxLength: 50,
+                            enabled: false,
+                            initialValue: producto.data["Codigo"],
+                            validator: (value) {
+                              if (value.isEmpty ||
+                                  producto.data["Codigo"]
+                                          .toString()
+                                          .compareTo(value.toString()) ==
+                                      0) {
+                                modelProducto.setCodigo(
+                                    producto.data["Codigo"].toString());
+                              }
+                            },
+                            keyboardType: TextInputType.number,
+                            inputFormatters: <TextInputFormatter>[
+                              WhitelistingTextInputFormatter.digitsOnly
+                            ],
+                            decoration: InputDecoration(
+                              labelText: "Codigo",
+                            ),
+                            onChanged: (String value) {
+                              modelProducto.setCodigo(value);
+                            },
+                          ),
+                          SizedBox(
+                            height: 15,
+                          ),
+                          TextFormField(
+                            maxLength: 9,
+                            initialValue: producto.data["Mg/u"],
+                            validator: (value) {
+                              if (value.isEmpty ||
+                                  producto.data["Mg/u"]
+                                          .toString()
+                                          .compareTo(value.toString()) ==
+                                      0) {
+                                modelProducto.setMgPorU(
+                                    double.parse(producto.data["Mg/u"]));
+                              }
+                            },
+                            keyboardType: TextInputType.number,
+                            inputFormatters: <TextInputFormatter>[
+                              WhitelistingTextInputFormatter.digitsOnly
+                            ],
+                            decoration: InputDecoration(
+                              labelText: "Peso en mg/u",
+                            ),
+                            onChanged: (String value) {
+                              modelProducto.setMgPorU(double.parse(value));
+                            },
+                          ),
+                          SizedBox(
+                            height: 15,
+                          ),
+                          TextFormField(
+                            maxLength: 9,
+                            initialValue: producto.data["Precio"],
+                            validator: (value) {
+                              if (value.isEmpty ||
+                                  producto.data["Precio"]
+                                          .toString()
+                                          .compareTo(value.toString()) ==
+                                      0) {
+                                modelProducto
+                                    .setPrecio(producto.data["Precio"]);
+                              }
+                            },
+                            keyboardType: TextInputType.number,
+                            inputFormatters: <TextInputFormatter>[
+                              WhitelistingTextInputFormatter.digitsOnly
+                            ],
+                            decoration: InputDecoration(
+                              labelText: "Precio en pesos",
+                            ),
+                            onChanged: (String value) {
+                              modelProducto.setPrecio(int.parse(value));
+                            },
+                          ),
+                          SizedBox(
+                            height: 15,
+                          ),
+                          TextFormField(
+                            maxLength: 30,
+                            initialValue: producto.data["Stock"],
+                            validator: (value) {
+                              if (value.isEmpty ||
+                                  producto.data["Stock"]
+                                          .toString()
+                                          .compareTo(value.toString()) ==
+                                      0) {
+                                modelProducto
+                                    .setCantidad(producto.data["Stock"]);
+                              }
+                            },
+                            keyboardType: TextInputType.number,
+                            inputFormatters: <TextInputFormatter>[
+                              WhitelistingTextInputFormatter.digitsOnly
+                            ],
+                            decoration: InputDecoration(
+                              labelText: "Ingrese el stock",
+                            ),
+                            onChanged: (String value) {
+                              modelProducto.setCantidad(int.parse(value));
+                            },
+                          ),
+                          SizedBox(
+                            height: 15,
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: <Widget>[
+                              Expanded(
+                                child: Container(),
                               ),
-                              onChanged: (String value){
-                                modelProducto.nombre = value;
-                              },
-                            ),
-                            SizedBox(
-                              height: 15,
-                            ),
-                            TextFormField(
-                              maxLength: 50,
-                              enabled: false,
-                              initialValue: producto.data["Codigo"],
-                              validator: (value){
-                                if(value.isEmpty || producto.data["Codigo"].toString().compareTo(value.toString())==0){
-                                  modelProducto.codigo = producto.data["Codigo"].toString();
-                                }
-                              },
-                              keyboardType: TextInputType.number,
-                              inputFormatters: <TextInputFormatter>[
-                                WhitelistingTextInputFormatter.digitsOnly],
-                              decoration: InputDecoration(
-                                labelText: "Codigo",
-                              ),
-                              onChanged: (String value){
-                                modelProducto.codigo = value;
-                              },
-                            ),
-                            SizedBox(
-                              height: 15,
-                            ),
-                            TextFormField(
-                              maxLength: 9,
-                              initialValue: producto.data["Mg/u"],
-                              validator: (value){
-                                if(value.isEmpty || producto.data["Mg/u"].toString().compareTo(value.toString())==0){
-                                  modelProducto.peso = producto.data["Mg/u"].toString();
-                                }
-                              },
-                              keyboardType: TextInputType.number,
-                              inputFormatters: <TextInputFormatter>[
-                                WhitelistingTextInputFormatter.digitsOnly],
-                              decoration: InputDecoration(
-                                labelText: "Peso en mg/u",
-                              ),
-                              onChanged: (String value){
-                                modelProducto.peso = value;
-                              },
-                            ),
-                            SizedBox(
-                              height: 15,
-                            ),
-                            TextFormField(
-                              maxLength: 9,
-                              initialValue: producto.data["Precio"],
-                              validator: (value){
-                                if(value.isEmpty || producto.data["Precio"].toString().compareTo(value.toString())==0){
-                                  modelProducto.precio = producto.data["Precio"].toString();
-                                }
-                              },
-                              keyboardType: TextInputType.number,
-                              inputFormatters: <TextInputFormatter>[
-                                WhitelistingTextInputFormatter.digitsOnly],
-                              decoration: InputDecoration(
-                                labelText: "Precio en pesos",
-                              ),
-                              onChanged: (String value){
-                                modelProducto.precio = value;
-                              },
-                            ),
-                            SizedBox(
-                              height: 15,
-                            ),
-                            TextFormField(
-                              maxLength: 30,
-                              initialValue: producto.data["Stock"],
-                              validator: (value){
-                                if(value.isEmpty || producto.data["Stock"].toString().compareTo(value.toString())==0){
-                                  modelProducto.cantidad = producto.data["Stock"].toString();
-                                }
-                              },
-                              keyboardType: TextInputType.number,
-                              inputFormatters: <TextInputFormatter>[
-                                WhitelistingTextInputFormatter.digitsOnly],
-                              decoration: InputDecoration(
-                                labelText: "Ingrese el stock",
-                              ),
-                              onChanged: (String value){
-                                modelProducto.cantidad = value;
-                              },
-                            ),
-                            SizedBox(
-                              height: 15,
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: <Widget>[
-                                Expanded(
-                                  child: Container( ),
-                                ),
-                                FlatButton(
-                                    child: Text( "Atrás" ),
-                                    color: Colors.blue,
-                                    textColor: Colors.white,
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular( 15 ) ),
-                                    onPressed: () {
-                                      Provider.of<LoginState>(context).borrarProducto();
-                                      Navigator.pop(context);
-                                    }
-                                ),
-                                SizedBox(
-                                  width: 20,
-                                ),
-                                FlatButton(
-                                  child: Text( "Guardar" ),
+                              FlatButton(
+                                  child: Text("Atrás"),
                                   color: Colors.blue,
                                   textColor: Colors.white,
                                   shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular( 15 ) ),
+                                      borderRadius: BorderRadius.circular(15)),
                                   onPressed: () {
-                                    if(_formKey.currentState.validate()) {
-                                        _createProducto(_user,modelProducto.cantidad,modelProducto.nombre,modelProducto.codigo, modelProducto.peso, modelProducto.precio);
-                                      }
+                                    Provider.of<LoginState>(context)
+                                        .borrarProducto();
                                     Navigator.pop(context);
+                                  }),
+                              SizedBox(
+                                width: 20,
+                              ),
+                              FlatButton(
+                                  child: Text("Guardar"),
+                                  color: Colors.blue,
+                                  textColor: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(15)),
+                                  onPressed: () {
+                                    if (_formKey.currentState.validate()) {
+                                      _createProducto(
+                                          _user,
+                                          modelProducto
+                                              .getCantidad()
+                                              .toString(),
+                                          modelProducto.getNombre(),
+                                          modelProducto.getCodigo(),
+                                          modelProducto.getMgPorU().toString(),
+                                          modelProducto.getPrecio().toString());
                                     }
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
+                                    Navigator.pop(context);
+                                  }),
+                            ],
+                          ),
+                        ],
                       ),
+                    ),
                   ),
                 ),
               ),
@@ -271,16 +293,13 @@ class ModificarProducto extends StatelessWidget {
                 ),
               ),
             ],
-          )
-      ),
+          )),
     );
   }
 
-  void _createProducto(FirebaseUser _user, String cantidad, String nombre, String codigo, String peso, String precio){
-
-    Firestore.instance
-        .collection('usuarios')
-        .document(_user.uid).path;
+  void _createProducto(FirebaseUser _user, String cantidad, String nombre,
+      String codigo, String peso, String precio) {
+    Firestore.instance.collection('usuarios').document(_user.uid).path;
     Firestore.instance
         .collection('usuarios')
         .document(_user.uid)
@@ -295,9 +314,9 @@ class ModificarProducto extends StatelessWidget {
       "Tienda": _user.uid,
     });
   }
+
   void goToHomeScreen(BuildContext context) {
     Navigator.push(
-        context,
-        MaterialPageRoute( builder: (context) => HomeScreen( ) ) );
+        context, MaterialPageRoute(builder: (context) => HomeScreen()));
   }
 }

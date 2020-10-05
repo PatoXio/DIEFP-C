@@ -1,13 +1,12 @@
+import 'package:diefpc/Clases/Usuario.dart';
 import 'package:diefpc/states/login_state.dart';
-//import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:dart_rut_validator/dart_rut_validator.dart' show RUTValidator;
 import 'package:provider/provider.dart';
-import 'package:diefpc/models/usuario.dart';
 
 TextEditingController _rutController = TextEditingController();
 
-void onChangedApplyFormat(String text){
+void onChangedApplyFormat(String text) {
   RUTValidator.formatFromTextController(_rutController);
 }
 
@@ -18,29 +17,23 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   double screenHeight;
-  User model;
   var _user;
   // Set intial mode to login
   @override
   initState() {
-    super.initState( );
-    _rutController.clear( );
+    super.initState();
+    _rutController.clear();
   }
 
   @override
   Widget build(BuildContext context) {
     _user = Provider.of<LoginState>(context).currentUser();
-    screenHeight = MediaQuery
-        .of( context )
-        .size
-        .height;
+    screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       body: SingleChildScrollView(
         child: Stack(
           children: <Widget>[
-            _user == null
-                ? loginCard(context)
-                : loginCard(context),
+            loginCard(context),
             pageTitle(),
           ],
         ),
@@ -50,7 +43,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Widget pageTitle() {
     return Container(
-      margin: EdgeInsets.only( top: 50 ),
+      margin: EdgeInsets.only(top: 50),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
@@ -63,7 +56,7 @@ class _LoginScreenState extends State<LoginScreen> {
           Text(
             "DIEFP-C",
             style: TextStyle(
-                fontSize: 34, color: Colors.blue, fontWeight: FontWeight.w400 ),
+                fontSize: 34, color: Colors.blue, fontWeight: FontWeight.w400),
           )
         ],
       ),
@@ -71,18 +64,20 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Widget loginCard(BuildContext context) {
+    String contrasenia;
+    String correo;
     return Column(
       children: <Widget>[
         Container(
-          margin: EdgeInsets.only( top: screenHeight / 4 ),
-          padding: EdgeInsets.only( left: 10, right: 10 ),
+          margin: EdgeInsets.only(top: screenHeight / 4),
+          padding: EdgeInsets.only(left: 10, right: 10),
           child: Card(
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular( 10 ),
+              borderRadius: BorderRadius.circular(10),
             ),
             elevation: 8,
             child: Padding(
-              padding: const EdgeInsets.all( 30.0 ),
+              padding: const EdgeInsets.all(30.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
@@ -104,24 +99,54 @@ class _LoginScreenState extends State<LoginScreen> {
                     height: 20,
                   ),
                   Consumer<LoginState>(
-                    builder: (BuildContext context, LoginState value, Widget child){
-                      if(value.isLoading()){
-                        return CircularProgressIndicator();
-                      }else return child;
-                    },
-                    child: FlatButton(
-                      child: Text( "Entrar con una cuenta google" ),
-                      color: Colors.blue,
-                      textColor: Colors.white,
-                      padding: EdgeInsets.only(
-                          left: 38, right: 38, top: 15, bottom: 15 ),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular( 5 ) ),
-                      onPressed: () {
-                        Provider.of<LoginState>(context).login();
+                      builder: (BuildContext context, LoginState value,
+                          Widget child) {
+                        if (value.isLoading()) {
+                          return CircularProgressIndicator();
+                        } else
+                          return child;
                       },
-                    ),
-                  ),
+                      child: Column(
+                        children: <Widget>[
+                          SizedBox(
+                            height: 15,
+                          ),
+                          TextFormField(
+                            decoration: InputDecoration(
+                              labelText: "Correo",
+                            ),
+                            onChanged: (String value) {
+                              //  onSaved: (String value) {
+                              correo = value;
+                            },
+                            //},
+                          ),
+                          SizedBox(
+                            height: 15,
+                          ),
+                          TextFormField(
+                            decoration: InputDecoration(
+                              labelText: "Contraseña",
+                            ),
+                            onChanged: (String value) {
+                              //onSaved: (String value){
+                              contrasenia = value;
+                            },
+                          ),
+                          SizedBox(
+                            height: 15,
+                          ),
+                          ButtonBar(
+                            children: <Widget>[
+                              FlatButton(
+                                child: Text('Ingresar'),
+                                color: Colors.blue,
+                                onPressed: () {/** */},
+                              ),
+                            ],
+                          )
+                        ],
+                      )),
                   SizedBox(
                     height: 20,
                   ),
@@ -133,7 +158,7 @@ class _LoginScreenState extends State<LoginScreen> {
       ],
     );
   }
-  Widget singUpCard(BuildContext context) {
+  /*Widget singUpCard(BuildContext context) {
     bool issSwitched = false;
     model.delivery = issSwitched;
     return Column(
@@ -171,7 +196,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     onChanged: (String value) {
                       //  onSaved: (String value) {
-                      model.correo = value;
+                      usuario.setEmail(value);
                     },
                     //},
                   ),
@@ -282,5 +307,5 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       ],
     );
-  }
+  }*/
 }

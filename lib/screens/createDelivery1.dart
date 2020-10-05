@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:diefpc/Clases/Delivery.dart';
 //import 'package:diefpc/app/app.dart';
 import 'package:diefpc/screens/Menu.dart';
 import 'package:diefpc/screens/home.dart';
@@ -8,18 +9,13 @@ import 'package:flutter/material.dart';
 import 'package:dart_rut_validator/dart_rut_validator.dart' show RUTValidator;
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:diefpc/models/usuario.dart';
-import 'package:diefpc/models/delivery.dart';
-import 'package:diefpc/models/tienda.dart';
-
 import 'createDelivery2.dart';
-
 
 //import 'login.dart';
 
 TextEditingController _rutController = TextEditingController();
 
-void onChangedApplyFormat(String text){
+void onChangedApplyFormat(String text) {
   RUTValidator.formatFromTextController(_rutController);
 }
 
@@ -39,16 +35,13 @@ class _CreateDelivery1State extends State<CreateDelivery1> {
   // Set intial mode to login
   @override
   void initState() {
-    super.initState( );
-    _rutController.clear( );
+    super.initState();
+    _rutController.clear();
   }
 
   @override
   Widget build(BuildContext context) {
-    screenHeight = MediaQuery
-        .of( context )
-        .size
-        .height;
+    screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       body: SingleChildScrollView(
         child: Stack(
@@ -61,9 +54,9 @@ class _CreateDelivery1State extends State<CreateDelivery1> {
     );
   }
 
-  Widget pageTitle(){
+  Widget pageTitle() {
     return Container(
-      margin: EdgeInsets.only( top: 50 ),
+      margin: EdgeInsets.only(top: 50),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
@@ -76,7 +69,7 @@ class _CreateDelivery1State extends State<CreateDelivery1> {
           Text(
             "DIEFP-C",
             style: TextStyle(
-                fontSize: 34, color: Colors.blue, fontWeight: FontWeight.w400 ),
+                fontSize: 34, color: Colors.blue, fontWeight: FontWeight.w400),
           )
         ],
       ),
@@ -91,17 +84,16 @@ class _CreateDelivery1State extends State<CreateDelivery1> {
         child: Column(
           children: <Widget>[
             Container(
-              margin: EdgeInsets.only( top: screenHeight / 5 ),
-              padding: EdgeInsets.only( left: 10, right: 10 ),
+              margin: EdgeInsets.only(top: screenHeight / 5),
+              padding: EdgeInsets.only(left: 10, right: 10),
               child: Card(
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular( 10 ),
+                  borderRadius: BorderRadius.circular(10),
                 ),
                 elevation: 8,
                 child: Padding(
-                  padding: const EdgeInsets.all( 30.0 ),
-
-                    child: _columnDelivery(context),
+                  padding: const EdgeInsets.all(30.0),
+                  child: _columnDelivery(context),
                 ),
               ),
             ),
@@ -118,11 +110,10 @@ class _CreateDelivery1State extends State<CreateDelivery1> {
               ),
             ),
           ],
-        )
-    );
+        ));
   }
 
-  Widget _columnDelivery(BuildContext context){
+  Widget _columnDelivery(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
@@ -144,51 +135,50 @@ class _CreateDelivery1State extends State<CreateDelivery1> {
           title: Text('Motocicleta'),
           value: moto,
           activeColor: Colors.green,
-          secondary: const Icon( Icons.motorcycle ),
-          onChanged: (bool newValue){
+          secondary: const Icon(Icons.motorcycle),
+          onChanged: (bool newValue) {
             setState(() {
               moto = true;
               automovil = false;
               bicicleta = false;
-              modelDelivery.transporte = "Motocicleta";
+              modelDelivery.setMedioDeTransporte("Motocicleta");
             });
           },
-        )
-        ,
+        ),
         SizedBox(
           height: 15,
         ),
         CheckboxListTile(
-          title: Text( 'Automovil' ),
+          title: Text('Automovil'),
           value: automovil,
           //activeTrackColor: Colors.lightGreenAccent,
           activeColor: Colors.green,
-          secondary: const Icon( Icons.directions_car),
+          secondary: const Icon(Icons.directions_car),
           onChanged: (bool newValue) {
-            setState((){
+            setState(() {
               automovil = true;
               moto = false;
               bicicleta = false;
-              modelDelivery.transporte = "Automovil";
-            } );
+              modelDelivery.setMedioDeTransporte("Automovil");
+            });
           },
         ),
         SizedBox(
           height: 15,
         ),
         CheckboxListTile(
-          title: Text( 'Bicicleta' ),
+          title: Text('Bicicleta'),
           value: bicicleta,
           //activeTrackColor: Colors.lightGreenAccent,
           activeColor: Colors.green,
-          secondary: const Icon( Icons.directions_bike ),
+          secondary: const Icon(Icons.directions_bike),
           onChanged: (bool newValue) {
-            setState((){
+            setState(() {
               bicicleta = true;
               moto = false;
               automovil = false;
-              modelDelivery.transporte = "Bicicleta";
-            } );
+              modelDelivery.setMedioDeTransporte("Bicicleta");
+            });
           },
         ),
         SizedBox(
@@ -198,37 +188,36 @@ class _CreateDelivery1State extends State<CreateDelivery1> {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: <Widget>[
             Expanded(
-              child: Container( ),
+              child: Container(),
             ),
             FlatButton(
-                child: Text( "Atrás" ),
+                child: Text("Atrás"),
                 color: Colors.blue,
                 textColor: Colors.white,
                 shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular( 15 ) ),
+                    borderRadius: BorderRadius.circular(15)),
                 onPressed: () {
                   Navigator.pop(context);
-                }
-            ),
+                }),
             SizedBox(
               width: 20,
             ),
             FlatButton(
-              child: Text( "Siguiente" ),
+              child: Text("Siguiente"),
               color: Colors.blue,
               textColor: Colors.white,
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular( 15 ) ),
+                  borderRadius: BorderRadius.circular(15)),
               onPressed: () {
-                  if(automovil == true || moto == true || bicicleta == true) {
-                    _createDelivery( _user, modelDelivery.transporte);
-                    //Provider.of<LoginState>(context).isComplete();
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => CreateDelivery2( ) ) );
-                  }else
-                    _showDialog();
+                if (automovil == true || moto == true || bicicleta == true) {
+                  _createDelivery(_user, modelDelivery.getMedioDeTransporte());
+                  //Provider.of<LoginState>(context).isComplete();
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => CreateDelivery2()));
+                } else
+                  _showDialog();
               },
             ),
           ],
@@ -237,20 +226,16 @@ class _CreateDelivery1State extends State<CreateDelivery1> {
     );
   }
 
-  void _createDelivery(FirebaseUser _user, String transporte){
+  void _createDelivery(FirebaseUser _user, String transporte) {
     Firestore.instance
         .collection('usuarios')
         .document(_user.uid)
-        .updateData({
-      "transporte": transporte
-
-    });
+        .updateData({"transporte": transporte});
   }
 
   void goToHomeScreen(BuildContext context) {
     Navigator.push(
-        context,
-        MaterialPageRoute( builder: (context) => HomeScreen( ) ) );
+        context, MaterialPageRoute(builder: (context) => HomeScreen()));
   }
 
   void _showDialog() {
@@ -261,7 +246,8 @@ class _CreateDelivery1State extends State<CreateDelivery1> {
         // return object of type Dialog
         return AlertDialog(
           title: new Text("No has seleccionado ninguna opción :/"),
-          content: new Text("Debes seleccionar un medio de transporte para poder realizar las entregas de los productos a tiempo."),
+          content: new Text(
+              "Debes seleccionar un medio de transporte para poder realizar las entregas de los productos a tiempo."),
           actions: <Widget>[
             // usually buttons at the bottom of the dialog
             new FlatButton(

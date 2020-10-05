@@ -1,27 +1,27 @@
 import 'Pedido.dart';
 
 class ListPedido {
-  List<Pedido> listPedido;
+  List<Pedido> _listPedido;
 
   ListPedido() {
-    listPedido = new List<Pedido>();
+    _listPedido = new List<Pedido>();
   }
 
   ListPedido.carga(List<Pedido> listPedido) {
-    this.listPedido = listPedido;
+    this._listPedido = listPedido;
   }
 
   List<Pedido> getListPedido() {
-    return listPedido;
+    return _listPedido;
   }
 
   Pedido getPedido(String id) {
     int i;
-    if (listPedido != null) {
-      for (i = 0; i < listPedido.length; i++) {
-        if (listPedido.elementAt(i) != null) {
-          if (listPedido.elementAt(i).getId().compareTo(id) == 0) {
-            return listPedido.elementAt(i);
+    if (_listPedido != null) {
+      for (i = 0; i < _listPedido.length; i++) {
+        if (_listPedido.elementAt(i) != null) {
+          if (_listPedido.elementAt(i).getId().compareTo(id) == 0) {
+            return _listPedido.elementAt(i);
           }
         }
       }
@@ -30,10 +30,10 @@ class ListPedido {
   }
 
   void setListPedido(List<Pedido> listPedido) {
-    this.listPedido = listPedido;
+    this._listPedido = listPedido;
   }
 
   void setPedido(Pedido pedido) {
-    listPedido.add(pedido);
+    _listPedido.add(pedido);
   }
 }

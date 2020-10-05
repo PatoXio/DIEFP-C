@@ -1,9 +1,8 @@
 import 'dart:math';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:diefpc/Clases/Tienda.dart';
 import 'package:diefpc/app/app.dart';
 //import 'package:diefpc/app/app.dart';
-import 'package:diefpc/screens/Menu.dart';
 import 'package:diefpc/screens/home.dart';
 import 'package:diefpc/states/login_state.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -12,20 +11,14 @@ import 'package:dart_rut_validator/dart_rut_validator.dart' show RUTValidator;
 import 'package:flutter/services.dart';
 import 'package:mailer/smtp_server.dart';
 import 'package:provider/provider.dart';
-import 'package:diefpc/models/usuario.dart';
-import 'package:diefpc/models/delivery.dart';
-import 'package:diefpc/models/tienda.dart';
-import 'package:flutter_email_sender/flutter_email_sender.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:mailer/mailer.dart';
 import 'package:mailer/smtp_server.dart';
-
 
 //import 'login.dart';
 
 TextEditingController _rutController = TextEditingController();
 
-void onChangedApplyFormat(String text){
+void onChangedApplyFormat(String text) {
   RUTValidator.formatFromTextController(_rutController);
 }
 
@@ -43,16 +36,13 @@ class _CreateTienda1State extends State<CreateTienda1> {
   // Set intial mode to login
   @override
   void initState() {
-    super.initState( );
+    super.initState();
     codigoVerificacion = random();
   }
 
   @override
   Widget build(BuildContext context) {
-    screenHeight = MediaQuery
-        .of( context )
-        .size
-        .height;
+    screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       body: SingleChildScrollView(
         child: Stack(
@@ -65,9 +55,9 @@ class _CreateTienda1State extends State<CreateTienda1> {
     );
   }
 
-  Widget pageTitle(){
+  Widget pageTitle() {
     return Container(
-      margin: EdgeInsets.only( top: 50 ),
+      margin: EdgeInsets.only(top: 50),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
@@ -80,7 +70,7 @@ class _CreateTienda1State extends State<CreateTienda1> {
           Text(
             "DIEFP-C",
             style: TextStyle(
-                fontSize: 34, color: Colors.blue, fontWeight: FontWeight.w400 ),
+                fontSize: 34, color: Colors.blue, fontWeight: FontWeight.w400),
           )
         ],
       ),
@@ -95,16 +85,16 @@ class _CreateTienda1State extends State<CreateTienda1> {
         child: Column(
           children: <Widget>[
             Container(
-              margin: EdgeInsets.only( top: screenHeight / 5 ),
-              padding: EdgeInsets.only( left: 10, right: 10 ),
+              margin: EdgeInsets.only(top: screenHeight / 5),
+              padding: EdgeInsets.only(left: 10, right: 10),
               child: Card(
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular( 10 ),
+                  borderRadius: BorderRadius.circular(10),
                 ),
                 elevation: 8,
                 child: Padding(
-                  padding: const EdgeInsets.all( 30.0 ),
-                    child: _columnTienda(context),
+                  padding: const EdgeInsets.all(30.0),
+                  child: _columnTienda(context),
                 ),
               ),
             ),
@@ -121,11 +111,10 @@ class _CreateTienda1State extends State<CreateTienda1> {
               ),
             ),
           ],
-        )
-    );
+        ));
   }
 
-  Widget _columnTienda(BuildContext context){
+  Widget _columnTienda(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
@@ -145,7 +134,8 @@ class _CreateTienda1State extends State<CreateTienda1> {
         ),
         Align(
           alignment: Alignment.topLeft,
-          child: Text("Ingrese al link para enviar los documentos necesarios",
+          child: Text(
+            "Ingrese al link para enviar los documentos necesarios",
             style: TextStyle(
               color: Colors.blue,
               fontSize: 16,
@@ -159,11 +149,12 @@ class _CreateTienda1State extends State<CreateTienda1> {
         Align(
           alignment: Alignment.topLeft,
           child: RaisedButton(
-            onPressed: (){
+            onPressed: () {
               sendEmail(codigoVerificacion, _user.email);
               _showAlert();
             },
-            child: Text("Debido a que deben probarlo por los casos de prueba, al presionar se les enviara un correo sin necesidad de entrar a la página y validar sus documentos"),
+            child: Text(
+                "Debido a que deben probarlo por los casos de prueba, al presionar se les enviara un correo sin necesidad de entrar a la página y validar sus documentos"),
           ),
         ),
         SizedBox(
@@ -171,7 +162,8 @@ class _CreateTienda1State extends State<CreateTienda1> {
         ),
         Align(
           alignment: Alignment.topLeft,
-          child: Text("Ingrese el código de verificación que le llegara a su correo",
+          child: Text(
+            "Ingrese el código de verificación que le llegara a su correo",
             style: TextStyle(
               color: Colors.blue,
               fontSize: 16,
@@ -181,17 +173,17 @@ class _CreateTienda1State extends State<CreateTienda1> {
         ),
         SizedBox(
           height: 15,
-        ),        
+        ),
         TextFormField(
           maxLength: 50,
           decoration: InputDecoration(
             labelText: "Código",
           ),
-          onChanged: (String value){
-            modelTienda.codigoVerificacion = value;
+          onChanged: (String value) {
+            modelTienda.setCodigoDeVerificacion(value);
           },
-          validator: (value){
-            if(value != (codigoVerificacion.toString())){
+          validator: (value) {
+            if (value != (codigoVerificacion.toString())) {
               return 'Por favor ingrese su Código de\nverificación correctamente';
             }
           },
@@ -203,31 +195,31 @@ class _CreateTienda1State extends State<CreateTienda1> {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: <Widget>[
             Expanded(
-              child: Container( ),
+              child: Container(),
             ),
             FlatButton(
-                child: Text( "Atrás" ),
+                child: Text("Atrás"),
                 color: Colors.blue,
                 textColor: Colors.white,
                 shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular( 15 ) ),
+                    borderRadius: BorderRadius.circular(15)),
                 onPressed: () {
                   Navigator.pop(context);
-                }
-            ),
+                }),
             SizedBox(
               width: 20,
             ),
             FlatButton(
-              child: Text( "Completar\n\tRegistro" ),
+              child: Text("Completar\n\tRegistro"),
               color: Colors.blue,
               textColor: Colors.white,
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular( 15 ) ),
+                  borderRadius: BorderRadius.circular(15)),
               onPressed: () {
-                if(_formKey.currentState.validate()) {
-                    _createTienda( _user, modelTienda.codigoVerificacion, '11111111-2' );
-                    _showDialog();
+                if (_formKey.currentState.validate()) {
+                  _createTienda(_user, modelTienda.getCodigoDeVerificacion(),
+                      '11111111-2');
+                  _showDialog();
                 }
               },
             ),
@@ -254,9 +246,8 @@ class _CreateTienda1State extends State<CreateTienda1> {
                 //Provider.of<LoginState>(context).isComplete();
                 //Navigator.pop(context);
                 Provider.of<LoginState>(context).logout();
-                Navigator.push(
-                    context,
-                    new MaterialPageRoute(builder: (context) =>MyApp()));
+                Navigator.push(context,
+                    new MaterialPageRoute(builder: (context) => MyApp()));
               },
             ),
           ],
@@ -265,48 +256,47 @@ class _CreateTienda1State extends State<CreateTienda1> {
     );
   }
 
-  void _createTienda(FirebaseUser _user, String codigo, String rut){
+  void _createTienda(FirebaseUser _user, String codigo, String rut) {
     Firestore.instance
         .collection('usuarios')
         .document(_user.uid)
-        .updateData({
-      "codigoVerificacion": codigo,
-      "Rut": rut
-    });
+        .updateData({"codigoVerificacion": codigo, "Rut": rut});
   }
 
   void goToHomeScreen(BuildContext context) {
     Navigator.push(
-        context,
-        MaterialPageRoute( builder: (context) => HomeScreen( ) ) );
+        context, MaterialPageRoute(builder: (context) => HomeScreen()));
   }
 
   int random() {
     var rng = new Random();
-      return rng.nextInt(100000000);
+    return rng.nextInt(100000000);
   }
+
   Future<void> sendEmail(int codigoVerificacion, String correo) async {
     String username = 'Patricio.igtr@gmail.com';
     String password = 'Raideon133';
-    final smtpServer = gmail( username, password );
-    final message = Message( )
-      ..from = Address( username, 'Patricio Ignacio Torres Rojas' )
-      ..recipients.add( '$correo' )
+    final smtpServer = gmail(username, password);
+    final message = Message()
+      ..from = Address(username, 'Patricio Ignacio Torres Rojas')
+      ..recipients.add('$correo')
       //..ccRecipients.addAll( ['destCc1@example.com', 'destCc2@example.com'] )
       //..bccRecipients.add( Address( 'bccAddress@example.com' ) )
       ..subject = 'Hola, Te enviamos tu codigo de verificación'
       //..text = 'This is the plain text.\nThis is line 2 of the text part.'
-      ..html = "<h1>Código de Verificación</h1>\n<p>Tu código es: $codigoVerificacion</p>";
+      ..html =
+          "<h1>Código de Verificación</h1>\n<p>Tu código es: $codigoVerificacion</p>";
     try {
-      final sendReport = await send( message, smtpServer );
-      print( 'Message sent: ' + sendReport.toString( ) );
+      final sendReport = await send(message, smtpServer);
+      print('Message sent: ' + sendReport.toString());
     } on MailerException catch (e) {
-      print( 'Message not sent.' );
+      print('Message not sent.');
       for (var p in e.problems) {
-        print( 'Problem: ${p.code}: ${p.msg}' );
+        print('Problem: ${p.code}: ${p.msg}');
       }
     }
   }
+
   void _showAlert() {
     // flutter defined function
     showDialog(
@@ -315,7 +305,8 @@ class _CreateTienda1State extends State<CreateTienda1> {
         // return object of type Dialog
         return AlertDialog(
           title: new Text("Email enviado"),
-          content: new Text("Se ha enviado el código de verificación a su correo."),
+          content:
+              new Text("Se ha enviado el código de verificación a su correo."),
           actions: <Widget>[
             // usually buttons at the bottom of the dialog
             new FlatButton(

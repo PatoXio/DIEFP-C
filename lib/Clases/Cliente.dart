@@ -7,20 +7,20 @@ import 'Producto.dart';
 import 'Usuario.dart';
 
 class Cliente extends Usuario {
-  String rut;
-  int idDireccion;
-  ListDireccion listDireccion;
-  ListPedido historialCompra;
-  ListProducto carritoDeCompra;
-  ListPedido pedidosPendientes;
+  String _rut;
+  int _idDireccion;
+  ListDireccion _listDireccion;
+  ListPedido _historialCompra;
+  ListProducto _carritoDeCompra;
+  ListPedido _pedidosPendientes;
 
   Cliente() {
-    rut = null;
-    idDireccion = -1;
-    listDireccion = new ListDireccion();
-    historialCompra = new ListPedido();
-    carritoDeCompra = new ListProducto();
-    pedidosPendientes = new ListPedido();
+    _rut = null;
+    _idDireccion = -1;
+    _listDireccion = new ListDireccion();
+    _historialCompra = new ListPedido();
+    _carritoDeCompra = new ListProducto();
+    _pedidosPendientes = new ListPedido();
   }
 
   Cliente.carga(
@@ -30,79 +30,79 @@ class Cliente extends Usuario {
       ListPedido historialCompra,
       pedidosPendientes,
       ListProducto carritoDeCompra) {
-    this.rut = rut;
-    this.idDireccion = idDireccion;
-    this.listDireccion = listDireccion;
-    this.historialCompra = historialCompra;
-    this.carritoDeCompra = carritoDeCompra;
-    this.pedidosPendientes = pedidosPendientes;
+    this._rut = rut;
+    this._idDireccion = idDireccion;
+    this._listDireccion = listDireccion;
+    this._historialCompra = historialCompra;
+    this._carritoDeCompra = carritoDeCompra;
+    this._pedidosPendientes = pedidosPendientes;
   }
 
   String getRut() {
-    return rut;
+    return _rut;
   }
 
   int getIdDireccion() {
-    return idDireccion;
+    return _idDireccion;
   }
 
   ListDireccion getListDireccion() {
-    return listDireccion;
+    return _listDireccion;
   }
 
   Direccion getDireccion() {
-    return listDireccion.getDireccion(idDireccion);
+    return _listDireccion.getDireccion(_idDireccion);
   }
 
   ListPedido getHistorialDeCompras() {
-    return historialCompra;
+    return _historialCompra;
   }
 
   Pedido getCompra(String id) {
-    return historialCompra.getPedido(id);
+    return _historialCompra.getPedido(id);
   }
 
   ListProducto getCarritoDeCompra() {
-    return carritoDeCompra;
+    return _carritoDeCompra;
   }
 
   ListPedido getPedidosPendientes() {
-    return pedidosPendientes;
+    return _pedidosPendientes;
   }
 
   Pedido getPedidoPendiente(String id) {
-    return pedidosPendientes.getPedido(id);
+    return _pedidosPendientes.getPedido(id);
   }
 
   void setRut(String rut) {
-    this.rut = rut;
+    this._rut = rut;
   }
 
   void setIdDireccion(int idDireccion) {
-    this.idDireccion = idDireccion;
+    this._idDireccion = idDireccion;
   }
 
   void setListDireccion(ListDireccion listDireccion) {
-    this.listDireccion = listDireccion;
+    this._listDireccion = listDireccion;
   }
 
   void setDireccion(Direccion direccion) {
-    listDireccion.setDireccion(direccion);
+    _listDireccion.setDireccion(direccion);
   }
 
   void setCarritoDeCompra(ListProducto carritoDeCompra) {
-    this.carritoDeCompra = carritoDeCompra;
+    this._carritoDeCompra = carritoDeCompra;
   }
 
   void setProductoACarrito(Producto producto) {
-    carritoDeCompra.setProducto(producto);
+    _carritoDeCompra.setProducto(producto);
   }
 
   void setPedidosPendientes(ListPedido pedidosPendientes) {
-    this.pedidosPendientes = pedidosPendientes;
+    this._pedidosPendientes = pedidosPendientes;
   }
 
   void setPedidoPendiente(Pedido pedido) {
-    pedidosPendientes.setPedido(pedido);
+    _pedidosPendientes.setPedido(pedido);
   }
 }

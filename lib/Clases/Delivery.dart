@@ -1,96 +1,95 @@
 import 'ListPedido.dart';
 import 'Pedido.dart';
-import 'Pedido.dart';
 import 'Usuario.dart';
 
 class Delivery extends Usuario {
-  String rut;
-  int telefono;
-  String medioDeTransporte;
-  ListPedido pedidosPorTomar;
-  Pedido pedidoActual;
-  ListPedido listPedidoEntregado;
+  String _rut;
+  int _telefono;
+  String _medioDeTransporte;
+  ListPedido _pedidosPorTomar;
+  Pedido _pedidoActual;
+  ListPedido _listPedidoEntregado;
 
   Delivery() {
-    rut = null;
-    telefono = 0;
-    medioDeTransporte = null;
-    pedidosPorTomar = new ListPedido();
-    pedidoActual = new Pedido();
-    listPedidoEntregado = new ListPedido();
+    _rut = null;
+    _telefono = 0;
+    _medioDeTransporte = null;
+    _pedidosPorTomar = new ListPedido();
+    _pedidoActual = new Pedido();
+    _listPedidoEntregado = new ListPedido();
   }
 
   Delivery.carga(String rut, medioDeTransporte, int telefono,
       ListPedido pedidosPorTomar, listPedidoEntregado, Pedido pedidoActual) {
-    this.rut = rut;
-    this.telefono = telefono;
-    this.medioDeTransporte = medioDeTransporte;
-    this.pedidosPorTomar = pedidosPorTomar;
-    this.pedidoActual = pedidoActual;
-    this.listPedidoEntregado = listPedidoEntregado;
+    this._rut = rut;
+    this._telefono = telefono;
+    this._medioDeTransporte = medioDeTransporte;
+    this._pedidosPorTomar = pedidosPorTomar;
+    this._pedidoActual = pedidoActual;
+    this._listPedidoEntregado = listPedidoEntregado;
   }
 
   String getRut() {
-    return rut;
+    return _rut;
   }
 
   int getTelefono() {
-    return telefono;
+    return _telefono;
   }
 
   String getMedioDeTransporte() {
-    return medioDeTransporte;
+    return _medioDeTransporte;
   }
 
   ListPedido getPedidosPorTomar() {
-    return pedidosPorTomar;
+    return _pedidosPorTomar;
   }
 
   Pedido getPedidoPorTomar(String id) {
-    return listPedidoEntregado.getPedido(id);
+    return _listPedidoEntregado.getPedido(id);
   }
 
   Pedido getPedidoActual() {
-    return pedidoActual;
+    return _pedidoActual;
   }
 
   ListPedido getPedidosEntregados() {
-    return listPedidoEntregado;
+    return _listPedidoEntregado;
   }
 
   Pedido getPedidoEntregado(String id) {
-    return listPedidoEntregado.getPedido(id);
+    return _listPedidoEntregado.getPedido(id);
   }
 
   void setRut(String rut) {
-    this.rut = rut;
+    this._rut = rut;
   }
 
   void setTelefono(int telefono) {
-    this.telefono = telefono;
+    this._telefono = telefono;
   }
 
   void setMedioDeTransporte(String medioDeTransporte) {
-    this.medioDeTransporte = medioDeTransporte;
+    this._medioDeTransporte = medioDeTransporte;
   }
 
   void setPedidosPorTomar(ListPedido pedidosPorTomar) {
-    this.pedidosPorTomar = pedidosPorTomar;
+    this._pedidosPorTomar = pedidosPorTomar;
   }
 
   void setPedidoPorTomar(Pedido pedido) {
-    pedidosPorTomar.setPedido(pedido);
+    _pedidosPorTomar.setPedido(pedido);
   }
 
   void setPedidoActual(Pedido pedidoActual) {
-    this.pedidoActual = pedidoActual;
+    this._pedidoActual = pedidoActual;
   }
 
   void setPedidosEntregados(ListPedido listPedidoEntregado) {
-    this.listPedidoEntregado = listPedidoEntregado;
+    this._listPedidoEntregado = listPedidoEntregado;
   }
 
   void setPedidoEntregado(Pedido pedido) {
-    listPedidoEntregado.setPedido(pedido);
+    _listPedidoEntregado.setPedido(pedido);
   }
 }

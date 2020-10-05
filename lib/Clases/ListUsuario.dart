@@ -1,27 +1,27 @@
 import 'Usuario.dart';
 
 class ListUsuario {
-  List<Usuario> listUsuario;
+  List<Usuario> _listUsuario;
 
   ListUsuario() {
-    listUsuario = new List<Usuario>();
+    _listUsuario = new List<Usuario>();
   }
 
   ListUsuario.carga(List<Usuario> listUsuario) {
-    this.listUsuario = listUsuario;
+    this._listUsuario = listUsuario;
   }
 
   List<Usuario> getListUsuario() {
-    return listUsuario;
+    return _listUsuario;
   }
 
   Usuario getUsuario(String id) {
     int i;
-    if (listUsuario != null) {
-      for (i = 0; i < listUsuario.length; i++) {
-        if (listUsuario.elementAt(i) != null) {
-          if (id.compareTo(listUsuario.elementAt(i).getId()) == 0) {
-            return listUsuario.elementAt(i);
+    if (_listUsuario != null) {
+      for (i = 0; i < _listUsuario.length; i++) {
+        if (_listUsuario.elementAt(i) != null) {
+          if (id.compareTo(_listUsuario.elementAt(i).getId()) == 0) {
+            return _listUsuario.elementAt(i);
           }
         }
       }
@@ -30,10 +30,10 @@ class ListUsuario {
   }
 
   void setListUsuario(List<Usuario> listUsuario) {
-    this.listUsuario = listUsuario;
+    this._listUsuario = listUsuario;
   }
 
   void setUsuario(Usuario usuario) {
-    listUsuario.add(usuario);
+    _listUsuario.add(usuario);
   }
 }

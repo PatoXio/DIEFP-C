@@ -1,1 +1,0 @@
-Readme para que la carpeta sea visible y/o se pueda subir

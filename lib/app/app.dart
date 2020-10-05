@@ -8,7 +8,6 @@ import 'package:diefpc/screens/cambiarContrasena.dart';
 import 'package:diefpc/screens/cambiarCorreo.dart';
 import 'package:diefpc/screens/login.dart';
 
-
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -16,20 +15,19 @@ class MyApp extends StatelessWidget {
     // hacer uso de las facilidades de Material Design puede omitirce esto pero
     // no podran hacer uso de estos widgets de material.dart
     return ChangeNotifierProvider<LoginState>(
-      builder: (BuildContext context) => LoginState( ),
+      builder: (BuildContext context) => LoginState(),
       child: MaterialApp(
         title: "DIEFP-C",
         debugShowCheckedModeBanner: false,
-        theme: ThemeData.light( ),
+        theme: ThemeData.light(),
 //        theme: ThemeData.dark(),
         routes: {
           // ignore: missing_return
           "/": (BuildContext context) {
-            var state = Provider.of<LoginState>( context );
-            if (state.isLoggedIn()){
+            var state = Provider.of<LoginState>(context);
+            if (state.isLoggedIn()) {
               return HomeScreen();
-            }
-            else{
+            } else {
               return LoginScreen();
             }
           }
@@ -39,22 +37,23 @@ class MyApp extends StatelessWidget {
   }
 }
 
-void configMenu(BuildContext context){
+void configMenu(BuildContext context) {
   Navigator.of(context).push(
     MaterialPageRoute<void>(
       builder: (BuildContext context) {
         return Scaffold(
           appBar: AppBar(
-            title: Text( 'Congifuración' ),
+            title: Text('Congifuración'),
           ),
           body: ListView(
             children: <Widget>[
               Card(
                 child: ListTile(
-                  leading: IconButton(icon: Icon(Icons.supervised_user_circle),
+                  leading: IconButton(
+                    icon: Icon(Icons.supervised_user_circle),
                     iconSize: 40,
                     tooltip: 'Cambio de Contraseña',
-                    onPressed: (){
+                    onPressed: () {
                       goToCambioNombre(context);
                     },
                   ),
@@ -63,10 +62,11 @@ void configMenu(BuildContext context){
               ),
               Card(
                 child: ListTile(
-                  leading: IconButton(icon: Icon(Icons.lock),
+                  leading: IconButton(
+                    icon: Icon(Icons.lock),
                     iconSize: 40,
                     tooltip: 'Cambio de Nombre',
-                    onPressed: (){
+                    onPressed: () {
                       goToCambioContrasena(context);
                     },
                   ),
@@ -75,42 +75,44 @@ void configMenu(BuildContext context){
               ),
               Card(
                 child: ListTile(
-                  leading: IconButton(icon: Icon(Icons.power_settings_new),
+                  leading: IconButton(
+                    icon: Icon(Icons.power_settings_new),
                     iconSize: 40,
                     tooltip: 'Cerrar Sesión',
                     onPressed: () async {
                       await showDialog<void>(
-                      context: context,
-                      builder: (BuildContext context){
-                        return AlertDialog(
-                          title: const Text('¿Estás seguro de cerrar sesión?'),
-                          actions: <Widget>[
-                            FlatButton(
-                              onPressed: (){
-                                Provider.of<LoginState>(context).logout();
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(builder: (context) =>MyApp()));
-                              },
-                              child: const Text('Si'),
-                            ),
-                            FlatButton(
-                              onPressed: (){
-                                Navigator.pop(context);
-                              },
-                              child: const Text('No'),
-                            )
-                          ],
-                        );
-                      }
-                      );
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title:
+                                  const Text('¿Estás seguro de cerrar sesión?'),
+                              actions: <Widget>[
+                                FlatButton(
+                                  onPressed: () {
+                                    Provider.of<LoginState>(context).logout();
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => MyApp()));
+                                  },
+                                  child: const Text('Si'),
+                                ),
+                                FlatButton(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  child: const Text('No'),
+                                )
+                              ],
+                            );
+                          });
                     },
                   ),
                   title: Text('Cerrar Sesión'),
                 ),
-                  //subtitle: Text(''),
-                  //trailing: Icon(Icons.more_vert),
-                  //isThreeLine: true,
+                //subtitle: Text(''),
+                //trailing: Icon(Icons.more_vert),
+                //isThreeLine: true,
               )
             ],
           ),
@@ -144,17 +146,14 @@ void alertaCerrarSesion(BuildContext context) {
   );
 }
 
-void alertText(){
+void alertText() {}
 
-}
-
-void goToCambioContrasena(BuildContext context){
-  Navigator.push(
-      context,
+void goToCambioContrasena(BuildContext context) {
+  Navigator.push(context,
       MaterialPageRoute(builder: (context) => CambioContrasenaScreen()));
 }
-void goToCambioNombre(BuildContext context){
+
+void goToCambioNombre(BuildContext context) {
   Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => CambioCorreoScreen()));
+      context, MaterialPageRoute(builder: (context) => CambioCorreoScreen()));
 }

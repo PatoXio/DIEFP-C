@@ -1,23 +1,19 @@
-
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:diefpc/Clases/Cliente.dart';
+import 'package:diefpc/Clases/Delivery.dart';
+import 'package:diefpc/Clases/Tienda.dart';
 import 'package:diefpc/app/app.dart';
 //import 'package:diefpc/app/app.dart';
-import 'package:diefpc/screens/Menu.dart';
 import 'package:diefpc/screens/home.dart';
 import 'package:diefpc/states/login_state.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:dart_rut_validator/dart_rut_validator.dart' show RUTValidator;
 import 'package:flutter/services.dart';
-import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:provider/provider.dart';
-import 'package:diefpc/models/usuario.dart';
-import 'package:diefpc/models/delivery.dart';
-import 'package:diefpc/models/tienda.dart';
-import '../main.dart';
+
 import 'createDelivery1.dart';
 import 'createTienda1.dart';
-
 
 //import 'login.dart';
 
@@ -30,7 +26,7 @@ class CreateScreen extends StatefulWidget {
 
 class _CreateScreenState extends State<CreateScreen> {
   double screenHeight;
-  User model = new User();
+  Cliente model = new Cliente();
   Delivery modelDelivery = new Delivery();
   Tienda modelTienda = new Tienda();
   bool isSwitchDelivery = false;
@@ -42,15 +38,13 @@ class _CreateScreenState extends State<CreateScreen> {
   @override
   void initState() {
     _rutController.clear();
-    super.initState( );
+    super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
     Provider.of<LoginState>(context).isComplete();
-    screenHeight = MediaQuery
-        .of( context )
-        .size
-        .height;
+    screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       body: SingleChildScrollView(
         child: Stack(
@@ -63,9 +57,9 @@ class _CreateScreenState extends State<CreateScreen> {
     );
   }
 
-  Widget pageTitle(){
+  Widget pageTitle() {
     return Container(
-      margin: EdgeInsets.only( top: 50 ),
+      margin: EdgeInsets.only(top: 50),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
@@ -78,7 +72,7 @@ class _CreateScreenState extends State<CreateScreen> {
           Text(
             "DIEFP-C",
             style: TextStyle(
-                fontSize: 34, color: Colors.blue, fontWeight: FontWeight.w400 ),
+                fontSize: 34, color: Colors.blue, fontWeight: FontWeight.w400),
           )
         ],
       ),
@@ -93,16 +87,16 @@ class _CreateScreenState extends State<CreateScreen> {
         child: Column(
           children: <Widget>[
             Container(
-              margin: EdgeInsets.only( top: screenHeight / 5 ),
-              padding: EdgeInsets.only( left: 10, right: 10 ),
+              margin: EdgeInsets.only(top: screenHeight / 5),
+              padding: EdgeInsets.only(left: 10, right: 10),
               child: Card(
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular( 10 ),
+                  borderRadius: BorderRadius.circular(10),
                 ),
                 elevation: 8,
                 child: Padding(
-                  padding: const EdgeInsets.all( 30.0 ),
-                    child: _column(context, isComplete),
+                  padding: const EdgeInsets.all(30.0),
+                  child: _column(context, isComplete),
                 ),
               ),
             ),
@@ -119,23 +113,19 @@ class _CreateScreenState extends State<CreateScreen> {
               ),
             ),
           ],
-        )
-    );
+        ));
   }
 
-  Widget _column(BuildContext context, bool isComplete){
-    if(isComplete == false) {
-      if (checkBoxValue == true)
-        return _columnUser( context );
-      if (isSwitchDelivery == true)
-        return _columnDelivery( context );
-      if (isSwitchTienda == true)
-        return _columnTienda( context );
-    }else
+  Widget _column(BuildContext context, bool isComplete) {
+    if (isComplete == false) {
+      if (checkBoxValue == true) return _columnUser(context);
+      if (isSwitchDelivery == true) return _columnDelivery(context);
+      if (isSwitchTienda == true) return _columnTienda(context);
+    } else
       goBack(context);
   }
 
-  Widget _columnDelivery(BuildContext context){
+  Widget _columnDelivery(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
@@ -150,7 +140,7 @@ class _CreateScreenState extends State<CreateScreen> {
             ),
           ),
         ),
-      /*  SizedBox(
+        /*  SizedBox(
           height: 15,
         ),
      TextFormField(
@@ -169,16 +159,16 @@ class _CreateScreenState extends State<CreateScreen> {
         ),
         TextFormField(
           maxLength: 50,
-          validator: (value){
-            if(value.isEmpty){
+          validator: (value) {
+            if (value.isEmpty) {
               return 'Por favor ingrese su nombre completo';
             }
           },
           decoration: InputDecoration(
             labelText: "Nombre Completo",
           ),
-          onChanged: (String value){
-            modelDelivery.nombreCompleto = value;
+          onChanged: (String value) {
+            modelDelivery.setName(value);
           },
         ),
         SizedBox(
@@ -186,8 +176,8 @@ class _CreateScreenState extends State<CreateScreen> {
         ),
         TextFormField(
           maxLength: 9,
-          validator: (value){
-            if(value.isEmpty){
+          validator: (value) {
+            if (value.isEmpty) {
               return 'Por favor ingrese su número de celular';
             }
           },
@@ -196,26 +186,10 @@ class _CreateScreenState extends State<CreateScreen> {
           ),
           keyboardType: TextInputType.number,
           inputFormatters: <TextInputFormatter>[
-            WhitelistingTextInputFormatter.digitsOnly],
-          onChanged: (String value){
-            modelDelivery.numero = value;
-          },
-        ),
-        SizedBox(
-          height: 15,
-        ),
-        TextFormField(
-          maxLength: 30,
-          validator: (value){
-            if(value.isEmpty){
-              return 'Por favor ingrese su ciudad';
-            }
-          },
-          decoration: InputDecoration(
-            labelText: "Ingrese su ciudad",
-          ),
-          onChanged: (String value){
-            modelDelivery.ciudad = value;
+            WhitelistingTextInputFormatter.digitsOnly
+          ],
+          onChanged: (String value) {
+            modelDelivery.setTelefono(int.parse(value));
           },
         ),
         SizedBox(
@@ -226,58 +200,57 @@ class _CreateScreenState extends State<CreateScreen> {
           decoration: InputDecoration(
             labelText: "Código de invitación (Opcional",
           ),
-          onChanged: (String value){
-            modelDelivery.codigoInvitacion = value;
+          onChanged: (String value) {
+            modelDelivery.setCodigoDeInvitacion(value);
           },
         ),
         CheckboxListTile(
           title: Text('¿Usted es un Usuario Común?'),
           value: checkBoxValue,
           activeColor: Colors.green,
-          secondary: const Icon( Icons.supervised_user_circle ),
-          onChanged: (bool newValue){
+          secondary: const Icon(Icons.supervised_user_circle),
+          onChanged: (bool newValue) {
             setState(() {
               checkBoxValue = true;
               isSwitchDelivery = false;
               isSwitchTienda = false;
             });
           },
-        )
-        ,
+        ),
         SizedBox(
           height: 15,
         ),
         SwitchListTile(
-          title: Text( '¿Usted es Delivery?' ),
+          title: Text('¿Usted es Delivery?'),
           value: isSwitchDelivery,
           activeTrackColor: Colors.lightGreenAccent,
           activeColor: Colors.green,
-          secondary: const Icon( Icons.directions_bike ),
+          secondary: const Icon(Icons.directions_bike),
           onChanged: (bool newValue) {
-            setState((){
+            setState(() {
               isSwitchDelivery = newValue;
               isSwitchTienda = false;
               checkBoxValue = false;
-              if(isSwitchDelivery == false) checkBoxValue = true;
-            } );
+              if (isSwitchDelivery == false) checkBoxValue = true;
+            });
           },
         ),
         SizedBox(
           height: 15,
         ),
         SwitchListTile(
-          title: Text( '¿Usted es una Farmacia?' ),
+          title: Text('¿Usted es una Farmacia?'),
           value: isSwitchTienda,
           activeTrackColor: Colors.lightGreenAccent,
           activeColor: Colors.green,
-          secondary: const Icon( Icons.local_hospital ),
+          secondary: const Icon(Icons.local_hospital),
           onChanged: (bool newValue) {
-            setState((){
+            setState(() {
               isSwitchTienda = newValue;
               isSwitchDelivery = false;
               checkBoxValue = false;
-              if(isSwitchTienda == false) checkBoxValue = true;
-            } );
+              if (isSwitchTienda == false) checkBoxValue = true;
+            });
           },
         ),
         SizedBox(
@@ -287,47 +260,45 @@ class _CreateScreenState extends State<CreateScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: <Widget>[
             Expanded(
-              child: Container( ),
+              child: Container(),
             ),
             FlatButton(
-                child: Text( "Atrás" ),
+                child: Text("Atrás"),
                 color: Colors.blue,
                 textColor: Colors.white,
                 shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular( 15 ) ),
+                    borderRadius: BorderRadius.circular(15)),
                 onPressed: () {
                   Navigator.pop(context);
-                }
-            ),
+                }),
             SizedBox(
               width: 20,
             ),
             FlatButton(
-              child: Text( "Siguiente" ),
+              child: Text("Siguiente"),
               color: Colors.blue,
               textColor: Colors.white,
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular( 15 ) ),
+                  borderRadius: BorderRadius.circular(15)),
               onPressed: () {
                 RUTValidator.formatFromTextController(_rutController);
                 //modelDelivery.rut = _rutController.value.text;
-                if(_formKey.currentState.validate()) {
+                if (_formKey.currentState.validate()) {
                   if (isSwitchDelivery == true) {
                     _createDelivery(
                         _user,
                         isSwitchDelivery,
                         isSwitchTienda,
                         //modelDelivery.rut,
-                        modelDelivery.numero,
-                        modelDelivery.ciudad,
-                        modelDelivery.codigoInvitacion,
-                        modelDelivery.nombreCompleto );
+                        modelDelivery.getTelefono().toString(),
+                        modelDelivery.getCodigoDeInvitacion(),
+                        modelDelivery.getname());
                   }
                   //Provider.of<LoginState>(context).isComplete();
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => CreateDelivery1( ) ) );
+                          builder: (context) => CreateDelivery1()));
                 }
               },
             ),
@@ -337,7 +308,7 @@ class _CreateScreenState extends State<CreateScreen> {
     );
   }
 
-  Widget _columnTienda(BuildContext context){
+  Widget _columnTienda(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
@@ -360,11 +331,11 @@ class _CreateScreenState extends State<CreateScreen> {
           decoration: InputDecoration(
             labelText: "Patente",
           ),
-          onChanged: (String value){
-            modelTienda.patente = value;
+          onChanged: (String value) {
+            modelTienda.setPatente(value);
           },
-          validator: (value){
-            if(value.isEmpty || (value != null && value.length <5)){
+          validator: (value) {
+            if (value.isEmpty || (value != null && value.length < 5)) {
               return 'Por favor ingrese una patente de 5 o + digitos';
             }
           },
@@ -373,50 +344,49 @@ class _CreateScreenState extends State<CreateScreen> {
           title: Text('¿Usted es un Usuario Común?'),
           value: checkBoxValue,
           activeColor: Colors.green,
-          secondary: const Icon( Icons.supervised_user_circle ),
-          onChanged: (bool newValue){
+          secondary: const Icon(Icons.supervised_user_circle),
+          onChanged: (bool newValue) {
             setState(() {
               checkBoxValue = true;
               isSwitchDelivery = false;
               isSwitchTienda = false;
             });
           },
-        )
-        ,
+        ),
         SizedBox(
           height: 15,
         ),
         SwitchListTile(
-          title: Text( '¿Usted es Delivery?' ),
+          title: Text('¿Usted es Delivery?'),
           value: isSwitchDelivery,
           activeTrackColor: Colors.lightGreenAccent,
           activeColor: Colors.green,
-          secondary: const Icon( Icons.directions_bike ),
+          secondary: const Icon(Icons.directions_bike),
           onChanged: (bool newValue) {
-            setState((){
+            setState(() {
               isSwitchDelivery = newValue;
               isSwitchTienda = false;
               checkBoxValue = false;
-              if(isSwitchDelivery == false) checkBoxValue = true;
-            } );
+              if (isSwitchDelivery == false) checkBoxValue = true;
+            });
           },
         ),
         SizedBox(
           height: 15,
         ),
         SwitchListTile(
-          title: Text( '¿Usted es una Farmacia?' ),
+          title: Text('¿Usted es una Farmacia?'),
           value: isSwitchTienda,
           activeTrackColor: Colors.lightGreenAccent,
           activeColor: Colors.green,
-          secondary: const Icon( Icons.local_hospital ),
+          secondary: const Icon(Icons.local_hospital),
           onChanged: (bool newValue) {
-            setState((){
+            setState(() {
               isSwitchTienda = newValue;
               isSwitchDelivery = false;
               checkBoxValue = false;
-              if(isSwitchTienda == false) checkBoxValue = true;
-            } );
+              if (isSwitchTienda == false) checkBoxValue = true;
+            });
           },
         ),
         SizedBox(
@@ -426,39 +396,38 @@ class _CreateScreenState extends State<CreateScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: <Widget>[
             Expanded(
-              child: Container( ),
+              child: Container(),
             ),
             FlatButton(
-                child: Text( "Atrás" ),
+                child: Text("Atrás"),
                 color: Colors.blue,
                 textColor: Colors.white,
                 shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular( 15 ) ),
+                    borderRadius: BorderRadius.circular(15)),
                 onPressed: () {
                   Navigator.pop(context);
-                }
-            ),
+                }),
             SizedBox(
               width: 20,
             ),
             FlatButton(
-              child: Text( "Siguiente" ),
+              child: Text("Siguiente"),
               color: Colors.blue,
               textColor: Colors.white,
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular( 15 ) ),
+                  borderRadius: BorderRadius.circular(15)),
               onPressed: () {
-                if(_formKey.currentState.validate()){
-                  if(_user.email.compareTo("patricio.igtr@gmail.com")==0)
-                    _createAdmin(_user, modelTienda.patente, isSwitchDelivery, isSwitchTienda);
-                  else
-                  if(isSwitchTienda == true){
-                    _createTienda(_user, modelTienda.patente, isSwitchDelivery, isSwitchTienda);
+                if (_formKey.currentState.validate()) {
+                  if (_user.email.compareTo("patricio.igtr@gmail.com") == 0)
+                    _createAdmin(_user, modelTienda.getPatente(),
+                        isSwitchDelivery, isSwitchTienda);
+                  else if (isSwitchTienda == true) {
+                    _createTienda(_user, modelTienda.getPatente(),
+                        isSwitchDelivery, isSwitchTienda);
                   }
                   Provider.of<LoginState>(context).isComplete();
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) =>CreateTienda1()));
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => CreateTienda1()));
                 }
               },
             ),
@@ -468,7 +437,7 @@ class _CreateScreenState extends State<CreateScreen> {
     );
   }
 
-  Widget _columnUser(BuildContext context){
+  Widget _columnUser(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
@@ -492,59 +461,59 @@ class _CreateScreenState extends State<CreateScreen> {
             labelText: "Rut",
           ),
           controller: _rutController,
-          onChanged: (String value){
-            model.rut = value;
+          onChanged: (String value) {
+            model.setRut(value);
           },
-          validator: RUTValidator(validationErrorText: 'Ingrese un RUT válido').validator,
+          validator: RUTValidator(validationErrorText: 'Ingrese un RUT válido')
+              .validator,
         ),
         CheckboxListTile(
           title: Text('¿Usted es un Usuario Común?'),
           value: checkBoxValue,
           activeColor: Colors.green,
-          secondary: const Icon( Icons.supervised_user_circle ),
-          onChanged: (bool newValue){
+          secondary: const Icon(Icons.supervised_user_circle),
+          onChanged: (bool newValue) {
             setState(() {
               checkBoxValue = true;
               isSwitchDelivery = false;
               isSwitchTienda = false;
             });
           },
-        )
-        ,
+        ),
         SizedBox(
           height: 15,
         ),
         SwitchListTile(
-          title: Text( '¿Usted es Delivery?' ),
+          title: Text('¿Usted es Delivery?'),
           value: isSwitchDelivery,
           activeTrackColor: Colors.lightGreenAccent,
           activeColor: Colors.green,
-          secondary: const Icon( Icons.directions_bike ),
+          secondary: const Icon(Icons.directions_bike),
           onChanged: (bool newValue) {
-            setState((){
+            setState(() {
               isSwitchDelivery = newValue;
               isSwitchTienda = false;
               checkBoxValue = false;
-              if(isSwitchDelivery == false) checkBoxValue = true;
-            } );
+              if (isSwitchDelivery == false) checkBoxValue = true;
+            });
           },
         ),
         SizedBox(
           height: 15,
         ),
         SwitchListTile(
-          title: Text( '¿Usted es una Farmacia?' ),
+          title: Text('¿Usted es una Farmacia?'),
           value: isSwitchTienda,
           activeTrackColor: Colors.lightGreenAccent,
           activeColor: Colors.green,
-          secondary: const Icon( Icons.local_hospital ),
+          secondary: const Icon(Icons.local_hospital),
           onChanged: (bool newValue) {
-            setState((){
+            setState(() {
               isSwitchTienda = newValue;
               isSwitchDelivery = false;
               checkBoxValue = false;
-              if(isSwitchTienda == false) checkBoxValue = true;
-            } );
+              if (isSwitchTienda == false) checkBoxValue = true;
+            });
           },
         ),
         SizedBox(
@@ -554,36 +523,36 @@ class _CreateScreenState extends State<CreateScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: <Widget>[
             Expanded(
-              child: Container( ),
+              child: Container(),
             ),
             FlatButton(
-                child: Text( "Atrás" ),
+                child: Text("Atrás"),
                 color: Colors.blue,
                 textColor: Colors.white,
                 shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular( 15 ) ),
+                    borderRadius: BorderRadius.circular(15)),
                 onPressed: () {
                   Navigator.pop(context);
-                }
-            ),
+                }),
             SizedBox(
               width: 20,
             ),
             FlatButton(
-              child: Text( "Completar\n\tRegistro" ),
+              child: Text("Completar\n\tRegistro"),
               color: Colors.blue,
               textColor: Colors.white,
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular( 15 ) ),
+                  borderRadius: BorderRadius.circular(15)),
               onPressed: () {
-                if(_formKey.currentState.validate()){
+                if (_formKey.currentState.validate()) {
                   RUTValidator.formatFromTextController(_rutController);
-                  model.rut = _rutController.value.text;
-                  if(_user.email.compareTo("patricio.igtr@gmail.com")==0)
-                    _createAdmin(_user, model.rut, isSwitchDelivery, isSwitchTienda);
-                  else
-                  if(checkBoxValue == true){
-                    _createUser(_user, model.rut, isSwitchDelivery, isSwitchTienda);
+                  model.setRut(_rutController.value.text);
+                  if (_user.email.compareTo("patricio.igtr@gmail.com") == 0)
+                    _createAdmin(_user, model.getRut(), isSwitchDelivery,
+                        isSwitchTienda);
+                  else if (checkBoxValue == true) {
+                    _createUser(_user, model.getRut(), isSwitchDelivery,
+                        isSwitchTienda);
                   }
                   _showDialog();
                 }
@@ -612,9 +581,8 @@ class _CreateScreenState extends State<CreateScreen> {
                 //Provider.of<LoginState>(context).isComplete();
                 //Navigator.pop(context);
                 Provider.of<LoginState>(context).logout();
-                Navigator.push(
-                    context,
-                    new MaterialPageRoute(builder: (context) =>MyApp()));
+                Navigator.push(context,
+                    new MaterialPageRoute(builder: (context) => MyApp()));
               },
             ),
           ],
@@ -623,11 +591,9 @@ class _CreateScreenState extends State<CreateScreen> {
     );
   }
 
-  void _createTienda(FirebaseUser _user, String patente, bool delivery, bool tienda){
-    Firestore.instance
-        .collection('usuarios')
-        .document(_user.uid)
-        .updateData({
+  void _createTienda(
+      FirebaseUser _user, String patente, bool delivery, bool tienda) {
+    Firestore.instance.collection('usuarios').document(_user.uid).updateData({
       "nombre": _user.displayName,
       "email": _user.email,
       "Patente": patente,
@@ -637,11 +603,8 @@ class _CreateScreenState extends State<CreateScreen> {
     });
   }
 
-  void _createUser(FirebaseUser _user, String rut, bool delivery, bool tienda){
-    Firestore.instance
-        .collection('usuarios')
-        .document(_user.uid)
-        .updateData({
+  void _createUser(FirebaseUser _user, String rut, bool delivery, bool tienda) {
+    Firestore.instance.collection('usuarios').document(_user.uid).updateData({
       "nombre": _user.displayName,
       "email": _user.email,
       "Rut": rut,
@@ -651,28 +614,29 @@ class _CreateScreenState extends State<CreateScreen> {
     });
   }
 
-  void _createDelivery(FirebaseUser _user, bool delivery, bool tienda, /*String rut,*/String numero, String ciudad, String codigo, String nombreCompleto){
-    Firestore.instance
-        .collection('usuarios')
-        .document(_user.uid)
-        .updateData({
+  void _createDelivery(
+      FirebaseUser _user,
+      bool delivery,
+      bool tienda,
+      /*String rut,*/ String numero,
+      String codigo,
+      String nombreCompleto) {
+    Firestore.instance.collection('usuarios').document(_user.uid).updateData({
       "nombre": _user.displayName,
       "nombreApp": nombreCompleto,
       "email": _user.email,
-     // "Rut": rut,
+      // "Rut": rut,
       "numero": numero,
-      "ciudad": ciudad,
       "codigo": codigo,
       "Delivery": delivery,
       "Tienda": tienda,
       "Admin": false,
     });
   }
-  void _createAdmin(FirebaseUser _user, String rut, bool delivery, bool tienda){
-    Firestore.instance
-        .collection('usuarios')
-        .document(_user.uid)
-        .updateData({
+
+  void _createAdmin(
+      FirebaseUser _user, String rut, bool delivery, bool tienda) {
+    Firestore.instance.collection('usuarios').document(_user.uid).updateData({
       "nombre": _user.displayName,
       "email": _user.email,
       "Rut": rut,
@@ -681,21 +645,20 @@ class _CreateScreenState extends State<CreateScreen> {
       "Admin": true,
     });
   }
+
   void goToHomeScreen(BuildContext context) {
     Navigator.push(
-        context,
-        MaterialPageRoute( builder: (context) => HomeScreen( ) ) );
+        context, MaterialPageRoute(builder: (context) => HomeScreen()));
   }
 
-  void goToRestart(BuildContext context){
+  void goToRestart(BuildContext context) {
     Provider.of<LoginState>(context).isComplete();
     Provider.of<LoginState>(context).logout();
     Navigator.push(
-        context,
-        new MaterialPageRoute(builder: (context) =>MyApp()));
+        context, new MaterialPageRoute(builder: (context) => MyApp()));
   }
 
-  void goBack(BuildContext context){
+  void goBack(BuildContext context) {
     Navigator.pop(context);
   }
 }

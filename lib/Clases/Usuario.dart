@@ -1,51 +1,73 @@
 class Usuario {
-  String id;
-  String name;
-  String email;
-  String password;
+  String _id;
+  String _name;
+  String _email;
+  String _password;
+  String _codigoVerificacion;
+  String _codigoDeInvitacion;
 
   Usuario() {
-    id = null;
-    name = null;
-    email = null;
-    password = null;
+    _id = null;
+    _name = null;
+    _email = null;
+    _password = null;
+    _codigoVerificacion = null;
   }
-  Usuario.carga(String id, name, email, password) {
-    this.id = id;
-    this.name = name;
-    this.email = email;
-    this.password = password;
+  Usuario.carga(String id, name, email, password, codigoVerificacion,
+      codigoDeInvitacion) {
+    this._id = id;
+    this._name = name;
+    this._email = email;
+    this._password = password;
+    this._codigoVerificacion = codigoVerificacion;
+    this._codigoDeInvitacion = codigoDeInvitacion;
   }
 
   String getId() {
-    return id;
+    return _id;
   }
 
   String getname() {
-    return name;
+    return _name;
   }
 
   String getEmail() {
-    return email;
+    return _email;
   }
 
   String getPassword() {
-    return password;
+    return _password;
+  }
+
+  String getCodigoDeVerificacion() {
+    return _codigoVerificacion;
+  }
+
+  String getCodigoDeInvitacion() {
+    return _codigoDeInvitacion;
   }
 
   void setId(String id) {
-    this.id = id;
+    this._id = id;
   }
 
   void setName(String name) {
-    this.name = name;
+    this._name = name;
   }
 
   void setEmail(String email) {
-    this.email = email;
+    this._email = email;
   }
 
   void setPassword(String password) {
-    this.password = password;
+    this._password = password;
+  }
+
+  void setCodigoDeVerificacion(String codigoVerificacion) {
+    this._codigoVerificacion = codigoVerificacion;
+  }
+
+  void setCodigoDeInvitacion(String codigoDeInvitacion) {
+    this._codigoDeInvitacion = codigoDeInvitacion;
   }
 }

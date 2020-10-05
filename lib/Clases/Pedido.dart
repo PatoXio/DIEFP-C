@@ -2,150 +2,150 @@ import 'ListProducto.dart';
 import 'Producto.dart';
 
 class Pedido {
-  String id;
-  int costoDeEnvio;
-  DateTime fecha;
-  String medioDePago;
-  bool porAceptar;
-  bool porEntregar;
-  String idTienda;
-  String idUsuario;
-  String nombreTienda;
-  int totalPagado;
-  ListProducto listProducto;
+  String _id;
+  int _costoDeEnvio;
+  DateTime _fecha;
+  String _medioDePago;
+  bool _porAceptar;
+  bool _porEntregar;
+  String _idTienda;
+  String _idUsuario;
+  String _nombreTienda;
+  int _totalPagado;
+  ListProducto _listProducto;
 
   Pedido() {
-    id = null;
-    costoDeEnvio = 0;
-    fecha = null;
-    medioDePago = null;
-    porAceptar = false;
-    porEntregar = false;
-    idTienda = null;
-    idUsuario = null;
-    nombreTienda = null;
-    totalPagado = 0;
-    listProducto = new ListProducto();
+    _id = null;
+    _costoDeEnvio = 0;
+    _fecha = null;
+    _medioDePago = null;
+    _porAceptar = false;
+    _porEntregar = false;
+    _idTienda = null;
+    _idUsuario = null;
+    _nombreTienda = null;
+    _totalPagado = 0;
+    _listProducto = new ListProducto();
   }
 
   Pedido.carga(
-      String id,
+      String _id,
       medioDePado,
-      idTienda,
-      idUsuario,
-      nombreTienda,
-      int costoDeEnvio,
-      totalPagado,
-      bool porAceptar,
-      porEntregar,
-      DateTime fecha,
-      ListProducto listProducto) {
-    this.id = id;
-    this.costoDeEnvio = costoDeEnvio;
-    this.fecha = fecha;
-    this.medioDePago = medioDePago;
-    this.porAceptar = porAceptar;
-    this.porEntregar = porEntregar;
-    this.idTienda = idTienda;
-    this.idUsuario = idUsuario;
-    this.nombreTienda = nombreTienda;
-    this.totalPagado = totalPagado;
-    this.listProducto = listProducto;
+      _idTienda,
+      _idUsuario,
+      _nombreTienda,
+      int _costoDeEnvio,
+      _totalPagado,
+      bool _porAceptar,
+      _porEntregar,
+      DateTime _fecha,
+      ListProducto _listProducto) {
+    this._id = _id;
+    this._costoDeEnvio = _costoDeEnvio;
+    this._fecha = _fecha;
+    this._medioDePago = _medioDePago;
+    this._porAceptar = _porAceptar;
+    this._porEntregar = _porEntregar;
+    this._idTienda = _idTienda;
+    this._idUsuario = _idUsuario;
+    this._nombreTienda = _nombreTienda;
+    this._totalPagado = _totalPagado;
+    this._listProducto = _listProducto;
   }
 
   String getId() {
-    return id;
+    return _id;
   }
 
   int getCostoDeEnvio() {
-    return costoDeEnvio;
+    return _costoDeEnvio;
   }
 
   DateTime getFecha() {
-    return fecha;
+    return _fecha;
   }
 
   String getMedioDePago() {
-    return medioDePago;
+    return _medioDePago;
   }
 
   bool getPorAceptar() {
-    return porAceptar;
+    return _porAceptar;
   }
 
   bool getPorEntregar() {
-    return porEntregar;
+    return _porEntregar;
   }
 
   String getIdTienda() {
-    return idTienda;
+    return _idTienda;
   }
 
   String getIdUsuario() {
-    return idUsuario;
+    return _idUsuario;
   }
 
   String getNombreTienda() {
-    return nombreTienda;
+    return _nombreTienda;
   }
 
   int getTotalPagado() {
-    return totalPagado;
+    return _totalPagado;
   }
 
   ListProducto getListProducto() {
-    return listProducto;
+    return _listProducto;
   }
 
-  Producto getProducto(String id) {
-    return listProducto.getProducto(id);
+  Producto getProducto(String _id) {
+    return _listProducto.getProducto(_id);
   }
 
-  void setId(String id) {
-    this.id = id;
+  void setId(String _id) {
+    this._id = _id;
   }
 
-  void setCostoDeEnvio(int costoDeEnvio) {
-    this.costoDeEnvio = costoDeEnvio;
+  void setCostoDeEnvio(int _costoDeEnvio) {
+    this._costoDeEnvio = _costoDeEnvio;
   }
 
-  void setFecha(DateTime fecha) {
-    this.fecha = fecha;
+  void setFecha(DateTime _fecha) {
+    this._fecha = _fecha;
   }
 
-  void setMedioDePago(String medioDePago) {
-    this.medioDePago = medioDePago;
+  void setMedioDePago(String _medioDePago) {
+    this._medioDePago = _medioDePago;
   }
 
-  void setPorAceptar(bool porAceptar) {
-    this.porAceptar = porAceptar;
+  void setPorAceptar(bool _porAceptar) {
+    this._porAceptar = _porAceptar;
   }
 
-  void setporEntregar(bool porEntregar) {
-    this.porEntregar = porEntregar;
+  void setporEntregar(bool _porEntregar) {
+    this._porEntregar = _porEntregar;
   }
 
-  void setIdTienda(String idTienda) {
-    this.idTienda = idTienda;
+  void setIdTienda(String _idTienda) {
+    this._idTienda = _idTienda;
   }
 
-  void setIdUsuario(String idUsuario) {
-    this.idUsuario = idUsuario;
+  void setIdUsuario(String _idUsuario) {
+    this._idUsuario = _idUsuario;
   }
 
-  void setNombreTienda(String nombreTienda) {
-    this.nombreTienda = nombreTienda;
+  void setNombreTienda(String _nombreTienda) {
+    this._nombreTienda = _nombreTienda;
   }
 
-  void setTotalPagado(int totalPagado) {
-    this.totalPagado = totalPagado;
+  void setTotalPagado(int _totalPagado) {
+    this._totalPagado = _totalPagado;
   }
 
-  void setListProducto(ListProducto listProducto) {
-    this.listProducto = listProducto;
+  void setListProducto(ListProducto _listProducto) {
+    this._listProducto = _listProducto;
   }
 
   void setProducto(Producto producto) {
-    listProducto.setProducto(producto);
+    _listProducto.setProducto(producto);
   }
 }

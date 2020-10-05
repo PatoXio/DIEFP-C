@@ -1,5 +1,3 @@
-import 'package:diefpc/screens/pedidosPendientes.dart';
-
 import 'Direccion.dart';
 import 'ListPedido.dart';
 import 'ListProducto.dart';
@@ -8,90 +6,90 @@ import 'Producto.dart';
 import 'Usuario.dart';
 
 class Tienda extends Usuario {
-  String patente;
-  Direccion direccion;
-  ListProducto listProducto;
-  ListPedido listPedidoPendiente;
-  ListProducto listVenta;
+  String _patente;
+  Direccion _direccion;
+  ListProducto _listProducto;
+  ListPedido _listPedidoPendiente;
+  ListProducto _listVenta;
 
   Tienda() {
-    patente = null;
-    direccion = new Direccion();
-    listProducto = new ListProducto();
-    listPedidoPendiente = new ListPedido();
-    listVenta = new ListProducto();
+    _patente = null;
+    _direccion = new Direccion();
+    _listProducto = new ListProducto();
+    _listPedidoPendiente = new ListPedido();
+    _listVenta = new ListProducto();
   }
 
   Tienda.carga(String patente, Direccion direccion, ListProducto listProducto,
       listVenta, ListPedido listPedidoPendiente) {
-    this.patente = patente;
-    this.direccion = direccion;
-    this.listProducto = listProducto;
-    this.listVenta = listVenta;
-    this.listPedidoPendiente = listPedidoPendiente;
+    this._patente = patente;
+    this._direccion = direccion;
+    this._listProducto = listProducto;
+    this._listVenta = listVenta;
+    this._listPedidoPendiente = listPedidoPendiente;
   }
 
   String getPatente() {
-    return patente;
+    return _patente;
   }
 
   Direccion getDireccion() {
-    return direccion;
+    return _direccion;
   }
 
   ListProducto getListProducto() {
-    return listProducto;
+    return _listProducto;
   }
 
   Producto getProducto(String id) {
-    return listProducto.getProducto(id);
+    return _listProducto.getProducto(id);
   }
 
   ListPedido getListPedidosPendientes() {
-    return listPedidoPendiente;
+    return _listPedidoPendiente;
   }
 
   Pedido getPedidoPendiente(String id) {
-    return listPedidoPendiente.getPedido(id);
+    return _listPedidoPendiente.getPedido(id);
   }
 
   ListProducto getListVenta() {
-    return listVenta;
+    return _listVenta;
   }
 
   Producto getProductoVendido(String id) {
-    return listVenta.getProducto(id);
+    return _listVenta.getProducto(id);
   }
 
   void setPatente(String patente) {
-    this.patente = patente;
+    this._patente = patente;
   }
 
   void setDireccion(Direccion direccion) {
-    this.direccion = direccion;
+    this._direccion = direccion;
   }
 
   void setListProducto(ListProducto listProducto) {
-    this.listProducto = listProducto;
+    this._listProducto = listProducto;
   }
 
   void setProducto(Producto producto) {
-    listProducto.setProducto(producto);
+    _listProducto.setProducto(producto);
   }
 
   void setListPedidoPendiente(ListPedido listPedidoPendiente) {
-    this.listPedidoPendiente = listPedidoPendiente;
+    this._listPedidoPendiente = listPedidoPendiente;
   }
 
   void setPedidoPendiente(Pedido pedidoPendiente) {
-    listPedidoPendiente.setPedido(pedidoPendiente);
+    _listPedidoPendiente.setPedido(pedidoPendiente);
   }
 
   void setListVenta(ListProducto listVenta) {
-    this.listVenta = listVenta;
+    this._listVenta = listVenta;
   }
 
   void setProductoVendido(Producto producto) {
-    listVenta.setProducto(producto);
+    _listVenta.setProducto(producto);
   }
 }

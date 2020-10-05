@@ -1,27 +1,27 @@
 import 'Direccion.dart';
 
 class ListDireccion {
-  List<Direccion> listDireccion;
+  List<Direccion> _listDireccion;
 
   ListDireccion() {
-    listDireccion = new List<Direccion>();
+    _listDireccion = new List<Direccion>();
   }
 
   ListDireccion.carga(List<Direccion> listDireccion) {
-    this.listDireccion = listDireccion;
+    this._listDireccion = listDireccion;
   }
 
   List<Direccion> getListDireccion() {
-    return listDireccion;
+    return _listDireccion;
   }
 
   Direccion getDireccion(int idDireccion) {
     int i;
-    if (listDireccion != null) {
-      for (i = 0; i < listDireccion.length; i++) {
-        if (listDireccion.elementAt(i) != null) {
-          if (listDireccion.elementAt(i).getId() == idDireccion) {
-            return listDireccion.elementAt(i);
+    if (_listDireccion != null) {
+      for (i = 0; i < _listDireccion.length; i++) {
+        if (_listDireccion.elementAt(i) != null) {
+          if (_listDireccion.elementAt(i).getId() == idDireccion) {
+            return _listDireccion.elementAt(i);
           }
         }
       }
@@ -30,10 +30,10 @@ class ListDireccion {
   }
 
   void setListDireccion(List<Direccion> listDireccion) {
-    this.listDireccion = listDireccion;
+    this._listDireccion = listDireccion;
   }
 
   void setDireccion(Direccion direccion) {
-    listDireccion.add(direccion);
+    _listDireccion.add(direccion);
   }
 }

@@ -1,88 +1,88 @@
 class Producto {
-  String id;
-  int cantidad;
-  String codigo;
-  double mgPorU;
-  int precio;
-  int stock;
-  int stockReservado;
-  String idTienda;
-  String nombreTienda;
-  String nombre;
+  String _id;
+  int _cantidad;
+  String _codigo;
+  double _mgPorU;
+  int _precio;
+  int _stock;
+  int _stockReservado;
+  String _idTienda;
+  String _nombreTienda;
+  String _nombre;
 
   String getId() {
-    return id;
+    return _id;
   }
 
   int getCantidad() {
-    return cantidad;
+    return _cantidad;
   }
 
   String getCodigo() {
-    return codigo;
+    return _codigo;
   }
 
   double getMgPorU() {
-    return mgPorU;
+    return _mgPorU;
   }
 
   int getPrecio() {
-    return precio;
+    return _precio;
   }
 
   int getStock() {
-    return stock;
+    return _stock;
   }
 
   int getStockReservado() {
-    return stockReservado;
+    return _stockReservado;
   }
 
   String getIdTienda() {
-    return idTienda;
+    return _idTienda;
   }
 
   String getNombreTienda() {
-    return nombreTienda;
+    return _nombreTienda;
   }
 
   String getNombre() {
-    return nombre;
+    return _nombre;
   }
 
   void setCantidad(int cantidad) {
-    this.cantidad = cantidad;
+    this._cantidad = cantidad;
   }
 
   void setCodigo(String codigo) {
-    this.codigo = codigo;
+    this._codigo = codigo;
   }
 
   void setMgPorU(double mgPorU) {
-    this.mgPorU = mgPorU;
+    this._mgPorU = mgPorU;
   }
 
   void setPrecio(int precio) {
-    this.precio = precio;
+    this._precio = precio;
   }
 
   void setStock(int stock) {
-    this.stock = stock;
+    this._stock = stock;
   }
 
   void setStockReservado(int stockReservado) {
-    this.stockReservado = stockReservado;
+    this._stockReservado = stockReservado;
   }
 
   void setIdTienda(String idTienda) {
-    this.idTienda = idTienda;
+    this._idTienda = idTienda;
   }
 
   void setNombreTienda(String nombreTienda) {
-    this.nombreTienda = nombreTienda;
+    this._nombreTienda = nombreTienda;
   }
 
   void setNombre(String nombre) {
-    this.nombre = nombre;
+    this._nombre = nombre;
   }
 }
