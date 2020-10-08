@@ -1,24 +1,15 @@
 import 'dart:math';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:diefpc/Clases/Delivery.dart';
 import 'package:diefpc/app/app.dart';
-//import 'package:diefpc/app/app.dart';
-import 'package:diefpc/screens/Menu.dart';
 import 'package:diefpc/screens/home.dart';
 import 'package:diefpc/states/login_state.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:dart_rut_validator/dart_rut_validator.dart' show RUTValidator;
-import 'package:flutter/services.dart';
 import 'package:mailer/smtp_server.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_email_sender/flutter_email_sender.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:mailer/mailer.dart';
-import 'package:mailer/smtp_server.dart';
-
-//import 'login.dart';
 
 TextEditingController _rutController = TextEditingController();
 
@@ -224,8 +215,8 @@ class _CreateDelivery2State extends State<CreateDelivery2> {
                   borderRadius: BorderRadius.circular(15)),
               onPressed: () {
                 if (_formKey.currentState.validate()) {
-                  _createDelivery(_user,
-                      modelDelivery.getCodigoDeVerificacion(), '11111111-1');
+                  _createDelivery(
+                      _user, modelDelivery.getCodigoDeVerificacion(), "blabla");
                   _showDialog();
                 }
               },
@@ -236,10 +227,10 @@ class _CreateDelivery2State extends State<CreateDelivery2> {
     );
   }
 
-  void _createDelivery(FirebaseUser _user, String codigo, String rut) {
+  void _createDelivery(FirebaseUser _user, String rut, codigo) {
     Firestore.instance
         .collection('usuarios')
-        .document(_user.uid)
+        .document(_user.email)
         .updateData({"codigoVerificacion": codigo, "Rut": rut});
   }
 

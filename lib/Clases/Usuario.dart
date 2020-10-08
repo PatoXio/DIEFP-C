@@ -1,15 +1,15 @@
 class Usuario {
   String _id;
   String _name;
-  String _email;
+  String email;
   String _password;
   String _codigoVerificacion;
   String _codigoDeInvitacion;
 
-  Usuario() {
+  Usuario({String email}) {
     _id = null;
     _name = null;
-    _email = null;
+    email = null;
     _password = null;
     _codigoVerificacion = null;
   }
@@ -17,7 +17,7 @@ class Usuario {
       codigoDeInvitacion) {
     this._id = id;
     this._name = name;
-    this._email = email;
+    this.email = email;
     this._password = password;
     this._codigoVerificacion = codigoVerificacion;
     this._codigoDeInvitacion = codigoDeInvitacion;
@@ -27,12 +27,12 @@ class Usuario {
     return _id;
   }
 
-  String getname() {
+  String getName() {
     return _name;
   }
 
   String getEmail() {
-    return _email;
+    return email;
   }
 
   String getPassword() {
@@ -56,7 +56,7 @@ class Usuario {
   }
 
   void setEmail(String email) {
-    this._email = email;
+    this.email = email;
   }
 
   void setPassword(String password) {

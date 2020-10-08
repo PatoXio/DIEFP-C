@@ -2,6 +2,12 @@
   "configVersion": 2,
   "packages": [
     {
+      "name": "address_search_text_field",
+      "rootUri": "file:///D:/SRC/flutter/.pub-cache/hosted/pub.dartlang.org/address_search_text_field-1.3.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.1"
+    },
+    {
       "name": "analog_clock",
       "rootUri": "file:///D:/SRC/flutter/.pub-cache/hosted/pub.dartlang.org/analog_clock-0.0.4",
       "packageUri": "lib/",
@@ -105,7 +111,7 @@
     },
     {
       "name": "equatable",
-      "rootUri": "file:///D:/SRC/flutter/.pub-cache/hosted/pub.dartlang.org/equatable-0.2.6",
+      "rootUri": "file:///D:/SRC/flutter/.pub-cache/hosted/pub.dartlang.org/equatable-1.2.5",
       "packageUri": "lib/",
       "languageVersion": "2.0"
     },
@@ -231,9 +237,21 @@
     },
     {
       "name": "geocoder",
-      "rootUri": "file:///D:/SRC/flutter/.pub-cache/hosted/pub.dartlang.org/geocoder-0.1.2",
+      "rootUri": "file:///D:/SRC/flutter/.pub-cache/hosted/pub.dartlang.org/geocoder-0.2.1",
       "packageUri": "lib/",
       "languageVersion": "2.0"
+    },
+    {
+      "name": "geolocator",
+      "rootUri": "file:///D:/SRC/flutter/.pub-cache/hosted/pub.dartlang.org/geolocator-5.3.2+2",
+      "packageUri": "lib/",
+      "languageVersion": "2.1"
+    },
+    {
+      "name": "google_api_availability",
+      "rootUri": "file:///D:/SRC/flutter/.pub-cache/hosted/pub.dartlang.org/google_api_availability-2.0.4",
+      "packageUri": "lib/",
+      "languageVersion": "2.3"
     },
     {
       "name": "google_maps_flutter",
@@ -300,6 +318,12 @@
       "rootUri": "file:///D:/SRC/flutter/.pub-cache/hosted/pub.dartlang.org/location-3.0.2",
       "packageUri": "lib/",
       "languageVersion": "2.0"
+    },
+    {
+      "name": "location_permissions",
+      "rootUri": "file:///D:/SRC/flutter/.pub-cache/hosted/pub.dartlang.org/location_permissions-3.0.0+1",
+      "packageUri": "lib/",
+      "languageVersion": "2.1"
     },
     {
       "name": "location_platform_interface",
@@ -518,7 +542,7 @@
       "languageVersion": "2.6"
     }
   ],
-  "generated": "2020-08-04T19:59:32.626338Z",
+  "generated": "2020-10-08T05:12:00.184025Z",
   "generator": "pub",
   "generatorVersion": "2.9.0-21.2.beta"
 }
