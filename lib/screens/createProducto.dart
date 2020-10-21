@@ -2,19 +2,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:diefpc/Clases/Producto.dart';
 import 'package:diefpc/app/app.dart';
 //import 'package:diefpc/app/app.dart';
-import 'package:diefpc/screens/Menu.dart';
 import 'package:diefpc/screens/home.dart';
-import 'package:diefpc/screens/productosTienda.dart';
 import 'package:diefpc/states/login_state.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:dart_rut_validator/dart_rut_validator.dart' show RUTValidator;
 import 'package:flutter/services.dart';
-import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:provider/provider.dart';
-import '../main.dart';
-import 'createDelivery1.dart';
-import 'createTienda1.dart';
 
 //import 'login.dart';
 
@@ -110,6 +103,7 @@ class _CrearProductoState extends State<CrearProducto> {
                           if (value.isEmpty) {
                             return 'Por favor ingrese el nombre del producto';
                           }
+                          return "Nombre ingresado correctamente";
                         },
                         decoration: InputDecoration(
                           labelText: "Nombre",
@@ -123,10 +117,11 @@ class _CrearProductoState extends State<CrearProducto> {
                       ),
                       TextFormField(
                         maxLength: 50,
-                        validator: (value) {
+                        validator: (String value) {
                           if (value.isEmpty) {
                             return 'Por favor ingrese el codigo';
                           }
+                          return "Codigo ingresado";
                         },
                         keyboardType: TextInputType.number,
                         inputFormatters: <TextInputFormatter>[

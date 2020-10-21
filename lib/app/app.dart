@@ -1,6 +1,8 @@
 //import 'package:diefpc/screens/Menu.dart';
 //import 'package:diefpc/screens/createScreen.dart';
 import 'package:diefpc/screens/home.dart';
+import 'package:diefpc/screens/splashScreen.dart';
+import 'package:diefpc/states/auth.dart';
 import 'package:diefpc/states/login_state.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -14,8 +16,8 @@ class MyApp extends StatelessWidget {
     // Todas sus apliaciones deben de estar dentro de Material App para poder
     // hacer uso de las facilidades de Material Design puede omitirce esto pero
     // no podran hacer uso de estos widgets de material.dart
-    return ChangeNotifierProvider<LoginState>(
-      builder: (BuildContext context) => LoginState(),
+    return ChangeNotifierProvider<AuthService>(
+      builder: (BuildContext context) => AuthService(),
       child: MaterialApp(
         title: "DIEFP-C",
         debugShowCheckedModeBanner: false,
@@ -24,8 +26,8 @@ class MyApp extends StatelessWidget {
         routes: {
           // ignore: missing_return
           "/": (BuildContext context) {
-            var state = Provider.of<LoginState>(context);
-            if (state.isLoggedIn()) {
+            var state = Provider.of<AuthService>(context);
+            if (state.isComplete()) {
               return HomeScreen();
             } else {
               return LoginScreen();
@@ -89,7 +91,7 @@ void configMenu(BuildContext context) {
                               actions: <Widget>[
                                 FlatButton(
                                   onPressed: () {
-                                    Provider.of<LoginState>(context).logout();
+                                    Provider.of<AuthService>(context).signOut();
                                     Navigator.push(
                                         context,
                                         MaterialPageRoute(
@@ -145,8 +147,6 @@ void alertaCerrarSesion(BuildContext context) {
     },
   );
 }
-
-void alertText() {}
 
 void goToCambioContrasena(BuildContext context) {
   Navigator.push(context,

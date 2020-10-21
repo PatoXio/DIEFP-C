@@ -2,19 +2,14 @@ import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:diefpc/Clases/Tienda.dart';
 import 'package:diefpc/app/app.dart';
-//import 'package:diefpc/app/app.dart';
 import 'package:diefpc/screens/home.dart';
 import 'package:diefpc/states/login_state.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:dart_rut_validator/dart_rut_validator.dart' show RUTValidator;
-import 'package:flutter/services.dart';
 import 'package:mailer/smtp_server.dart';
 import 'package:provider/provider.dart';
 import 'package:mailer/mailer.dart';
-import 'package:mailer/smtp_server.dart';
-
-//import 'login.dart';
 
 TextEditingController _rutController = TextEditingController();
 
@@ -23,6 +18,8 @@ void onChangedApplyFormat(String text) {
 }
 
 class CreateTienda1 extends StatefulWidget {
+  CreateTienda1(String email);
+
   @override
   _CreateTienda1State createState() => _CreateTienda1State();
 }
@@ -32,7 +29,6 @@ class _CreateTienda1State extends State<CreateTienda1> {
   Tienda modelTienda = new Tienda();
   int codigoVerificacion;
   final _formKey = GlobalKey<FormState>();
-  FirebaseUser _user;
   // Set intial mode to login
   @override
   void initState() {
@@ -78,8 +74,6 @@ class _CreateTienda1State extends State<CreateTienda1> {
   }
 
   Widget singUpCard(BuildContext context) {
-    _user = Provider.of<LoginState>(context).currentUser();
-    var isComplete = Provider.of<LoginState>(context).isComplete();
     return Form(
         key: _formKey,
         child: Column(
@@ -150,7 +144,7 @@ class _CreateTienda1State extends State<CreateTienda1> {
           alignment: Alignment.topLeft,
           child: RaisedButton(
             onPressed: () {
-              sendEmail(codigoVerificacion, _user.email);
+              //sendEmail(codigoVerificacion, _user.email);
               _showAlert();
             },
             child: Text(
@@ -216,11 +210,11 @@ class _CreateTienda1State extends State<CreateTienda1> {
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(15)),
               onPressed: () {
-                if (_formKey.currentState.validate()) {
+                /*if (_formKey.currentState.validate()) {
                   _createTienda(_user, modelTienda.getCodigoDeVerificacion(),
                       '11111111-2');
                   _showDialog();
-                }
+                }*/
               },
             ),
           ],

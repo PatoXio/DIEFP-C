@@ -1,30 +1,31 @@
 class Usuario {
-  String _id;
   String _name;
   String email;
   String _password;
   String _codigoVerificacion;
   String _codigoDeInvitacion;
+  String _tipo;
 
   Usuario({String email}) {
-    _id = null;
     _name = null;
-    email = null;
+    this.email = email;
     _password = null;
     _codigoVerificacion = null;
+    _codigoDeInvitacion = null;
+    _tipo = null;
   }
-  Usuario.carga(String id, name, email, password, codigoVerificacion,
+  Usuario.carga(String name, tipo, email, password, codigoVerificacion,
       codigoDeInvitacion) {
-    this._id = id;
     this._name = name;
     this.email = email;
     this._password = password;
     this._codigoVerificacion = codigoVerificacion;
     this._codigoDeInvitacion = codigoDeInvitacion;
+    this._tipo = tipo;
   }
 
-  String getId() {
-    return _id;
+  String getTipo() {
+    return _tipo;
   }
 
   String getName() {
@@ -47,8 +48,8 @@ class Usuario {
     return _codigoDeInvitacion;
   }
 
-  void setId(String id) {
-    this._id = id;
+  void setTipo(String tipo) {
+    this._tipo = tipo;
   }
 
   void setName(String name) {

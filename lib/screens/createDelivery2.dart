@@ -77,6 +77,7 @@ class _CreateDelivery2State extends State<CreateDelivery2> {
 
   Widget singUpCard(BuildContext context) {
     _user = Provider.of<LoginState>(context).currentUser();
+    // ignore: unused_local_variable
     var isComplete = Provider.of<LoginState>(context).isComplete();
     return Form(
         key: _formKey,
@@ -180,10 +181,12 @@ class _CreateDelivery2State extends State<CreateDelivery2> {
           onChanged: (String value) {
             modelDelivery.setCodigoDeVerificacion(value);
           },
+          // ignore: missing_return
           validator: (value) {
             if (value != (codigoVerificacion.toString())) {
               return 'Por favor ingrese su Código de\nverificación correctamente';
             }
+            return "Codigo de verificación valido";
           },
         ),
         SizedBox(

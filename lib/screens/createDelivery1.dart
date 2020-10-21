@@ -1,13 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:diefpc/Clases/Delivery.dart';
 //import 'package:diefpc/app/app.dart';
-import 'package:diefpc/screens/Menu.dart';
 import 'package:diefpc/screens/home.dart';
 import 'package:diefpc/states/login_state.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:dart_rut_validator/dart_rut_validator.dart' show RUTValidator;
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'createDelivery2.dart';
 
@@ -78,6 +76,7 @@ class _CreateDelivery1State extends State<CreateDelivery1> {
 
   Widget singUpCard(BuildContext context) {
     _user = Provider.of<LoginState>(context).currentUser();
+    // ignore: unused_local_variable
     var isComplete = Provider.of<LoginState>(context).isComplete();
     return Form(
         key: _formKey,

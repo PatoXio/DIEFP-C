@@ -1,5 +1,7 @@
-import 'package:diefpc/Clases/Usuario.dart';
+import 'package:diefpc/app/app.dart';
 import 'package:diefpc/screens/createScreen.dart';
+import 'package:diefpc/screens/splashScreen.dart';
+import 'package:diefpc/states/auth.dart';
 import 'package:diefpc/states/login_state.dart';
 import 'package:flutter/material.dart';
 import 'package:dart_rut_validator/dart_rut_validator.dart' show RUTValidator;
@@ -21,7 +23,7 @@ class _LoginScreenState extends State<LoginScreen> {
   String contrasenia;
   String correo;
   final _formKey = GlobalKey<FormState>();
-  var _user;
+  final AuthService _auth = AuthService();
   // Set intial mode to login
   @override
   initState() {
@@ -31,7 +33,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    _user = Provider.of<LoginState>(context).currentUser();
     screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       body: SingleChildScrollView(
@@ -121,8 +122,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   SizedBox(
                     height: 20,
                   ),
-                  Consumer<LoginState>(
-                      builder: (BuildContext context, LoginState value,
+                  Consumer<AuthService>(
+                      builder: (BuildContext context, AuthService value,
                           Widget child) {
                         if (value.isLoading()) {
                           return CircularProgressIndicator();
@@ -139,6 +140,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               if (value.isEmpty) {
                                 return 'Por favor ingrese un correo valido';
                               }
+                              return null;
                             },
                             decoration: InputDecoration(
                               labelText: "Correo",
@@ -154,8 +156,11 @@ class _LoginScreenState extends State<LoginScreen> {
                             obscureText: true,
                             validator: (value) {
                               if (value.isEmpty) {
-                                return 'Por favor ingrese una contraseña valida';
+                                return 'Ingrese una contraseña valida';
+                              } else if (value.length < 6) {
+                                return "La contraseña debe poseer al menos 6 caracteres";
                               }
+                              return null;
                             },
                             decoration: InputDecoration(
                               labelText: "Contraseña",
@@ -186,8 +191,29 @@ class _LoginScreenState extends State<LoginScreen> {
                               FlatButton(
                                 child: Text('Ingresar'),
                                 color: Colors.blue,
-                                onPressed: () {
-                                  if (_formKey.currentState.validate()) {}
+                                onPressed: () async {
+                                  if (_formKey.currentState.validate()) {
+                                    dynamic result =
+                                        await _auth.singInWithEmailAndPassword(
+                                            correo, contrasenia);
+                                    if (result == null) {
+                                      _showDialog();
+                                    } else {
+                                      var value =
+                                          Provider.of<AuthService>(context);
+                                      if (value.isLoggedIn() == true) {
+                                        if (value.isLoadingData() == false) {
+                                          value.cargarDatosUser();
+                                          return CircularProgressIndicator();
+                                        } else {
+                                          goToHomeScreen(context);
+                                        }
+                                      } else {
+                                        value.signOut();
+                                        goToMyApp(context);
+                                      }
+                                    }
+                                  }
                                 },
                               ),
                             ],
@@ -203,6 +229,41 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  void goToHomeScreen(BuildContext context) {
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => SplashScreen()));
+  }
+
+  void goToMyApp(BuildContext context) {
+    Navigator.push(context, MaterialPageRoute(builder: (context) => MyApp()));
+  }
+
+  void _showDialog() {
+    // flutter defined function
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          title: new Text("Algo salió mal :C"),
+          content: new Text(
+              "El correo y/o la contraseña no es/son correctos.\nPor favor intente nuevamente."),
+          actions: <Widget>[
+            // usually buttons at the bottom of the dialog
+            new FlatButton(
+              child: new Text("Ok"),
+              onPressed: () {
+                //Provider.of<LoginState>(context).isComplete();
+                //Navigator.pop(context);
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }

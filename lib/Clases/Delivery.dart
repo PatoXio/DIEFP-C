@@ -4,7 +4,7 @@ import 'Usuario.dart';
 
 class Delivery extends Usuario {
   String _rut;
-  int _telefono;
+  String _telefono;
   String _medioDeTransporte;
   ListPedido _pedidosPorTomar;
   Pedido _pedidoActual;
@@ -12,15 +12,32 @@ class Delivery extends Usuario {
 
   Delivery() {
     _rut = null;
-    _telefono = 0;
+    _telefono = null;
     _medioDeTransporte = null;
     _pedidosPorTomar = new ListPedido();
     _pedidoActual = new Pedido();
     _listPedidoEntregado = new ListPedido();
   }
 
-  Delivery.carga(String rut, medioDeTransporte, int telefono,
-      ListPedido pedidosPorTomar, listPedidoEntregado, Pedido pedidoActual) {
+  Delivery.carga(
+      String rut,
+      name,
+      tipo,
+      email,
+      password,
+      codigoVerificacion,
+      codigoDeInvitacion,
+      medioDeTransporte,
+      telefono,
+      ListPedido pedidosPorTomar,
+      listPedidoEntregado,
+      Pedido pedidoActual) {
+    setName(name);
+    setTipo(tipo);
+    setEmail(email);
+    setPassword(password);
+    setCodigoDeVerificacion(codigoVerificacion);
+    setCodigoDeInvitacion(codigoDeInvitacion);
     this._rut = rut;
     this._telefono = telefono;
     this._medioDeTransporte = medioDeTransporte;
@@ -33,7 +50,7 @@ class Delivery extends Usuario {
     return _rut;
   }
 
-  int getTelefono() {
+  String getTelefono() {
     return _telefono;
   }
 
@@ -65,7 +82,7 @@ class Delivery extends Usuario {
     this._rut = rut;
   }
 
-  void setTelefono(int telefono) {
+  void setTelefono(String telefono) {
     this._telefono = telefono;
   }
 

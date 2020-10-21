@@ -15,12 +15,12 @@ class ListUsuario {
     return _listUsuario;
   }
 
-  Usuario getUsuario(String id) {
+  Usuario getUsuario(String email) {
     int i;
     if (_listUsuario != null) {
       for (i = 0; i < _listUsuario.length; i++) {
         if (_listUsuario.elementAt(i) != null) {
-          if (id.compareTo(_listUsuario.elementAt(i).getId()) == 0) {
+          if (email.compareTo(_listUsuario.elementAt(i).getEmail()) == 0) {
             return _listUsuario.elementAt(i);
           }
         }

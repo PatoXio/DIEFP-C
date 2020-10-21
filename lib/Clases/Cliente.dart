@@ -25,11 +25,23 @@ class Cliente extends Usuario {
 
   Cliente.carga(
       String rut,
+      name,
+      tipo,
+      email,
+      password,
+      codigoVerificacion,
+      codigoDeInvitacion,
       int idDireccion,
       ListDireccion listDireccion,
       ListPedido historialCompra,
       pedidosPendientes,
       ListProducto carritoDeCompra) {
+    setName(name);
+    setTipo(tipo);
+    setEmail(email);
+    setPassword(password);
+    setCodigoDeVerificacion(codigoVerificacion);
+    setCodigoDeInvitacion(codigoDeInvitacion);
     this._rut = rut;
     this._idDireccion = idDireccion;
     this._listDireccion = listDireccion;

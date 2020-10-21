@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:diefpc/Clases/Cliente.dart';
 import 'package:diefpc/Clases/Delivery.dart';
+import 'package:diefpc/Clases/Direccion.dart';
 import 'package:diefpc/Clases/Tienda.dart';
+import 'package:diefpc/Clases/Usuario.dart';
 import 'package:diefpc/app/app.dart';
 import 'package:diefpc/screens/home.dart';
 import 'package:diefpc/states/auth.dart';
@@ -10,7 +12,9 @@ import 'package:flutter/material.dart';
 import 'package:dart_rut_validator/dart_rut_validator.dart' show RUTValidator;
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:address_search_text_field/address_search_text_field.dart';
+import 'package:uuid/uuid.dart';
+import 'package:diefpc/Maps/place_service.dart';
+import 'package:diefpc/Maps/adressSearch.dart';
 import 'createTienda1.dart';
 
 TextEditingController _rutController = TextEditingController();
@@ -22,18 +26,24 @@ class CreateScreen extends StatefulWidget {
 
 class _CreateScreenState extends State<CreateScreen> {
   double screenHeight;
-  String error = '';
   Cliente model = new Cliente();
   Delivery modelDelivery = new Delivery();
   Tienda modelTienda = new Tienda();
+  Direccion direccion = new Direccion();
   bool isSwitchDelivery = false;
   bool isSwitchTienda = false;
   bool checkBoxValue = true;
   bool moto = false;
   bool automovil = false;
   bool bicicleta = false;
+  final _controller = TextEditingController();
   final AuthService _auth = AuthService();
   final _formKey = GlobalKey<FormState>();
+
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   // Set intial mode to login
   @override
@@ -44,7 +54,6 @@ class _CreateScreenState extends State<CreateScreen> {
 
   @override
   Widget build(BuildContext context) {
-    Provider.of<LoginState>(context).isComplete();
     screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       body: SingleChildScrollView(
@@ -81,7 +90,7 @@ class _CreateScreenState extends State<CreateScreen> {
   }
 
   Widget singUpCard(BuildContext context) {
-    var isComplete = Provider.of<LoginState>(context).isComplete();
+    bool isCreate = Provider.of<AuthService>(context).isCreate();
     return Form(
         key: _formKey,
         child: Column(
@@ -96,7 +105,7 @@ class _CreateScreenState extends State<CreateScreen> {
                 elevation: 8,
                 child: Padding(
                   padding: const EdgeInsets.all(30.0),
-                  child: _column(context, isComplete),
+                  child: _column(context, isCreate),
                 ),
               ),
             ),
@@ -116,13 +125,13 @@ class _CreateScreenState extends State<CreateScreen> {
         ));
   }
 
-  Widget _column(BuildContext context, bool isComplete) {
-    if (isComplete == false) {
+  // ignore: missing_return
+  Widget _column(BuildContext context, bool isCreate) {
+    if (isCreate == false) {
       if (checkBoxValue == true) return _columnUser(context);
       if (isSwitchDelivery == true) return _columnDelivery(context);
       if (isSwitchTienda == true) return _columnTienda(context);
-    } else
-      goBack(context);
+    }
   }
 
   Widget _columnDelivery(BuildContext context) {
@@ -163,10 +172,10 @@ class _CreateScreenState extends State<CreateScreen> {
           activeColor: Colors.green,
           secondary: const Icon(Icons.directions_bike),
           onChanged: (bool newValue) {
-            isSwitchDelivery = newValue;
+            isSwitchDelivery = true;
             isSwitchTienda = false;
             checkBoxValue = false;
-            if (isSwitchDelivery == false) checkBoxValue = true;
+            //if (isSwitchDelivery == false) checkBoxValue = true;
           },
         ),
         SizedBox(
@@ -178,10 +187,10 @@ class _CreateScreenState extends State<CreateScreen> {
           activeColor: Colors.green,
           secondary: const Icon(Icons.local_hospital),
           onChanged: (bool newValue) {
-            isSwitchTienda = newValue;
+            isSwitchTienda = true;
             isSwitchDelivery = false;
             checkBoxValue = false;
-            if (isSwitchTienda == false) checkBoxValue = true;
+            //if (isSwitchTienda == false) checkBoxValue = true;
           },
         ),
         SizedBox(
@@ -189,10 +198,11 @@ class _CreateScreenState extends State<CreateScreen> {
         ),
         TextFormField(
           maxLength: 50,
-          validator: (value) {
+          validator: (String value) {
             if (value.isEmpty) {
               return 'Ingrese un correo valido';
             }
+            return null;
           },
           decoration: InputDecoration(
             labelText: "Correo",
@@ -207,10 +217,11 @@ class _CreateScreenState extends State<CreateScreen> {
         TextFormField(
           obscureText: true,
           maxLength: 50,
-          validator: (value) {
+          validator: (String value) {
             if (value.isEmpty) {
               return 'Ingrese una contraseña valida';
             }
+            return null;
           },
           decoration: InputDecoration(
             labelText: "Contraseña",
@@ -231,9 +242,9 @@ class _CreateScreenState extends State<CreateScreen> {
             } else if (modelDelivery.getPassword() == null) {
               return 'Debe ingresar una contraseña valida\nen el parametro anterior';
             } else if (value.compareTo(modelDelivery.getPassword()) != 0) {
-              print(modelDelivery.getPassword());
               return 'La contraseña no coincide';
             }
+            return null;
           },
           decoration: InputDecoration(
             labelText: "Confirmar Contraseña",
@@ -248,6 +259,7 @@ class _CreateScreenState extends State<CreateScreen> {
             if (value.isEmpty) {
               return 'Ingrese su nombre completo';
             }
+            return null;
           },
           decoration: InputDecoration(
             labelText: "Nombre Completo",
@@ -280,6 +292,7 @@ class _CreateScreenState extends State<CreateScreen> {
             if (value.isEmpty) {
               return 'Ingrese su número de celular';
             }
+            return null;
           },
           decoration: InputDecoration(
             labelText: "Número Celular sin el '+56'",
@@ -289,7 +302,7 @@ class _CreateScreenState extends State<CreateScreen> {
             WhitelistingTextInputFormatter.digitsOnly
           ],
           onChanged: (String value) {
-            modelDelivery.setTelefono(int.parse(value));
+            modelDelivery.setTelefono(value);
           },
         ),
         SizedBox(
@@ -394,7 +407,7 @@ class _CreateScreenState extends State<CreateScreen> {
                           modelDelivery.getPassword(),
                           modelDelivery.getName(),
                           modelDelivery.getRut(),
-                          modelDelivery.getTelefono().toString(),
+                          modelDelivery.getTelefono(),
                           modelDelivery.getCodigoDeInvitacion(),
                           modelDelivery.getMedioDeTransporte());
                       /*Navigator.push(
@@ -452,10 +465,10 @@ class _CreateScreenState extends State<CreateScreen> {
           activeColor: Colors.green,
           secondary: const Icon(Icons.directions_bike),
           onChanged: (bool newValue) {
-            isSwitchDelivery = newValue;
+            isSwitchDelivery = true;
             isSwitchTienda = false;
             checkBoxValue = false;
-            if (isSwitchDelivery == false) checkBoxValue = true;
+            //if (isSwitchDelivery == false) checkBoxValue = true;
           },
         ),
         SizedBox(
@@ -467,10 +480,10 @@ class _CreateScreenState extends State<CreateScreen> {
           activeColor: Colors.green,
           secondary: const Icon(Icons.local_hospital),
           onChanged: (bool newValue) {
-            isSwitchTienda = newValue;
+            isSwitchTienda = true;
             isSwitchDelivery = false;
             checkBoxValue = false;
-            if (isSwitchTienda == false) checkBoxValue = true;
+            //if (isSwitchTienda == false) checkBoxValue = true;
           },
         ),
         SizedBox(
@@ -478,13 +491,54 @@ class _CreateScreenState extends State<CreateScreen> {
         ),
         TextFormField(
           maxLength: 50,
-          validator: (value) {
+          validator: (String value) {
             if (value.isEmpty) {
-              return 'Por favor ingrese un correo valido';
+              return 'Ingrese un nombre';
+            } else if (value.length < 5) {
+              return "El nobmre es demasiado corto";
             }
+            return null;
+          },
+          decoration: InputDecoration(
+            labelText: "Nombre Completo",
+          ),
+          onChanged: (String value) {
+            modelTienda.setName(value);
+          },
+        ),
+        SizedBox(
+          height: 15,
+        ),
+        TextFormField(
+          maxLength: 50,
+          validator: (String value) {
+            if (value.isEmpty) {
+              return 'Ingrese un correo valido';
+            }
+            return null;
           },
           decoration: InputDecoration(
             labelText: "Correo",
+          ),
+          onChanged: (String value) {
+            modelTienda.setEmail(value);
+          },
+        ),
+        SizedBox(
+          height: 15,
+        ),
+        TextFormField(
+          maxLength: 50,
+          obscureText: true,
+          validator: (value) {
+            if (value.isEmpty) {
+              return 'Ingrese una contraseña valida';
+            } else if (value.length < 6) {
+              return "Debe poseer al menos 6 caracteres";
+            }
+          },
+          decoration: InputDecoration(
+            labelText: "Contraseña",
           ),
           onChanged: (String value) {
             modelTienda.setPassword(value);
@@ -494,35 +548,17 @@ class _CreateScreenState extends State<CreateScreen> {
           height: 15,
         ),
         TextFormField(
-          maxLength: 50,
+          maxLength: 20,
+          obscureText: true,
           validator: (value) {
             if (value.isEmpty) {
-              return 'Ingrese una contraseña valida';
-            }
-          },
-          decoration: InputDecoration(
-            labelText: "Contraseña",
-          ),
-          onChanged: (String value) {
-            modelTienda.setEmail(value);
-          },
-        ),
-        SizedBox(
-          height: 15,
-        ),
-        TextFormField(
-          maxLength: 20,
-          validator: (value) {
-            if (value.compareTo(modelTienda.getPassword()) != 0) {
+              return 'Debe ingresar una contraseña';
+            } else if (value.compareTo(modelTienda.getPassword()) != 0)
               return 'La contraseña no coincide';
-            }
           },
           decoration: InputDecoration(
             labelText: "Confirmar Contraseña",
           ),
-          onChanged: (String value) {
-            modelTienda.setEmail(value);
-          },
         ),
         SizedBox(
           height: 15,
@@ -536,8 +572,48 @@ class _CreateScreenState extends State<CreateScreen> {
             modelTienda.setPatente(value);
           },
           validator: (value) {
-            if (value.isEmpty || (value != null && value.length < 5)) {
-              return 'Por favor ingrese una patente de 5 o + digitos';
+            if (value.isEmpty) {
+              return 'Ingrese una patente';
+            } else if (value.length < 12) {
+              return "La patente no es válida";
+            }
+          },
+        ),
+        SizedBox(
+          height: 15,
+        ),
+        TextFormField(
+          controller: _controller,
+          readOnly: true,
+          decoration: InputDecoration(
+            labelText: "Ingrese su dirección",
+          ),
+          onTap: () async {
+            final sessionToken = Uuid().v4();
+            final Suggestion result = await showSearch(
+              context: context,
+              delegate: AddressSearch(sessionToken),
+            );
+            if (result != null) {
+              final placeDetails = await PlaceApiProvider(sessionToken)
+                  .getPlaceDetailFromId(result.placeId);
+              _controller.text = result.description;
+              direccion.setNumero(placeDetails.streetNumber);
+              direccion.setCalle(placeDetails.street);
+              direccion.setCiudad(placeDetails.city);
+              direccion.setCodigoPostal(placeDetails.zipCode);
+              direccion.setLat(placeDetails.lat);
+              direccion.setLng(placeDetails.lng);
+              direccion.setRegion(placeDetails.region);
+              direccion.setProvincia(placeDetails.provincia);
+              direccion.setPais(placeDetails.country);
+              direccion.setId(0);
+              modelTienda.setDireccion(direccion);
+            }
+          },
+          validator: (value) {
+            if (value.isEmpty) {
+              return "Ingrese una dirección Valida";
             }
           },
         ),
@@ -563,20 +639,34 @@ class _CreateScreenState extends State<CreateScreen> {
               width: 20,
             ),
             FlatButton(
-              child: Text("Siguiente"),
+              child: Text("Confirmar Registro"),
               color: Colors.blue,
               textColor: Colors.white,
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(15)),
-              onPressed: () {
+              onPressed: () async {
                 if (_formKey.currentState.validate()) {
                   if (isSwitchTienda == true) {
-                    _createTienda(modelTienda.getName(), modelTienda.getEmail(),
-                        modelTienda.getPassword(), modelTienda.getPatente());
+                    dynamic resultEmail =
+                        await _auth.registerWithEmailAndPassword(
+                            modelTienda.getEmail(), modelTienda.getPassword());
+                    if (resultEmail == null) {
+                      _showDialogEmailError();
+                    } else {
+                      _createTienda(
+                          modelTienda.getName(),
+                          modelTienda.getEmail(),
+                          modelTienda.getPassword(),
+                          modelTienda.getPatente(),
+                          direccion);
+                      _showDialog();
+                      /*Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  CreateTienda1(modelTienda.getEmail())));*/
+                    }
                   }
-                  Provider.of<LoginState>(context).isComplete();
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => CreateTienda1()));
                 }
               },
             ),
@@ -610,11 +700,9 @@ class _CreateScreenState extends State<CreateScreen> {
           activeColor: Colors.green,
           secondary: const Icon(Icons.supervised_user_circle),
           onChanged: (bool newValue) {
-            setState(() {
-              checkBoxValue = true;
-              isSwitchDelivery = false;
-              isSwitchTienda = false;
-            });
+            checkBoxValue = true;
+            isSwitchDelivery = false;
+            isSwitchTienda = false;
           },
         ),
         SizedBox(
@@ -626,12 +714,10 @@ class _CreateScreenState extends State<CreateScreen> {
           activeColor: Colors.green,
           secondary: const Icon(Icons.directions_bike),
           onChanged: (bool newValue) {
-            setState(() {
-              isSwitchDelivery = newValue;
-              isSwitchTienda = false;
-              checkBoxValue = false;
-              if (isSwitchDelivery == false) checkBoxValue = true;
-            });
+            isSwitchDelivery = true;
+            isSwitchTienda = false;
+            checkBoxValue = false;
+            //if (isSwitchDelivery == false) checkBoxValue = true;
           },
         ),
         SizedBox(
@@ -643,12 +729,10 @@ class _CreateScreenState extends State<CreateScreen> {
           activeColor: Colors.green,
           secondary: const Icon(Icons.local_hospital),
           onChanged: (bool newValue) {
-            setState(() {
-              isSwitchTienda = newValue;
-              isSwitchDelivery = false;
-              checkBoxValue = false;
-              if (isSwitchTienda == false) checkBoxValue = true;
-            });
+            isSwitchTienda = true;
+            isSwitchDelivery = false;
+            checkBoxValue = false;
+            //if (isSwitchTienda == false) checkBoxValue = true;
           },
         ),
         SizedBox(
@@ -779,7 +863,7 @@ class _CreateScreenState extends State<CreateScreen> {
                   RUTValidator.formatFromTextController(_rutController);
                   model.setRut(_rutController.value.text);
                   if (checkBoxValue == true) {
-                    dynamic result = await _auth.registerWithEmailAndPassword(
+                    Usuario result = await _auth.registerWithEmailAndPassword(
                         model.getEmail(), model.getPassword());
                     if (result == null) {
                       _showDialogEmailError();
@@ -878,12 +962,35 @@ class _CreateScreenState extends State<CreateScreen> {
     );
   }
 
-  void _createTienda(String name, email, password, patente) {
+  void _createTienda(
+      String name, email, password, patente, Direccion direccion) {
     Firestore.instance.collection('usuarios').document(email).setData({
       "nombre": name,
       "email": email,
       "password": password,
       "patente": patente,
+      "tipo": "Tienda",
+    });
+    _createDireccion(direccion, email);
+  }
+
+  void _createDireccion(Direccion direccion, String email) {
+    Firestore.instance
+        .collection('usuarios')
+        .document(email)
+        .collection('Direccion')
+        .document(direccion.getId().toString())
+        .setData({
+      "calle": direccion.getCalle(),
+      "depto": direccion.getDepto(),
+      "ciudad": direccion.getCiudad(),
+      "provincia": direccion.getProvincia(),
+      "country": direccion.getCountry(),
+      "region": direccion.getRegion(),
+      "codigoPostal": direccion.getCodigoPostal(),
+      "numero": direccion.getNumero(),
+      "lat": direccion.getLatitud(),
+      "lng": direccion.getLongitud(),
     });
   }
 
@@ -895,6 +1002,7 @@ class _CreateScreenState extends State<CreateScreen> {
       "password": password,
       "Rut": rut,
       "codigo": codigo,
+      "tipo": "Cliente",
     });
   }
 
@@ -907,6 +1015,7 @@ class _CreateScreenState extends State<CreateScreen> {
       "numero": telefono,
       "codigo": codigo,
       "transporte": transporte,
+      "tipo": "Delivery",
     });
   }
 

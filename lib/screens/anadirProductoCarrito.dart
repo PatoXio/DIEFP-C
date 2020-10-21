@@ -9,6 +9,7 @@ import 'package:provider/provider.dart';
 import 'carrito.dart';
 import 'createProducto.dart';
 
+// ignore: must_be_immutable
 class AnadirProcutoCarrito extends StatelessWidget {
   double screenlong;
   String idTienda;
@@ -105,7 +106,7 @@ class AnadirProcutoCarrito extends StatelessWidget {
               onPressed: () {
                 goToCarrito(context);
               },
-              label: Text("Ver Carrito\n\t\t\t\t(${carritoLength})",
+              label: Text("Ver Carrito\n\t\t\t\t($carritoLength)",
                   style: TextStyle(fontSize: 15)),
               backgroundColor: Colors.blue,
             ),
@@ -231,6 +232,7 @@ class AnadirProcutoCarrito extends StatelessWidget {
         context, MaterialPageRoute(builder: (context) => CrearProducto()));
   }
 
+  // ignore: non_constant_identifier_names
   void AnadirAlCarrito(BuildContext context, Set<String> _saved,
       FirebaseUser _user, String idTienda) {
     int largo = _saved.length;
@@ -297,7 +299,7 @@ class AnadirProcutoCarrito extends StatelessWidget {
   void _showAlertBorrarCarrito(BuildContext context, Set<String> _saved,
       FirebaseUser _user, String idTienda) {
     int i;
-    int largo = _saved.length;
+    //int largo = _saved.length;
     showDialog(
       context: context,
       builder: (BuildContext context) {
