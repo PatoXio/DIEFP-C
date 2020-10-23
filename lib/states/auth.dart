@@ -11,8 +11,9 @@ import 'package:diefpc/documents/documents_service.dart';
 class AuthService with ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   SharedPreferences _prefs;
-  dynamic _usuario;
   FirebaseUser _user;
+  dynamic _usuario;
+  DocumentSnapshot document;
   bool _loggedIn = false;
   bool _loading = true;
   bool _isCreated = false;
@@ -29,15 +30,18 @@ class AuthService with ChangeNotifier {
   }
 
   dynamic currentUser() => _usuario;
+  DocumentSnapshot getDocument() => document;
+  FirebaseUser usuarioFirebase() => _user;
   bool isLoggedIn() => _loggedIn;
   bool isLoading() => _loading;
-  bool isLoadingData() => _isLoadData;
+  bool isLoadData() => _isLoadData;
   bool isComplete() => _isComplete;
 
   void loginState() async {
     _prefs = await SharedPreferences.getInstance();
     if (_prefs.containsKey("isLoggedIn")) {
       _user = await _auth.currentUser();
+      cargarDatosUser();
       _loggedIn = _user != null;
       _loading = false;
       notifyListeners();
@@ -51,7 +55,8 @@ class AuthService with ChangeNotifier {
     _prefs = await SharedPreferences.getInstance();
     if (_prefs.containsKey("isCreated")) {
       _user = await _auth.currentUser();
-      _isCreated = (await getDocument(_user.email)).data["email"] != null;
+      _isCreated =
+          (await getDocumentService(_user.email)).data["email"] != null;
       _loading = false;
       notifyListeners();
     } else {
@@ -60,10 +65,8 @@ class AuthService with ChangeNotifier {
     }
   }
 
-  dynamic _userFromFirebaseUser(FirebaseUser user) {
-    _usuario = user != null ? Usuario(email: user.email) : null;
-    notifyListeners();
-    return _usuario;
+  Usuario _userFromFirebaseUser(FirebaseUser user) {
+    return user != null ? Usuario(email: user.email) : null;
   }
 
   Stream<Usuario> get user {
@@ -81,6 +84,7 @@ class AuthService with ChangeNotifier {
         notifyListeners();
       } else {
         _prefs.setBool("isLoggedIn", true);
+        cargarDatosUser();
         _loggedIn = true;
         _loading = false;
         notifyListeners();
@@ -95,10 +99,9 @@ class AuthService with ChangeNotifier {
   Future cargarDatosUser() async {
     _isLoadData = false;
     _loading = true;
-    _isComplete = false;
     notifyListeners();
-    DocumentSnapshot document = await getDocument(_user.email);
-    print(_user.email);
+    this.document = await getDocumentService(_user.email);
+    notifyListeners();
     if (document.data["tipo"].compareTo("Cliente") == 0) {
       Cliente cliente = new Cliente.carga(
           document.data["Rut"],

@@ -1,8 +1,7 @@
 import 'package:diefpc/app/app.dart';
 import 'package:diefpc/screens/createScreen.dart';
-import 'package:diefpc/screens/splashScreen.dart';
+import 'package:diefpc/screens/home.dart';
 import 'package:diefpc/states/auth.dart';
-import 'package:diefpc/states/login_state.dart';
 import 'package:flutter/material.dart';
 import 'package:dart_rut_validator/dart_rut_validator.dart' show RUTValidator;
 import 'package:provider/provider.dart';
@@ -193,26 +192,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                 color: Colors.blue,
                                 onPressed: () async {
                                   if (_formKey.currentState.validate()) {
-                                    dynamic result =
-                                        await _auth.singInWithEmailAndPassword(
+                                    Provider.of<AuthService>(context)
+                                        .singInWithEmailAndPassword(
                                             correo, contrasenia);
-                                    if (result == null) {
-                                      _showDialog();
-                                    } else {
-                                      var value =
-                                          Provider.of<AuthService>(context);
-                                      if (value.isLoggedIn() == true) {
-                                        if (value.isLoadingData() == false) {
-                                          value.cargarDatosUser();
-                                          return CircularProgressIndicator();
-                                        } else {
-                                          goToHomeScreen(context);
-                                        }
-                                      } else {
-                                        value.signOut();
-                                        goToMyApp(context);
-                                      }
-                                    }
                                   }
                                 },
                               ),
@@ -234,7 +216,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void goToHomeScreen(BuildContext context) {
     Navigator.push(
-        context, MaterialPageRoute(builder: (context) => SplashScreen()));
+        context, MaterialPageRoute(builder: (context) => HomeScreen()));
   }
 
   void goToMyApp(BuildContext context) {

@@ -28,9 +28,9 @@ class LoginState with ChangeNotifier {
   bool _loggedIn = false;
   bool _loading = true;
 
-  LoginState() {
+  /*LoginState() {
     loginState();
-  }
+  }*/
 
   bool isCreate() => _isCreate;
 
@@ -140,11 +140,9 @@ class LoginState with ChangeNotifier {
       _loading = false;
       notifyListeners();
     }
-    print(document.data["Rut"]);
     if (document.data["Rut"] != null) {
       _prefs.setBool("isCreated", true);
       _isComplete = true;
-      print(_isComplete);
       _loading = true;
       _carrito = await _getListDocumentCarrito(_user.uid);
       _rol = await _getRol(_user.uid, _rol);
@@ -299,7 +297,7 @@ class LoginState with ChangeNotifier {
     return listDocument;
   }
 
-  void loginState() async {
+  /*void loginState() async {
     _prefs = await SharedPreferences.getInstance();
     if (_prefs.containsKey("isLoggedIn")) {
       _user = await _auth.currentUser();
@@ -310,7 +308,7 @@ class LoginState with ChangeNotifier {
       _loading = false;
       notifyListeners();
     }
-  }
+  }*/
 
   void createState() async {
     _prefs = await SharedPreferences.getInstance();

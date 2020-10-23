@@ -1,6 +1,4 @@
-import 'dart:async';
-
-import 'package:diefpc/app/app.dart';
+/*import 'package:diefpc/app/app.dart';
 import 'package:diefpc/screens/home.dart';
 import 'package:diefpc/states/auth.dart';
 import 'package:flutter/material.dart';
@@ -67,3 +65,4 @@ class _SplashScreenState extends State<SplashScreen> {
     Navigator.push(context, MaterialPageRoute(builder: (context) => MyApp()));
   }
 }
+*/

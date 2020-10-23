@@ -1,9 +1,7 @@
 //import 'package:diefpc/screens/Menu.dart';
 //import 'package:diefpc/screens/createScreen.dart';
 import 'package:diefpc/screens/home.dart';
-import 'package:diefpc/screens/splashScreen.dart';
 import 'package:diefpc/states/auth.dart';
-import 'package:diefpc/states/login_state.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:diefpc/screens/cambiarContrasena.dart';
@@ -22,12 +20,12 @@ class MyApp extends StatelessWidget {
         title: "DIEFP-C",
         debugShowCheckedModeBanner: false,
         theme: ThemeData.light(),
-//        theme: ThemeData.dark(),
+        //theme: ThemeData.dark(),
         routes: {
           // ignore: missing_return
           "/": (BuildContext context) {
             var state = Provider.of<AuthService>(context);
-            if (state.isComplete()) {
+            if (state.isLoggedIn()) {
               return HomeScreen();
             } else {
               return LoginScreen();
