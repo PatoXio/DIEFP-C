@@ -74,8 +74,8 @@ class Cliente extends Usuario {
     return _historialCompra.getPedido(id);
   }
 
-  ListProducto getCarritoDeCompra() {
-    return _carritoDeCompra;
+  List<Producto> getCarritoDeCompra() {
+    return _carritoDeCompra.getListProducto();
   }
 
   ListPedido getPedidosPendientes() {

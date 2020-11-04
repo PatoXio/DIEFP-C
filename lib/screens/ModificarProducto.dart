@@ -1,29 +1,34 @@
-import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:diefpc/Clases/Producto.dart';
-import 'package:diefpc/app/app.dart';
-//import 'package:diefpc/app/app.dart';
+import 'package:diefpc/Clases/Tienda.dart';
 import 'package:diefpc/screens/home.dart';
-import 'package:diefpc/states/login_state.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:diefpc/states/auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
-//import 'login.dart';
+// ignore: must_be_immutable
+class ModificarProducto extends StatefulWidget {
+  String codigo;
+  ModificarProducto(String value) {
+    codigo = value;
+  }
 
-class ModificarProducto extends StatelessWidget {
+  @override
+  _ModificarProductoState createState() => _ModificarProductoState();
+}
+
+class _ModificarProductoState extends State<ModificarProducto> {
   double screenHeight;
   Producto modelProducto = new Producto();
-  DocumentSnapshot producto;
+  Producto producto;
+  Tienda _user;
   final _formKey = GlobalKey<FormState>();
-  FirebaseUser _user;
-  // Set intial mode to login
+
   @override
   Widget build(BuildContext context) {
-    _user = Provider.of<LoginState>(context).currentUser();
-    producto = Provider.of<LoginState>(context).getProducto();
+    _user = Provider.of<AuthService>(context).currentUser();
+    producto = _user.getProducto(widget.codigo);
     screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       body: SingleChildScrollView(
@@ -76,9 +81,9 @@ class ModificarProducto extends StatelessWidget {
                   child: Padding(
                     padding: const EdgeInsets.all(30.0),
                     child: Consumer(
-                      builder: (BuildContext context, LoginState value,
+                      builder: (BuildContext context, AuthService value,
                           Widget child) {
-                        if (producto.data == null) {
+                        if (producto == null) {
                           return CircularProgressIndicator();
                         } else
                           return child;
@@ -89,7 +94,7 @@ class ModificarProducto extends StatelessWidget {
                           Align(
                             alignment: Alignment.topLeft,
                             child: Text(
-                              "Agregar Producto",
+                              "Codigo del producto a modificar: ${producto.getCodigo()}",
                               style: TextStyle(
                                 color: Colors.blue,
                                 fontSize: 28,
@@ -102,15 +107,13 @@ class ModificarProducto extends StatelessWidget {
                           ),
                           TextFormField(
                             maxLength: 50,
-                            initialValue: producto.data["Nombre"],
+                            initialValue: producto.getNombre(),
                             validator: (value) {
-                              if (value.isEmpty ||
-                                  producto.data["Nombre"]
-                                          .toString()
-                                          .compareTo(value) ==
-                                      0) {
-                                modelProducto
-                                    .setNombre(producto.data["Nombre"]);
+                              if (value.isEmpty) {
+                                return "Este campo no puede estar vacío.";
+                              } else {
+                                modelProducto.setNombre(value);
+                                return null;
                               }
                             },
                             decoration: InputDecoration(
@@ -126,48 +129,26 @@ class ModificarProducto extends StatelessWidget {
                           TextFormField(
                             maxLength: 50,
                             enabled: false,
-                            initialValue: producto.data["Codigo"],
-                            validator: (value) {
-                              if (value.isEmpty ||
-                                  producto.data["Codigo"]
-                                          .toString()
-                                          .compareTo(value.toString()) ==
-                                      0) {
-                                modelProducto.setCodigo(
-                                    producto.data["Codigo"].toString());
-                              }
-                            },
-                            keyboardType: TextInputType.number,
-                            inputFormatters: <TextInputFormatter>[
-                              WhitelistingTextInputFormatter.digitsOnly
-                            ],
+                            initialValue: producto.getCodigo(),
                             decoration: InputDecoration(
-                              labelText: "Codigo",
+                              labelText: "Codigo (No se puede modificar)",
                             ),
-                            onChanged: (String value) {
-                              modelProducto.setCodigo(value);
-                            },
                           ),
                           SizedBox(
                             height: 15,
                           ),
                           TextFormField(
                             maxLength: 9,
-                            initialValue: producto.data["Mg/u"],
+                            initialValue: producto.getMgPorU().toString(),
                             validator: (value) {
-                              if (value.isEmpty ||
-                                  producto.data["Mg/u"]
-                                          .toString()
-                                          .compareTo(value.toString()) ==
-                                      0) {
-                                modelProducto.setMgPorU(
-                                    double.parse(producto.data["Mg/u"]));
+                              if (value.isEmpty) {
+                                return "Este campo no puede estar vacío.";
+                              } else {
+                                modelProducto.setMgPorU(double.parse(value));
+                                return null;
                               }
                             },
                             keyboardType: TextInputType.number,
-                            inputFormatters: <TextInputFormatter>[
-                              WhitelistingTextInputFormatter.digitsOnly
-                            ],
                             decoration: InputDecoration(
                               labelText: "Peso en mg/u",
                             ),
@@ -180,15 +161,13 @@ class ModificarProducto extends StatelessWidget {
                           ),
                           TextFormField(
                             maxLength: 9,
-                            initialValue: producto.data["Precio"],
+                            initialValue: producto.getPrecio().toString(),
                             validator: (value) {
-                              if (value.isEmpty ||
-                                  producto.data["Precio"]
-                                          .toString()
-                                          .compareTo(value.toString()) ==
-                                      0) {
-                                modelProducto
-                                    .setPrecio(producto.data["Precio"]);
+                              if (value.isEmpty) {
+                                return "Este campo no puede estar vacío.";
+                              } else {
+                                modelProducto.setPrecio(int.parse(value));
+                                return null;
                               }
                             },
                             keyboardType: TextInputType.number,
@@ -207,15 +186,13 @@ class ModificarProducto extends StatelessWidget {
                           ),
                           TextFormField(
                             maxLength: 30,
-                            initialValue: producto.data["Stock"],
+                            initialValue: producto.getStock().toString(),
                             validator: (value) {
-                              if (value.isEmpty ||
-                                  producto.data["Stock"]
-                                          .toString()
-                                          .compareTo(value.toString()) ==
-                                      0) {
-                                modelProducto
-                                    .setCantidad(producto.data["Stock"]);
+                              if (value.isEmpty) {
+                                return "Este campo no puede estar vacío.";
+                              } else {
+                                modelProducto.setStock(int.parse(value));
+                                return null;
                               }
                             },
                             keyboardType: TextInputType.number,
@@ -226,7 +203,7 @@ class ModificarProducto extends StatelessWidget {
                               labelText: "Ingrese el stock",
                             ),
                             onChanged: (String value) {
-                              modelProducto.setCantidad(int.parse(value));
+                              modelProducto.setStock(int.parse(value));
                             },
                           ),
                           SizedBox(
@@ -245,8 +222,6 @@ class ModificarProducto extends StatelessWidget {
                                   shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(15)),
                                   onPressed: () {
-                                    Provider.of<LoginState>(context)
-                                        .borrarProducto();
                                     Navigator.pop(context);
                                   }),
                               SizedBox(
@@ -260,17 +235,32 @@ class ModificarProducto extends StatelessWidget {
                                       borderRadius: BorderRadius.circular(15)),
                                   onPressed: () {
                                     if (_formKey.currentState.validate()) {
-                                      _createProducto(
-                                          _user,
-                                          modelProducto
-                                              .getCantidad()
-                                              .toString(),
+                                      String value = _modificarProducto(
+                                          modelProducto.getStock().toString(),
                                           modelProducto.getNombre(),
-                                          modelProducto.getCodigo(),
+                                          producto.getCodigo(),
                                           modelProducto.getMgPorU().toString(),
                                           modelProducto.getPrecio().toString());
+                                      if (value == null) {
+                                        Producto newProducto =
+                                            new Producto.carga(
+                                                producto.getCodigo(),
+                                                producto.getCodigo(),
+                                                _user.getEmail(),
+                                                _user.getName(),
+                                                modelProducto.getNombre(),
+                                                modelProducto.getCantidad(),
+                                                modelProducto.getPrecio(),
+                                                modelProducto.getStock(),
+                                                modelProducto
+                                                    .getStockReservado(),
+                                                modelProducto.getMgPorU());
+                                        _user.editProducto(newProducto);
+                                        Navigator.pop(context);
+                                      } else {
+                                        _showAlert(value);
+                                      }
                                     }
-                                    Navigator.pop(context);
                                   }),
                             ],
                           ),
@@ -297,22 +287,47 @@ class ModificarProducto extends StatelessWidget {
     );
   }
 
-  void _createProducto(FirebaseUser _user, String cantidad, String nombre,
-      String codigo, String peso, String precio) {
-    Firestore.instance.collection('usuarios').document(_user.uid).path;
-    Firestore.instance
-        .collection('usuarios')
-        .document(_user.uid)
-        .collection('Productos')
-        .document(codigo)
-        .setData({
-      "Stock": cantidad,
-      "Codigo": codigo,
-      "Mg/u": peso,
-      "Nombre": nombre,
-      "Precio": precio,
-      "Tienda": _user.uid,
-    });
+  String _modificarProducto(
+      String stock, String nombre, String codigo, String peso, String precio) {
+    if (_user.getProducto(widget.codigo) != null) {
+      Firestore.instance
+          .collection('usuarios')
+          .document(_user.getEmail())
+          .collection('Productos')
+          .document(codigo)
+          .setData({
+        "Stock": stock,
+        "Mg/u": peso,
+        "Nombre": nombre,
+        "Precio": precio,
+      }, merge: true);
+      return null;
+    } else {
+      return "Ha ocurrido un error, el producto no existe.\nVuelve a ingresar a la Bodega.";
+    }
+  }
+
+  void _showAlert(String notify) {
+    // flutter defined function
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          title: new Text("Aviso"),
+          content: new Text(notify),
+          actions: <Widget>[
+            // usually buttons at the bottom of the dialog
+            new FlatButton(
+              child: new Text("Ok"),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   void goToHomeScreen(BuildContext context) {

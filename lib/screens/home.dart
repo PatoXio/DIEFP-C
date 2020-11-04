@@ -143,7 +143,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 if (value.isLoading())
                   return CircularProgressIndicator();
                 else
-                  return _boton(context, isComplete, user.getTipo());
+                  return _boton(context, value.isComplete(), user.getTipo());
               },
             ),
           ],

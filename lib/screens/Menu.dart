@@ -1,6 +1,6 @@
 import 'package:diefpc/screens/home.dart';
 import 'package:diefpc/screens/seguimientoCompra.dart';
-import 'package:diefpc/states/login_state.dart';
+import 'package:diefpc/states/auth.dart';
 import 'package:flutter/material.dart';
 import 'package:diefpc/screens/carrito.dart';
 import 'package:diefpc/app/app.dart';
@@ -38,7 +38,7 @@ class _MenuScreenState extends State<MenuScreen> {
               context,
               MaterialPageRoute(builder: (context) => HomeScreen()),
             );
-            },
+          },
         ),
       ),
       body: Column(
@@ -65,25 +65,25 @@ class _MenuScreenState extends State<MenuScreen> {
             ),
           ),
           Container(
-              margin: EdgeInsets.only(top: screenHeight / 100),
-              padding: EdgeInsets.only(left: 10, right: 10),
-              child: Card(
-                child: ListTile(
-                  leading: IconButton(
-                    icon: Icon(Icons.local_hospital),
-                    iconSize: 40,
-                    tooltip: 'Locales',
-                    onPressed: () {
-                      Provider.of<LoginState>(context).actualizarTiendas();
-                      goToLocales(context);
-                    },
-                  ),
-                  title: Text('Menú Locales'),
-                  subtitle: Text('Aquí puedes ver todos los locales cercanos'),
-                  //trailing: Icon(Icons.more_vert),
-                  isThreeLine: true,
+            margin: EdgeInsets.only(top: screenHeight / 100),
+            padding: EdgeInsets.only(left: 10, right: 10),
+            child: Card(
+              child: ListTile(
+                leading: IconButton(
+                  icon: Icon(Icons.local_hospital),
+                  iconSize: 40,
+                  tooltip: 'Locales',
+                  onPressed: () {
+                    Provider.of<AuthService>(context).actualizarTiendas();
+                    goToLocales(context);
+                  },
                 ),
+                title: Text('Menú Locales'),
+                subtitle: Text('Aquí puedes ver todos los locales cercanos'),
+                //trailing: Icon(Icons.more_vert),
+                isThreeLine: true,
               ),
+            ),
           ),
           Container(
             margin: EdgeInsets.only(top: screenHeight / 100),
@@ -120,8 +120,8 @@ class _MenuScreenState extends State<MenuScreen> {
                   },
                 ),
                 title: Text('Seguimiento Compras'),
-                subtitle: Text(
-                    'Aquí puedes ver los pedidos que vienen en camino'),
+                subtitle:
+                    Text('Aquí puedes ver los pedidos que vienen en camino'),
                 /*trailing: Icon(Icons.more_vert),
                 // isThreeLine: true,*/
               ),
@@ -133,10 +133,9 @@ class _MenuScreenState extends State<MenuScreen> {
   }
 }
 
-void goToSeguimiento(BuildContext context){
+void goToSeguimiento(BuildContext context) {
   Navigator.push(
-      context,
-      MaterialPageRoute( builder: (context) => Seguimiento()));
+      context, MaterialPageRoute(builder: (context) => Seguimiento()));
 }
 
 void goToCarrito(BuildContext context) {
@@ -148,6 +147,7 @@ void goToLocales(BuildContext context) {
   Navigator.push(
       context, MaterialPageRoute(builder: (context) => LocalesScreen()));
 }
+
 void goToHistorialCompras(BuildContext context) {
   Navigator.push(
       context, MaterialPageRoute(builder: (context) => HistorialCompras()));

@@ -20,8 +20,10 @@ class ListProducto {
     if (_listProducto != null) {
       for (i = 0; i < _listProducto.length; i++) {
         if (_listProducto.elementAt(i) != null) {
-          if (_listProducto.elementAt(i).getId().compareTo(id) == 0) {
-            return _listProducto.elementAt(i);
+          if (_listProducto.elementAt(i).getId() != null) {
+            if (_listProducto.elementAt(i).getId().compareTo(id) == 0) {
+              return _listProducto.elementAt(i);
+            }
           }
         }
       }
@@ -34,6 +36,20 @@ class ListProducto {
   }
 
   void setProducto(Producto producto) {
-    _listProducto.add(producto);
+    if (getProducto(producto.getCodigo()) == null) _listProducto.add(producto);
+  }
+
+  bool eliminarProducto(String id) {
+    return _listProducto.remove(getProducto(id));
+  }
+
+  bool editProducto(Producto producto) {
+    if (getProducto(producto.getCodigo()) != null) {
+      if (eliminarProducto(producto.getCodigo()) == true) {
+        setProducto(producto);
+        return true;
+      }
+    }
+    return false;
   }
 }

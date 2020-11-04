@@ -10,11 +10,43 @@ class Producto {
   String _nombreTienda;
   String _nombre;
 
+  Producto() {
+    _id = null;
+    _cantidad = 0;
+    _codigo = null;
+    _mgPorU = 0;
+    _precio = 0;
+    _stock = 0;
+    _stockReservado = 0;
+    _idTienda = null;
+    _nombreTienda = null;
+    _nombre = null;
+  }
+
+  Producto.carga(String id, codigo, idTienda, nombreTienda, nombre,
+      int cantidad, precio, stock, stockReservado, double mgPorU) {
+    _id = id;
+    _cantidad = cantidad;
+    _codigo = codigo;
+    _mgPorU = mgPorU;
+    _precio = precio;
+    _stock = stock;
+    _stockReservado = stockReservado;
+    _idTienda = idTienda;
+    _nombreTienda = nombreTienda;
+    _nombre = nombre;
+  }
+
+  String getDatos() {
+    return "Nombre: $_nombre\nStock: $_stock\nPrecio: $_precio\nPeso: $_mgPorU Mg/U\nCodigo: $_codigo";
+  }
+
   String getId() {
     return _id;
   }
 
   int getCantidad() {
+    if (_cantidad == null) return 0;
     return _cantidad;
   }
 
@@ -84,5 +116,9 @@ class Producto {
 
   void setNombre(String nombre) {
     this._nombre = nombre;
+  }
+
+  void setId(String id) {
+    this._id = id;
   }
 }

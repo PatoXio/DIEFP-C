@@ -1,10 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:diefpc/Clases/Producto.dart';
-import 'package:diefpc/app/app.dart';
-//import 'package:diefpc/app/app.dart';
+import 'package:diefpc/Clases/Tienda.dart';
 import 'package:diefpc/screens/home.dart';
-import 'package:diefpc/states/login_state.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:diefpc/states/auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -20,7 +18,7 @@ class _CrearProductoState extends State<CrearProducto> {
   double screenHeight;
   Producto modelProducto = new Producto();
   final _formKey = GlobalKey<FormState>();
-  FirebaseUser _user;
+  Tienda _user;
   // Set intial mode to login
   @override
   void initState() {
@@ -29,6 +27,7 @@ class _CrearProductoState extends State<CrearProducto> {
 
   @override
   Widget build(BuildContext context) {
+    _user = Provider.of<AuthService>(context).currentUser();
     screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       body: SingleChildScrollView(
@@ -65,7 +64,6 @@ class _CrearProductoState extends State<CrearProducto> {
   }
 
   Widget singUpCard(BuildContext context) {
-    _user = Provider.of<LoginState>(context).currentUser();
     return Form(
         key: _formKey,
         child: Column(
@@ -103,7 +101,7 @@ class _CrearProductoState extends State<CrearProducto> {
                           if (value.isEmpty) {
                             return 'Por favor ingrese el nombre del producto';
                           }
-                          return "Nombre ingresado correctamente";
+                          return null;
                         },
                         decoration: InputDecoration(
                           labelText: "Nombre",
@@ -121,7 +119,7 @@ class _CrearProductoState extends State<CrearProducto> {
                           if (value.isEmpty) {
                             return 'Por favor ingrese el codigo';
                           }
-                          return "Codigo ingresado";
+                          return null;
                         },
                         keyboardType: TextInputType.number,
                         inputFormatters: <TextInputFormatter>[
@@ -143,6 +141,7 @@ class _CrearProductoState extends State<CrearProducto> {
                           if (value.isEmpty) {
                             return 'Por favor ingrese el peso del producto';
                           }
+                          return null;
                         },
                         keyboardType: TextInputType.number,
                         inputFormatters: <TextInputFormatter>[
@@ -164,6 +163,7 @@ class _CrearProductoState extends State<CrearProducto> {
                           if (value.isEmpty) {
                             return 'Por favor ingrese el precio del producto';
                           }
+                          return null;
                         },
                         keyboardType: TextInputType.number,
                         inputFormatters: <TextInputFormatter>[
@@ -185,6 +185,7 @@ class _CrearProductoState extends State<CrearProducto> {
                           if (value.isEmpty) {
                             return 'Por favor ingrese la cantidad de stock';
                           }
+                          return null;
                         },
                         keyboardType: TextInputType.number,
                         inputFormatters: <TextInputFormatter>[
@@ -194,7 +195,7 @@ class _CrearProductoState extends State<CrearProducto> {
                           labelText: "Ingrese el stock",
                         ),
                         onChanged: (String value) {
-                          modelProducto.setCantidad(int.parse(value));
+                          modelProducto.setStock(int.parse(value));
                         },
                       ),
                       SizedBox(
@@ -226,13 +227,29 @@ class _CrearProductoState extends State<CrearProducto> {
                                   borderRadius: BorderRadius.circular(15)),
                               onPressed: () {
                                 if (_formKey.currentState.validate()) {
-                                  _createProducto(
-                                      _user,
-                                      modelProducto.getCantidad().toString(),
+                                  String value = _createProducto(
+                                      modelProducto.getStock().toString(),
                                       modelProducto.getNombre(),
                                       modelProducto.getCodigo(),
                                       modelProducto.getMgPorU().toString(),
                                       modelProducto.getPrecio().toString());
+                                  if (value == null) {
+                                    Producto producto = new Producto.carga(
+                                        modelProducto.getCodigo(),
+                                        modelProducto.getCodigo(),
+                                        _user.getEmail(),
+                                        _user.getName(),
+                                        modelProducto.getNombre(),
+                                        modelProducto.getCantidad(),
+                                        modelProducto.getPrecio(),
+                                        modelProducto.getStock(),
+                                        modelProducto.getStockReservado(),
+                                        modelProducto.getMgPorU());
+                                    _user.setProducto(producto);
+                                    Navigator.pop(context);
+                                  } else {
+                                    _showAlert(value);
+                                  }
                                 }
                                 /*Navigator.push(
                                       context,
@@ -240,7 +257,6 @@ class _CrearProductoState extends State<CrearProducto> {
                                           builder: (context) => ProductosTienda()));
                                 Navigator.popAndPushNamed(
                                     context,'');*/
-                                Navigator.pop(context);
                               }),
                         ],
                       ),
@@ -265,35 +281,57 @@ class _CrearProductoState extends State<CrearProducto> {
         ));
   }
 
-  void _createProducto(FirebaseUser _user, String cantidad, String nombre,
-      String codigo, String peso, String precio) {
-    String nombreTienda = Provider.of<LoginState>(context).getNombreTienda();
+  String _createProducto(
+      String stock, String nombre, String codigo, String peso, String precio) {
+    if (_user.getProducto(codigo) == null) {
+      Firestore.instance
+          .collection('usuarios')
+          .document(_user.getEmail())
+          .collection('Productos')
+          .document(codigo)
+          .setData({
+        "Stock": stock,
+        "Codigo": codigo,
+        "Mg/u": peso,
+        "Nombre": nombre,
+        "Precio": precio,
+        "StockReservado": "0",
+        "Tienda": _user.getEmail(),
+        "nombreTienda": _user.getName(),
+      });
+      print(_user.email);
+      return null;
+    } else {
+      print("El producto ya existe");
+      return "El producto ya existe";
+    }
+  }
 
-    Firestore.instance
-        .collection('usuarios')
-        .document(_user.uid)
-        .collection('Productos')
-        .document(codigo)
-        .setData({
-      "Stock": cantidad,
-      "Codigo": codigo,
-      "Mg/u": peso,
-      "Nombre": nombre,
-      "Precio": precio,
-      "Tienda": _user.uid,
-      "nombreTienda": _user.displayName,
-    });
+  void _showAlert(String notify) {
+    // flutter defined function
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          title: new Text("Aviso"),
+          content: new Text(notify),
+          actions: <Widget>[
+            // usually buttons at the bottom of the dialog
+            new FlatButton(
+              child: new Text("Ok"),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   void goToHomeScreen(BuildContext context) {
     Navigator.push(
         context, MaterialPageRoute(builder: (context) => HomeScreen()));
-  }
-
-  void goToRestart(BuildContext context) {
-    Provider.of<LoginState>(context).isComplete();
-    Provider.of<LoginState>(context).logout();
-    Navigator.push(
-        context, new MaterialPageRoute(builder: (context) => MyApp()));
   }
 }

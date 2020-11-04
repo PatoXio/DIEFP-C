@@ -197,7 +197,7 @@ class LoginState with ChangeNotifier {
     Stream<QuerySnapshot> listDocument;
     listDocument = await Firestore.instance
         .collection('usuarios')
-        .where("Tienda", isEqualTo: true)
+        .where("tipo", isEqualTo: "Tienda")
         .snapshots();
 
     return listDocument;

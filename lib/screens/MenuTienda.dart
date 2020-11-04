@@ -38,8 +38,7 @@ class _MenuScreenTiendaState extends State<MenuScreenTienda> {
             margin: EdgeInsets.only(top: screenHeight / 100),
             padding: EdgeInsets.only(left: 10, right: 10),
             child: Card(
-              child:
-              ListTile(
+              child: ListTile(
                 leading: IconButton(
                   icon: Icon(Icons.shopping_cart),
                   iconSize: 40,
@@ -49,8 +48,7 @@ class _MenuScreenTiendaState extends State<MenuScreenTienda> {
                   },
                 ),
                 title: Text('Pedidos Pendientes'),
-                subtitle: Text(
-                    'Aquí puedes ver todos los pedidos pendientes'),
+                subtitle: Text('Aquí puedes ver todos los pedidos pendientes'),
                 /*trailing: Icon(Icons.more_vert),
                 // isThreeLine: true,*/
               ),
@@ -60,8 +58,7 @@ class _MenuScreenTiendaState extends State<MenuScreenTienda> {
             margin: EdgeInsets.only(top: screenHeight / 100),
             padding: EdgeInsets.only(left: 10, right: 10),
             child: Card(
-              child:
-              ListTile(
+              child: ListTile(
                 leading: IconButton(
                   icon: Icon(Icons.store_mall_directory),
                   iconSize: 40,
@@ -92,7 +89,8 @@ class _MenuScreenTiendaState extends State<MenuScreenTienda> {
                     },
                   ),
                   title: Text('Historial de Ventas'),
-                  subtitle: Text('Aquí puedes ver tu historial de ventas y revisar tus ganancias'),
+                  subtitle: Text(
+                      'Aquí puedes ver tu historial de ventas y revisar tus ganancias'),
                   //trailing: Icon(Icons.more_vert),
                   isThreeLine: true,
                 ),
@@ -112,10 +110,8 @@ void goToHistorialVentas(BuildContext context) {
   Navigator.push(
       context, MaterialPageRoute(builder: (context) => HistorialVentas()));
 }
+
 void goToPedidosPendientes(BuildContext context) {
-  Provider.of<LoginState>(context).actualizarPendientes();
   Navigator.push(
       context, MaterialPageRoute(builder: (context) => PedidosPendientes()));
 }
-
-

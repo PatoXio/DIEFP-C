@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:diefpc/states/login_state.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:diefpc/Clases/Producto.dart';
+import 'package:diefpc/Clases/Tienda.dart';
+import 'package:diefpc/states/auth.dart';
 import 'package:flutter/material.dart';
 import 'package:diefpc/app/app.dart';
 import 'package:provider/provider.dart';
@@ -8,157 +9,182 @@ import 'ModificarProducto.dart';
 import 'createProducto.dart';
 import 'home.dart';
 
-class ProductosTienda extends StatefulWidget{
+class ProductosTienda extends StatefulWidget {
   @override
   _ProductosTiendaState createState() => _ProductosTiendaState();
 }
 
 class _ProductosTiendaState extends State<ProductosTienda> {
-  var _eliminar = Set<String>();
-  String _modificar;
-  bool state = false;
-  FirebaseUser _user;
+  var _prodSelect = Set<String>();
+  Tienda _user;
+  List<Producto> _listProducto;
   double screenlong;
   double screenHeight;
   @override
   Widget build(BuildContext context) {
     screenHeight = MediaQuery.of(context).size.height;
     screenlong = MediaQuery.of(context).size.longestSide;
-    Provider.of<LoginState>(context).actualizarProductos();
-    _user = Provider.of<LoginState>(context).currentUser();
+    _user = Provider.of<AuthService>(context).currentUser();
+    _listProducto = _user.getListProducto();
     return Scaffold(
       appBar: AppBar(
         title: Text("Productos Disponibles"),
         actions: <Widget>[
-          IconButton(icon: Icon(Icons.list),
+          IconButton(
+              icon: Icon(Icons.list),
               tooltip: 'Configuración',
-              onPressed: (){
+              onPressed: () {
                 configMenu(context);
-              }
-          ),
+              }),
         ],
       ),
-      body:
-      Scrollbar(
-        child: Container(
-          margin: EdgeInsets.only(top: screenHeight / 100),
-          padding: EdgeInsets.only(left: 10, right: 10),
-          child: Column(
-              children: <Widget> [
+      body: Container(
+        margin: EdgeInsets.only(top: screenHeight / 100),
+        padding: EdgeInsets.only(left: 10, right: 10),
+        child: Column(children: <Widget>[
+          Row(
+            children: <Widget>[
+              Divider(
+                indent: screenlong / 65,
+              ),
+              Text(
+                "  Productos ",
+                style: _styleText(),
+              ),
+              Divider(
+                indent: screenlong / 4,
+              ),
+              Text(" Seleccionar ", style: _styleText()),
+            ],
+          ),
+          Expanded(
+            flex: 7,
+            child: Container(
+              height: screenHeight / 1.4,
+              child: Theme(
+                data: ThemeData(
+                  highlightColor: Colors.blue, //Does not work
+                ),
+                child: Scrollbar(child: _queyList(context)),
+              ),
+            ),
+          ),
+          Expanded(
+            child: Row(
+              children: [
+                FloatingActionButton.extended(
+                  heroTag: "boton2",
+                  backgroundColor: Colors.red,
+                  onPressed: () {
+                    if (_prodSelect.isNotEmpty)
+                      eliminarProductos();
+                    else
+                      _showAlert("Debes seleccionar productos para eliminar");
+                  },
+                  label: Text(
+                    "Eliminar",
+                  ),
+                ),
+                Divider(
+                  indent: screenlong / 60,
+                ),
                 FloatingActionButton.extended(
                   heroTag: "boton1",
                   splashColor: Colors.blueAccent,
                   onPressed: () {
                     goToCreateProducto(context);
+                    setState(() {
+                      _user = Provider.of<AuthService>(context).currentUser();
+                      _listProducto = _user.getListProducto();
+                      _prodSelect.clear();
+                    });
                   },
                   label: Text(
-                    "Agregar Producto",
-                    style: TextStyle(fontSize: 20.0),
+                    "Agregar\nProducto",
                   ),
                 ),
-                Row(
-                  children: <Widget> [
-                    Divider(
-                      indent: screenlong / 65,
-                    ),
-                    Card(
-                        child:
-                        Text(" Productos ",
-                          style: _styleText(),
-                        )),
-                    Divider(
-                      indent: screenlong / 4.6,
-                    ),
-                    Card(
-                        child:
-                        Text(" Seleccionar ",
-                            style: _styleText())),
-                  ],
+                Divider(
+                  indent: screenlong / 60,
                 ),
-                Container(
-                  height: screenHeight / 1.4,
-                  child: Card(
-                    //elevation: 5,
-                    margin: EdgeInsets.all(10),
-                    semanticContainer: true,
-                    //color: Colors.transparent,
-                    child: Theme(
-                      data: ThemeData(
-                        highlightColor: Colors.blue, //Does not work
-                      ),
-                      child: Scrollbar(
-                          child: _queyList(context)),
+                if (_prodSelect.length == 1)
+                  FloatingActionButton.extended(
+                    heroTag: "hero3",
+                    onPressed: () {
+                      if (_prodSelect.isNotEmpty) {
+                        if (_prodSelect.length == 1) {
+                          goToModificar(context, _prodSelect.first);
+                          setState(() {
+                            _user =
+                                Provider.of<AuthService>(context).currentUser();
+                            _listProducto = _user.getListProducto();
+                            _prodSelect.clear();
+                          });
+                        } else {
+                          _showAlert(
+                              "Solo puedes modificar 1 producto a la vez");
+                        }
+                      } else
+                        _showAlert("Debes seleccionar un producto a modificar");
+                    },
+                    label: Text(
+                      "Modificar",
+                    ),
+                  )
+                else
+                  FloatingActionButton.extended(
+                    heroTag: "hero4",
+                    backgroundColor: Colors.grey,
+                    onPressed: () {},
+                    label: Text(
+                      "Modificar",
                     ),
                   ),
-                ),
-                Row(
-                  children: [
-                    Divider(
-                      indent: screenlong / 50,
-                    ),
-                    FloatingActionButton.extended(
-                      heroTag: "boton2",
-                      backgroundColor: Colors.red,
-                      onPressed: () {
-                        if(_eliminar.isNotEmpty)
-                          eliminarProductos(_user.uid, _eliminar);
-                        else
-                          _showAlert("Debes seleccionar productos para eliminar");
-
-                      },
-                      label: Text(
-                        "Eliminar",
-                        style: TextStyle(fontSize: 20.0),
-                      ),
-                    ),
-                    Divider(
-                      indent: screenlong /9,
-                    ),
-                    FloatingActionButton.extended(
-                      heroTag: "hero3",
-                      onPressed: () {
-                        if(_modificar != null){
-                          goToModificar(context);
-                        }else
-                          _showAlert("Debes seleccionar productos para modificar");
-                      },
-                      label: Text(
-                        "Modificar",
-                        style: TextStyle(fontSize: 20.0),
-                      ),
-                    ),
-                  ],
-                )
-              ]
-    ),
-        ),
+              ],
+            ),
+          )
+        ]),
       ),
     );
   }
-  TextStyle _styleText(){
-    return TextStyle(fontSize: 15,fontWeight: FontWeight.bold, color: Colors.black);
+
+  TextStyle _styleText() {
+    return TextStyle(
+        fontSize: 15, fontWeight: FontWeight.bold, color: Colors.black);
   }
+
   Widget _queyList(BuildContext context) {
-    var listDocuments = Provider.of<LoginState>(context).getProductos();
-    if (listDocuments != null) {
-      return ListView.builder(
-          itemCount: listDocuments.length,
-          itemBuilder: (BuildContext context, int index) => buildBody(context, index)
+    if (_listProducto != null) {
+      if (_listProducto.length > 0) {
+        return ListView.builder(
+            itemCount: _listProducto.length,
+            itemBuilder: (BuildContext context, int index) =>
+                buildBody(context, index));
+      } else {
+        return Text(
+          "La tienda no posee Productos asociados :c",
+          style: TextStyle(
+            color: Colors.red,
+            fontSize: 28,
+            fontWeight: FontWeight.w600,
+          ),
+          textAlign: TextAlign.center,
+        );
+      }
+    } else {
+      return Text(
+        "La tienda no posee Productos asociados :c",
+        style: TextStyle(
+          color: Colors.red,
+          fontSize: 28,
+          fontWeight: FontWeight.w600,
+        ),
+        textAlign: TextAlign.center,
       );
-    } else{
-      return Text("La tienda no posee Productos asociados :c",
-            style: TextStyle(
-              color: Colors.red,
-              fontSize: 28,
-              fontWeight: FontWeight.w600,
-            ),
-            textAlign: TextAlign.center,
-          );
     }
   }
+
   Widget buildBody(BuildContext ctxt, int index) {
-    var listDocuments = Provider.of<LoginState>(context).getProductos();
-    double screenHeight = MediaQuery.of(context).size.height;
+    //double screenHeight = MediaQuery.of(context).size.height;
     return Container(
       margin: EdgeInsets.only(top: screenHeight / 1000),
       padding: EdgeInsets.only(left: 10, right: 10),
@@ -167,115 +193,85 @@ class _ProductosTiendaState extends State<ProductosTienda> {
           leading: IconButton(
             icon: Icon(Icons.local_hospital),
             iconSize: 40,
-            tooltip: 'Productos', onPressed: () {  },
+            tooltip: 'Productos',
+            onPressed: () {},
           ),
-          title: Text(listDocuments[index].data["Nombre"]),
-          subtitle: TextProducto(context, listDocuments[index].data.keys.toList(), listDocuments[index].data.values.toList()),
-          trailing: _iconTravel(listDocuments[index].documentID),
+          title: Text(_listProducto.elementAt(index).getNombre()),
+          subtitle: Text(_listProducto.elementAt(index).getDatos()),
+          trailing: _iconTravel(_listProducto.elementAt(index).getCodigo()),
           isThreeLine: true,
         ),
       ),
     );
   }
-  // ignore: non_constant_identifier_names
-  Widget TextProducto(BuildContext context, List listaKeys, List listaValues){
-    int i = 0;
-    String info = '';
-    if (listaKeys!=null){
-      while(i<listaKeys.length){
-        if (listaKeys[i].toString().compareTo("Tienda")!=0 && listaKeys[i].toString().compareTo("Codigo")!=0) {
-          if (i == 1) {
-            info = "${listaKeys[i].toString( )}: ${listaValues[i].toString( )}\n";
-          }
-          if (i > 2) {
-            if(listaKeys[i].toString().compareTo("nombreTienda")!=0)
-              info = info +"${listaKeys[i].toString( )}: ${listaValues[i].toString( )}\n";
-            else
-              info = info +"Tienda: ${listaValues[i].toString( )}\n";
-          }
-        }
-          i=i+1;
-      }
-    }else
-      info = "Este producto no posee datos";
-    return Text("$info");
-  }
 
   IconButton _iconTravel(String id) {
-    bool enEliminar = _eliminar.contains(id);
-    bool enModificar = _modificar == id ? true:false;
-    if(enEliminar)
-      if(state == false) {
-        return IconButton(
-            icon: Icon( Icons.indeterminate_check_box ),
-            color: Colors.red,
-            iconSize: 30,
-            tooltip: 'Modificar',
-            onPressed: () {
-              _eliminar.remove( id );
-              _modificar = id;
-              Provider.of<LoginState>(context).actualizarProducto(_modificar);
-              state = true;
-            } );
-      }else{
-        return IconButton(
-            icon: Icon( Icons.indeterminate_check_box ),
-            color: Colors.red,
-            iconSize: 30,
-            tooltip: 'Normal',
-            onPressed: () {
-              _eliminar.remove(id);
-            } );
-      }
-    else
-      if(enModificar)
+    bool isSelect = _prodSelect.contains(id);
+    if (isSelect) {
       return IconButton(
           icon: Icon(Icons.check_box),
           color: Colors.blue,
           iconSize: 30,
-          tooltip: 'Normal', onPressed: (){
-        _modificar=null;
-        Provider.of<LoginState>(context).actualizarProducto(_modificar);
-        state = false;
-      });
-      else
-        return IconButton(
-            icon: Icon(Icons.check_box_outline_blank),
-            iconSize: 30,
-            tooltip: 'Eliminar', onPressed: (){
-          _eliminar.add(id);
-        });
+          tooltip: 'Seleccionado',
+          onPressed: () {
+            setState(() {
+              _prodSelect.remove(id);
+            });
+          });
+    } else {
+      return IconButton(
+          icon: Icon(Icons.check_box_outline_blank),
+          color: Colors.grey,
+          iconSize: 30,
+          tooltip: 'Sin seleccionar',
+          onPressed: () {
+            setState(() {
+              _prodSelect.add(id);
+            });
+          });
+    }
   }
 
-  void goToCreateProducto(BuildContext context){
+  void goToCreateProducto(BuildContext context) {
     Navigator.push(
-        context,
-        MaterialPageRoute( builder: (context) => CrearProducto()));
+        context, MaterialPageRoute(builder: (context) => CrearProducto()));
   }
+
   void goToHomeScreen(BuildContext context) {
     Navigator.push(
-        context,
-        MaterialPageRoute( builder: (context) => HomeScreen( ) ) );
+        context, MaterialPageRoute(builder: (context) => HomeScreen()));
   }
 
-  void eliminarProductos(String uid, Set<String> eliminar) {
-    int largo = eliminar.length;
+  void eliminarProductos() {
+    int largo = _prodSelect.length;
     int i;
-    try{
-      for(i=0;i<largo;i++){
-        Firestore.instance
-            .collection('usuarios')
-            .document(uid)
-            .collection('Productos')
-            .document(eliminar.elementAt(i))
-            .delete();
+    int cont = 0;
+    try {
+      for (i = 0; i < largo; i++) {
+        if (_user.eliminarProducto(_prodSelect.elementAt(i))) {
+          cont++;
+          Firestore.instance
+              .collection('usuarios')
+              .document(_user.getEmail())
+              .collection('Productos')
+              .document(_prodSelect.elementAt(i))
+              .delete();
+        }
       }
-      eliminar.clear();
-    }catch(error){
+      setState(() {
+        _prodSelect.clear();
+        _user = Provider.of<AuthService>(context).currentUser();
+      });
+    } catch (error) {
+      setState(() {
+        _prodSelect.clear();
+        _user = Provider.of<AuthService>(context).currentUser();
+      });
       return _showAlert("Ocurrió un error al borrar los productos");
     }
-    return _showAlert("Se borraron los productos");
+    return _showAlert("Se borraron $cont productos");
   }
+
   void _showAlert(String notify) {
     // flutter defined function
     showDialog(
@@ -298,9 +294,9 @@ class _ProductosTiendaState extends State<ProductosTienda> {
       },
     );
   }
-  void goToModificar(BuildContext context) {
-    Navigator.push(
-        context,
-        MaterialPageRoute( builder: (context) => new ModificarProducto()));
+
+  void goToModificar(BuildContext context, String codigo) {
+    Navigator.push(context,
+        MaterialPageRoute(builder: (context) => new ModificarProducto(codigo)));
   }
 }

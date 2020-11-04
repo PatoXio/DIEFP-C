@@ -61,8 +61,8 @@ class Tienda extends Usuario {
     return _direccion;
   }
 
-  ListProducto getListProducto() {
-    return _listProducto;
+  List<Producto> getListProducto() {
+    return _listProducto.getListProducto();
   }
 
   Producto getProducto(String id) {
@@ -93,8 +93,8 @@ class Tienda extends Usuario {
     this._direccion = direccion;
   }
 
-  void setListProducto(ListProducto listProducto) {
-    this._listProducto = listProducto;
+  void setListProducto(List<Producto> listProducto) {
+    this._listProducto.setListProducto(listProducto);
   }
 
   void setProducto(Producto producto) {
@@ -119,5 +119,13 @@ class Tienda extends Usuario {
 
   void setProductoVendido(Producto producto) {
     _listVenta.setProducto(producto);
+  }
+
+  bool eliminarProducto(String id) {
+    return _listProducto.eliminarProducto(id);
+  }
+
+  bool editProducto(Producto producto) {
+    return _listProducto.editProducto(producto);
   }
 }

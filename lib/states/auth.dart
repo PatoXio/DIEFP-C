@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:diefpc/Clases/Cliente.dart';
 import 'package:diefpc/Clases/Delivery.dart';
+import 'package:diefpc/Clases/ListProducto.dart';
+import 'package:diefpc/Clases/Producto.dart';
 import 'package:diefpc/Clases/Tienda.dart';
 import 'package:diefpc/Clases/Usuario.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -12,8 +14,13 @@ class AuthService with ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   SharedPreferences _prefs;
   FirebaseUser _user;
-  dynamic _usuario;
+  var _usuario;
+
   DocumentSnapshot document;
+  List<DocumentSnapshot> pedidosPendientes;
+  List<DocumentSnapshot> listProducto;
+  Stream<QuerySnapshot> _tiendas;
+
   bool _loggedIn = false;
   bool _loading = true;
   bool _isCreated = false;
@@ -29,9 +36,13 @@ class AuthService with ChangeNotifier {
     return _isCreated;
   }
 
-  dynamic currentUser() => _usuario;
-  DocumentSnapshot getDocument() => document;
   FirebaseUser usuarioFirebase() => _user;
+  currentUser() => _usuario;
+  Stream<QuerySnapshot> getTiendas() => _tiendas;
+  DocumentSnapshot getDocument() => document;
+  List<DocumentSnapshot> getPedidosPendientes() => pedidosPendientes;
+  List<DocumentSnapshot> getProductos() => listProducto;
+
   bool isLoggedIn() => _loggedIn;
   bool isLoading() => _loading;
   bool isLoadData() => _isLoadData;
@@ -56,7 +67,7 @@ class AuthService with ChangeNotifier {
     if (_prefs.containsKey("isCreated")) {
       _user = await _auth.currentUser();
       _isCreated =
-          (await getDocumentService(_user.email)).data["email"] != null;
+          (await getDataDocumentService(_user.email)).data["email"] != null;
       _loading = false;
       notifyListeners();
     } else {
@@ -100,9 +111,12 @@ class AuthService with ChangeNotifier {
     _isLoadData = false;
     _loading = true;
     notifyListeners();
-    this.document = await getDocumentService(_user.email);
+    this._tiendas = await getListDocumentTiendasService();
+    this.document = await getDataDocumentService(_user.email);
     notifyListeners();
     if (document.data["tipo"].compareTo("Cliente") == 0) {
+      this.listProducto = await getListDocumentCarritoService(_user.email);
+      ListProducto carrito = crearListaProductos(listProducto);
       Cliente cliente = new Cliente.carga(
           document.data["Rut"],
           document.data["nombre"],
@@ -115,7 +129,7 @@ class AuthService with ChangeNotifier {
           null, //listDireccion
           null, //historialCompra
           null, //pedidosPendientes
-          null); //carritoDeCompra
+          carrito); //carritoDeCompra
       _usuario = cliente;
       _prefs.setBool("isCreated", true);
     } else if (document.data["tipo"].compareTo("Delivery") == 0) {
@@ -135,6 +149,8 @@ class AuthService with ChangeNotifier {
       _usuario = delivery;
       _prefs.setBool("isCreated", true);
     } else {
+      this.listProducto = await getListDocumentProductoService(_user.email);
+      ListProducto productos = crearListaProductos(listProducto);
       Tienda tienda = new Tienda.carga(
           document.data["patente"],
           document.data["nombre"],
@@ -144,7 +160,7 @@ class AuthService with ChangeNotifier {
           null, //codigoVerificacion
           null, //codigoDeInvitacion
           null, //direccion
-          null, //listProducto
+          productos, //listProducto
           null, //listVenta
           null, //listPedidoPendiente
           null); //verificado
@@ -179,5 +195,36 @@ class AuthService with ChangeNotifier {
       print(e.toString());
       return null;
     }
+  }
+
+  Future<void> actualizarPendientes() async {
+    pedidosPendientes = await getListDocumentPedidosPendientes(_user.email);
+  }
+
+  Future<void> actualizarTiendas() async {
+    _tiendas = await getListDocumentTiendasService();
+  }
+
+  ListProducto crearListaProductos(List<DocumentSnapshot> listDocument) {
+    List<Producto> listProductos = new List<Producto>();
+    int i;
+    if (listDocument != null) {
+      for (i = 0; i < listDocument.length; i++) {
+        DocumentSnapshot document = listDocument[i];
+        Producto producto = new Producto.carga(
+            document.documentID,
+            document.data["Codigo"],
+            document.data["Tienda"],
+            document.data["nombreTienda"],
+            document.data["Nombre"],
+            int.parse(document.data["Cantidad"]),
+            int.parse(document.data["Precio"]),
+            int.parse(document.data["Stock"]),
+            int.parse(document.data["StockReservado"]),
+            double.parse(document.data["Mg/u"]));
+        listProductos.add(producto);
+      }
+    }
+    return ListProducto.carga(listProductos);
   }
 }
