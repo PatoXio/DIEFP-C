@@ -8,7 +8,7 @@ Future<DocumentSnapshot> getDataDocumentService(String email) async {
 
 Future<Stream<QuerySnapshot>> getListDocumentTiendasService() async {
   Stream<QuerySnapshot> listDocument;
-  listDocument = await Firestore.instance
+  listDocument = Firestore.instance
       .collection('usuarios')
       .where("tipo", isEqualTo: "Tienda")
       .snapshots();
