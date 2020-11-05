@@ -83,3 +83,8 @@ lint/generated/
 lint/outputs/
 lint/tmp/
 lint/reports/
+.dart_tool/package_config.json
+.dart_tool/package_config.json
+.flutter-plugins
+.packages
+pubspec.lock
