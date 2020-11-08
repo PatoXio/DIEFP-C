@@ -574,7 +574,7 @@ class _CreateScreenState extends State<CreateScreen> {
           validator: (value) {
             if (value.isEmpty) {
               return 'Ingrese una patente';
-            } else if (value.length < 12) {
+            } else if (value.length < 5) {
               return "La patente no es válida";
             }
           },
