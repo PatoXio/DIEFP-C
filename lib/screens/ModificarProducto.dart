@@ -249,6 +249,7 @@ class _ModificarProductoState extends State<ModificarProducto> {
                                                 _user.getEmail(),
                                                 _user.getName(),
                                                 modelProducto.getNombre(),
+                                                null,//categoria)
                                                 modelProducto.getCantidad(),
                                                 modelProducto.getPrecio(),
                                                 modelProducto.getStock(),

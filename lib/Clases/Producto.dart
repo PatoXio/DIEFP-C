@@ -9,6 +9,7 @@ class Producto {
   String _idTienda;
   String _nombreTienda;
   String _nombre;
+  List<String> _categoria;
 
   Producto() {
     _id = null;
@@ -21,9 +22,10 @@ class Producto {
     _idTienda = null;
     _nombreTienda = null;
     _nombre = null;
+    _categoria = new List<String>();
   }
 
-  Producto.carga(String id, codigo, idTienda, nombreTienda, nombre,
+  Producto.carga(String id, codigo, idTienda, nombreTienda, nombre, List<String>categoria,
       int cantidad, precio, stock, stockReservado, double mgPorU) {
     _id = id;
     _cantidad = cantidad;
@@ -35,6 +37,7 @@ class Producto {
     _idTienda = idTienda;
     _nombreTienda = nombreTienda;
     _nombre = nombre;
+    _categoria = categoria;
   }
 
   String getDatos() {
@@ -86,6 +89,10 @@ class Producto {
     return _nombre;
   }
 
+  List<String> getCategoria(){
+    return _categoria;
+  }
+
   void setCantidad(int cantidad) {
     this._cantidad = cantidad;
   }
@@ -125,4 +132,19 @@ class Producto {
   void setId(String id) {
     this._id = id;
   }
+  void setCategorias(List<String> categoria){
+    _categoria = categoria;
+  }
+   bool setCategoria(String categoria){
+    if(_categoria != null){
+      for(int i = 0; i < _categoria.length; i++){
+         if(_categoria.elementAt(i).compareTo(categoria) == 0 ){
+           return false;
+         }
+      }
+      _categoria.add(categoria);
+      return true;
+    }
+    return false;
+   }
 }
