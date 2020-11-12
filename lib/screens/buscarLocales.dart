@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:diefpc/app/app.dart';
+import 'package:diefpc/screens/anadirProductoCarrito.dart';
 import 'package:diefpc/states/auth.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -7,7 +8,7 @@ import 'package:location/location.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'dart:async';
-import 'anadirProductoCarrito.dart';
+import 'package:maps_toolkit/maps_toolkit.dart' as mp;
 
 const double CAMERA_ZOOM = 16;
 const double CAMERA_TILT = 80;
@@ -24,7 +25,8 @@ class _LocalesScreenState extends State<LocalesScreen> {
   String tiendaTest = "TiendaTest";
   double screenlong;
   double screenHeight;
-  Stream<QuerySnapshot> _query;
+  Map<String, double> distancia = new Map<String, double>();
+  List<DocumentSnapshot> _query;
   Completer<GoogleMapController> _controller = Completer();
   Set<Marker> _markers = Set<Marker>();
 // para mis rutas dibujadas en el mapa
@@ -88,6 +90,7 @@ class _LocalesScreenState extends State<LocalesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    _query = Provider.of<AuthService>(context).getTiendas();
     screenlong = MediaQuery.of(context).size.longestSide;
     screenHeight = MediaQuery.of(context).size.height;
     Provider.of<AuthService>(context).actualizarTiendas();
@@ -106,7 +109,6 @@ class _LocalesScreenState extends State<LocalesScreen> {
 
     return Consumer(
         builder: (BuildContext context, AuthService state, Widget child) {
-      _query = Provider.of<AuthService>(context).getTiendas();
       return Scaffold(
         appBar: AppBar(
           title: Text("Tiendas"),
@@ -159,43 +161,7 @@ class _LocalesScreenState extends State<LocalesScreen> {
                       data: ThemeData(
                         highlightColor: Colors.blue, //Does not work
                       ),
-                      child: Scrollbar(
-                        //isAlwaysShown: true,
-                        child: StreamBuilder<QuerySnapshot>(
-                          stream: _query,
-                          builder: (BuildContext context,
-                              AsyncSnapshot<QuerySnapshot> snapshot) {
-                            if (snapshot.hasError)
-                              return new Text('Error: ${snapshot.error}');
-                            switch (snapshot.connectionState) {
-                              case ConnectionState.waiting:
-                                return CircularProgressIndicator();
-                              default:
-                                return new ListView(
-                                  children: snapshot.data.documents
-                                      .map((DocumentSnapshot document) {
-                                    return Card(
-                                      child: new ListTile(
-                                        title:
-                                            new Text(document.data['nombre']),
-                                        subtitle: new Text(
-                                            "Distancia: ${obtenerDistancia(document.data['nombre'], document.data['nombre'])}"),
-                                        trailing: FloatingActionButton.extended(
-                                            heroTag:
-                                                "hero+${document.data["email"]}",
-                                            onPressed: () {
-                                              goProductosTest(
-                                                  document.documentID);
-                                            },
-                                            label: Text("Ver")),
-                                      ),
-                                    );
-                                  }).toList(),
-                                );
-                            }
-                          },
-                        ),
-                      ),
+                      child: Scrollbar(child: _queyList(context)),
                     ),
                   ),
                 ),
@@ -207,11 +173,85 @@ class _LocalesScreenState extends State<LocalesScreen> {
     });
   }
 
-  String obtenerDistancia(double x, y) {
-    double dist = ((currentLocation.longitude - x) * 2 +
-            (currentLocation.latitude - y) * 2) *
-        0.5;
-    return dist.toString();
+  Widget _queyList(BuildContext context) {
+    if (_query != null) {
+      if (_query.isNotEmpty) {
+        return ListView.builder(
+            itemCount: _query.length,
+            shrinkWrap: true,
+            itemBuilder: (BuildContext context, int index) =>
+                buildBody(context, index));
+      } else {
+        return Text(
+          "No posees productos en tu carrito",
+          style: TextStyle(
+            color: Colors.red,
+            fontSize: 28,
+            fontWeight: FontWeight.w600,
+          ),
+          textAlign: TextAlign.center,
+        );
+      }
+    } else {
+      return Text(
+        "No posees productos en tu carrito",
+        style: TextStyle(
+          color: Colors.red,
+          fontSize: 28,
+          fontWeight: FontWeight.w600,
+        ),
+        textAlign: TextAlign.center,
+      );
+    }
+  }
+
+  Widget buildBody(BuildContext context, int index) {
+    if (currentLocation == null) {
+      Future.delayed(Duration(seconds: 3),
+          () => obtenerDistancia(_query[index].documentID));
+    } else
+      obtenerDistancia(_query[index].documentID);
+
+    return Card(
+      child: ListTile(
+        dense: true,
+        leading: CircleAvatar(
+          backgroundImage: NetworkImage(
+              "https://firebasestorage.googleapis.com/v0/b/diefp-c.appspot.com/o/528-5286415_doge-dogge-strong-buff-meme-shitpost-nobackground-swole.png?alt=media&token=aeacea8d-2419-40bf-b220-ba7fcc5f2ac1"),
+        ),
+        title: Text(_query[index].data["nombre"]),
+        subtitle: Text(
+            "${distancia == null ? "Calculando..." : distancia[_query[index].documentID] == null ? "Calculando..." : distancia[_query[index].documentID].round() > 1000 ? "A ${(distancia[_query[index].documentID] / 1000).round()} kilometros" : "A ${distancia[_query[index].documentID].round()} metros"}"),
+        trailing: FloatingActionButton.extended(
+            heroTag: "hero+${_query[index].data["email"]}",
+            onPressed: () {
+              goProductosTest(
+                  _query[index].documentID, _query[index].data["nombre"]);
+            },
+            label: Text("Ver")),
+        isThreeLine: true,
+      ),
+    );
+  }
+
+  void obtenerDistancia(String codigo) async {
+    mp.LatLng latLng =
+        new mp.LatLng(currentLocation.latitude, currentLocation.longitude);
+    DocumentSnapshot document = await Firestore.instance
+        .collection('usuarios')
+        .document(codigo)
+        .collection("Direccion")
+        .document("0")
+        .get();
+    double dist = mp.SphericalUtil.computeDistanceBetween(
+        latLng, mp.LatLng(document.data["lat"], document.data["lng"]));
+    setState(() {
+      if (distancia == null) {
+        distancia.putIfAbsent(codigo, () => dist);
+      } else if (distancia.containsKey(codigo) == false) {
+        distancia.putIfAbsent(codigo, () => dist);
+      }
+    });
   }
 
   void showPinsOnMap() {
@@ -270,10 +310,11 @@ class _LocalesScreenState extends State<LocalesScreen> {
     });
   }
 
-  void goProductosTest(String tienda) {
+  void goProductosTest(String idTienda, nombreTienda) {
     Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) => AnadirProcutoCarrito(idTienda: tienda)));
+            builder: (context) => AnadirProductoCarrito(
+                idTienda: idTienda, nombre: nombreTienda)));
   }
 }

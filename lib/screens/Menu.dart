@@ -144,6 +144,7 @@ void goToCarrito(BuildContext context) {
 }
 
 void goToLocales(BuildContext context) {
+  Provider.of<AuthService>(context).actualizarTiendas();
   Navigator.push(
       context, MaterialPageRoute(builder: (context) => LocalesScreen()));
 }

@@ -19,7 +19,7 @@ class AuthService with ChangeNotifier {
   DocumentSnapshot document;
   List<DocumentSnapshot> pedidosPendientes;
   List<DocumentSnapshot> listProducto;
-  Stream<QuerySnapshot> _tiendas;
+  List<DocumentSnapshot> tiendas;
 
   bool _loggedIn = false;
   bool _loading = true;
@@ -38,7 +38,7 @@ class AuthService with ChangeNotifier {
 
   FirebaseUser usuarioFirebase() => _user;
   currentUser() => _usuario;
-  Stream<QuerySnapshot> getTiendas() => _tiendas;
+  List<DocumentSnapshot> getTiendas() => tiendas;
   DocumentSnapshot getDocument() => document;
   List<DocumentSnapshot> getPedidosPendientes() => pedidosPendientes;
   List<DocumentSnapshot> getProductos() => listProducto;
@@ -111,7 +111,7 @@ class AuthService with ChangeNotifier {
     _isLoadData = false;
     _loading = true;
     notifyListeners();
-    this._tiendas = await getListDocumentTiendasService();
+    this.tiendas = await getListDocumentTiendasService();
     this.document = await getDataDocumentService(_user.email);
     notifyListeners();
     if (document.data["tipo"].compareTo("Cliente") == 0) {
@@ -202,7 +202,11 @@ class AuthService with ChangeNotifier {
   }
 
   Future<void> actualizarTiendas() async {
-    _tiendas = await getListDocumentTiendasService();
+    tiendas = await getListDocumentTiendasService();
+  }
+
+  Future<void> actualizarProductosTienda(String id) async {
+    listProducto = await getListDocumentProductoService(id);
   }
 
   ListProducto crearListaProductos(List<DocumentSnapshot> listDocument) {

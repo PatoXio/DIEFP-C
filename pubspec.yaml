@@ -37,6 +37,7 @@ dependencies:
   flappy_search_bar: 1.4.1
   url_launcher: ^5.4.11
   location: ^3.0.2
+  maps_toolkit: ^1.1.0+2
   great_circle_distance: ^1.0.1
   flutter_bloc: ^0.14.0
   http: ^0.12.1

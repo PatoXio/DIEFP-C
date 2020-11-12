@@ -16,15 +16,15 @@ import 'anadirProductoCarrito.dart';
 const double CAMERA_ZOOM = 16;
 const double CAMERA_TILT = 80;
 const double CAMERA_BEARING = 30;
-const LatLng SOURCE_LOCATION = LatLng(42.747932,-71.167889);
-const LatLng DEST_LOCATION = LatLng(37.335685,-122.0605916);
+const LatLng SOURCE_LOCATION = LatLng(42.747932, -71.167889);
+const LatLng DEST_LOCATION = LatLng(37.335685, -122.0605916);
 
-class Seguimiento extends StatefulWidget{
+class Seguimiento extends StatefulWidget {
   @override
   _SeguimientoState createState() => _SeguimientoState();
 }
 
-class ListTileHistory extends StatefulWidget{
+class ListTileHistory extends StatefulWidget {
   int index;
   ListTileHistory({this.index});
   @override
@@ -77,15 +77,16 @@ class _ListTileHistoryState extends State<ListTileHistory> {
 // establece la ubicación inicial
     setInitialLocation();
   }
+
   void setSourceAndDestinationIcons() async {
     sourceIcon = await BitmapDescriptor.fromAssetImage(
-        ImageConfiguration(devicePixelRatio: 2.5),
-        'assets/driving_pin.png');
+        ImageConfiguration(devicePixelRatio: 2.5), 'assets/driving_pin.png');
 
     destinationIcon = await BitmapDescriptor.fromAssetImage(
         ImageConfiguration(devicePixelRatio: 2.5),
         'assets/destination_map_marker.png');
   }
+
   void setInitialLocation() async {
     // establece la ubicación inicial tirando del usuario
     // ubicación actual de getLocation () de la ubicación
@@ -97,199 +98,195 @@ class _ListTileHistoryState extends State<ListTileHistory> {
       "longitude": DEST_LOCATION.longitude
     });
   }
+
   @override
   Widget build(BuildContext context) {
     Provider.of<LoginState>(context).actualizarHistorial();
-    screenlong = MediaQuery.of( context ).size.longestSide;
-    screenHeight = MediaQuery.of( context ).size.height;
-    var listDocuments = Provider.of<LoginState>( context ).getHistorialPendientes( );
+    screenlong = MediaQuery.of(context).size.longestSide;
+    screenHeight = MediaQuery.of(context).size.height;
+    var listDocuments =
+        Provider.of<LoginState>(context).getHistorialPendientes();
     DateTime horaActual = DateTime.now();
 
     CameraPosition initialCameraPosition = CameraPosition(
         zoom: CAMERA_ZOOM,
         tilt: CAMERA_TILT,
         bearing: CAMERA_BEARING,
-        target: SOURCE_LOCATION
-    );
+        target: SOURCE_LOCATION);
     if (currentLocation != null) {
       initialCameraPosition = CameraPosition(
-          target: LatLng(currentLocation.latitude,
-              currentLocation.longitude),
+          target: LatLng(currentLocation.latitude, currentLocation.longitude),
           zoom: CAMERA_ZOOM,
           tilt: CAMERA_TILT,
-          bearing: CAMERA_BEARING
-      );
+          bearing: CAMERA_BEARING);
     }
-    if(listDocuments.elementAt(widget.index).data["Pendiente"] == true){
+    if (listDocuments.elementAt(widget.index).data["Pendiente"] == true) {
       _tiempoDeEntrega = "Su pedido se está preparando";
       _difTiempos = "Indefinidos";
-    }else{
-      if(listDocuments.elementAt(widget.index).data["HoraEntrega"] != null){
-        _tiempoDeEntrega = DateTime.parse(listDocuments.elementAt(widget.index).data["HoraEntrega"]);
-        if(_tiempoDeEntrega.difference(horaActual).inMinutes > 0) {
+    } else {
+      if (listDocuments.elementAt(widget.index).data["HoraEntrega"] != null) {
+        _tiempoDeEntrega = DateTime.parse(
+            listDocuments.elementAt(widget.index).data["HoraEntrega"]);
+        if (_tiempoDeEntrega.difference(horaActual).inMinutes > 0) {
           _difTiempos = _tiempoDeEntrega.difference(horaActual).inMinutes;
-        } else{
+        } else {
           _tiempoDeEntrega = "Su pedido está por llegar";
           _difTiempos = "solo unos";
         }
-      }
-      else{
+      } else {
         _tiempoDeEntrega = "Aún no se define\nla hora de llegada";
         _difTiempos = "(Por definir)";
       }
     }
-    if(listDocuments.elementAt(widget.index).data["Entregado"] == false){
+    if (listDocuments.elementAt(widget.index).data["Entregado"] == false) {
       return Container(
-        child: Column(
-          children: [
-            FloatingActionButton.extended(
-              heroTag: "hero${widget.index}",
-              label: Text("Pedido ${widget.index+1}",
-                  style: TextStyle(
-                      fontSize: 15,
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold
-                  )
-              ),
-              onPressed: (){
-                Navigator.push(
-                    context,
-                    MaterialPageRoute( builder: (context) => HistorialProductos(
+          child: Column(children: [
+        FloatingActionButton.extended(
+          heroTag: "hero${widget.index}",
+          label: Text("Pedido ${widget.index + 1}",
+              style: TextStyle(
+                  fontSize: 15,
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold)),
+          onPressed: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => HistorialProductos(
                         listDocuments[widget.index].data["Tienda"],
                         "${listDocuments[widget.index].data["Fecha"]}:${listDocuments[widget.index].data["Tienda"]}",
-                        listDocuments[widget.index].data["Total Pagado"].toString(),
-                        listDocuments[widget.index].data["Costo de Envío"].toString()
-                    )));
-                },
-      ),
-            Container(
-              height: screenHeight / 2,
-              child: Card(
-                //elevation: 5,
-                margin: EdgeInsets.all(10),
-                semanticContainer: true,
-                color: Colors.transparent,
-                child: GoogleMap(
-                    myLocationEnabled: true,
-                    compassEnabled: true,
-                    tiltGesturesEnabled: false,
-                    markers: _markers,
-                    polylines: _polylines,
-                    mapType: MapType.normal,
-                    initialCameraPosition: initialCameraPosition,
-                    onMapCreated: (GoogleMapController controller) {
-                      _controller.complete(controller);
-                      // mi mapa ha terminado de ser creado;
-                      // estoy listo para mostrar los pines en el mapa
-                      showPinsOnMap();
-                    }),
-              ),
-            ),
-            Container(
-              margin: EdgeInsets.only( top: screenHeight / 100 ),
-              padding: EdgeInsets.only( left: 30, right: 30 ),
-              child: Card(
-                margin: EdgeInsets.all( 10 ),
-                semanticContainer: true,
-                child: Row(
-                  children: [
-                    Divider(
-                      indent: screenlong / 38,
-                    ),
-                    Center( child: Icon(
-                      Icons.departure_board, size: 30, color: Colors.grey, ) ),
-                    Divider(
-                      indent: screenlong / 60,
-                    ),
-                    Center( child: Text( "Enviando sus productos",
+                        listDocuments[widget.index]
+                            .data["Total Pagado"]
+                            .toString(),
+                        listDocuments[widget.index]
+                            .data["Costo de Envío"]
+                            .toString())));
+          },
+        ),
+        Container(
+          height: screenHeight / 2,
+          child: Card(
+            //elevation: 5,
+            margin: EdgeInsets.all(10),
+            semanticContainer: true,
+            color: Colors.transparent,
+            child: GoogleMap(
+                myLocationEnabled: true,
+                compassEnabled: true,
+                tiltGesturesEnabled: false,
+                markers: _markers,
+                polylines: _polylines,
+                mapType: MapType.normal,
+                initialCameraPosition: initialCameraPosition,
+                onMapCreated: (GoogleMapController controller) {
+                  _controller.complete(controller);
+                  // mi mapa ha terminado de ser creado;
+                  // estoy listo para mostrar los pines en el mapa
+                  showPinsOnMap();
+                }),
+          ),
+        ),
+        Container(
+          margin: EdgeInsets.only(top: screenHeight / 100),
+          padding: EdgeInsets.only(left: 30, right: 30),
+          child: Card(
+            margin: EdgeInsets.all(10),
+            semanticContainer: true,
+            child: Row(
+              children: [
+                Divider(
+                  indent: screenlong / 38,
+                ),
+                Center(
+                    child: Icon(
+                  Icons.departure_board,
+                  size: 30,
+                  color: Colors.grey,
+                )),
+                Divider(
+                  indent: screenlong / 60,
+                ),
+                Center(
+                    child: Text("Enviando sus productos",
                         style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 20,
-                            color: Colors.blue ) ) ),
-                  ],
-                ),
-              ),
+                            color: Colors.blue))),
+              ],
             ),
-            Container(
-              height: screenHeight / 3.6,
-              child: Card(
-                //elevation: 10,
-                margin: EdgeInsets.all( 10 ),
-                semanticContainer: true,
-                //color: Colors.transparent,
-                child: Theme(
-                  data: ThemeData(
-                    highlightColor: Colors.blue, //Does not work
-                  ),
-                  child: Scrollbar(
-                    //isAlwaysShown: true,
-                    child: Row(
-                      children: [
-                        AnalogClock(
-                          decoration: BoxDecoration(
-                              border: Border.all(
-                                  width: 2.0, color: Colors.black ),
-                              color: Colors.transparent,
-                              shape: BoxShape.circle ),
-                          width: 150,
-                          isLive: true,
-                          hourHandColor: Colors.black,
-                          minuteHandColor: Colors.black,
-                          showSecondHand: false,
-                          numberColor: Colors.black87,
-                          showNumbers: true,
-                          textScaleFactor: 1.4,
-                          showTicks: true,
-                          showDigitalClock: false,
-                        ),
-                        Column(
-                          children: [
-                            Divider(
-                              height: screenHeight / 30,
-                            ),
-                            Card( child: Text( "Son las ${horaActual.hour} horas y ${horaActual.minute} minutos" ) ),
-                            Divider(
-                              height: screenHeight / 15,
-                            ),
-                            Text("LLegará a las:"),
-                            Card( child: Text("$_tiempoDeEntrega")),
-                          ],
-                        )
-                      ],
-                    ),
-                  ),
-                ),
+          ),
+        ),
+        Container(
+          height: screenHeight / 3.6,
+          child: Card(
+            //elevation: 10,
+            margin: EdgeInsets.all(10),
+            semanticContainer: true,
+            //color: Colors.transparent,
+            child: Theme(
+              data: ThemeData(
+                highlightColor: Colors.blue, //Does not work
               ),
-            ),
-            Card(
-                semanticContainer: true,
-                child: Column(
+              child: Scrollbar(
+                //isAlwaysShown: true,
+                child: Row(
                   children: [
-                    Center(
-                      child: Text(
-                          "\nQuedan ${_difTiempos} minutos para la\nentrega de su pedido.\n",
-                          style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.blue
-                          )
-                      ),
+                    AnalogClock(
+                      decoration: BoxDecoration(
+                          border: Border.all(width: 2.0, color: Colors.black),
+                          color: Colors.transparent,
+                          shape: BoxShape.circle),
+                      width: 150,
+                      isLive: true,
+                      hourHandColor: Colors.black,
+                      minuteHandColor: Colors.black,
+                      showSecondHand: false,
+                      numberColor: Colors.black87,
+                      showNumbers: true,
+                      textScaleFactor: 1.4,
+                      showTicks: true,
+                      showDigitalClock: false,
                     ),
+                    Column(
+                      children: [
+                        Divider(
+                          height: screenHeight / 30,
+                        ),
+                        Card(
+                            child: Text(
+                                "Son las ${horaActual.hour} horas y ${horaActual.minute} minutos")),
+                        Divider(
+                          height: screenHeight / 15,
+                        ),
+                        Text("LLegará a las:"),
+                        Card(child: Text("$_tiempoDeEntrega")),
+                      ],
+                    )
                   ],
-                )
-            )
-          ]
-        )
-      );
-    }
-    else{
+                ),
+              ),
+            ),
+          ),
+        ),
+        Card(
+            semanticContainer: true,
+            child: Column(
+              children: [
+                Center(
+                  child: Text(
+                      "\nQuedan ${_difTiempos} minutos para la\nentrega de su pedido.\n",
+                      style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.blue)),
+                ),
+              ],
+            ))
+      ]));
+    } else {
       return Container(
-          child: Column(
-            children: [
-              Text("Pedido ${widget.index+1} Entregado")
-            ]
-          )
-      );
+          child:
+              Column(children: [Text("Pedido ${widget.index + 1} Entregado")]));
     }
   }
 
@@ -297,30 +294,28 @@ class _ListTileHistoryState extends State<ListTileHistory> {
 // obtener un LatLng para la ubicación de origen
     // del objeto LocationData currentLocation
 
-    var pinPosition = LatLng(currentLocation.latitude,
-        currentLocation.longitude);
+    var pinPosition =
+        LatLng(currentLocation.latitude, currentLocation.longitude);
 
     // obtener un LatLng del objeto LocationData
-    var destPosition = LatLng(destinationLocation.latitude,
-        destinationLocation.longitude);
+    var destPosition =
+        LatLng(destinationLocation.latitude, destinationLocation.longitude);
     // agrega el pin de ubicación de origen inicial
     _markers.add(Marker(
         markerId: MarkerId('sourcePin'),
         position: pinPosition,
-        icon: sourceIcon
-    ));
+        icon: sourceIcon));
     // pin de destino
     _markers.add(Marker(
         markerId: MarkerId('destPin'),
         position: destPosition,
-        icon: destinationIcon
-    ));
+        icon: destinationIcon));
     // establece las líneas de ruta en el mapa desde el origen hasta   el destino
     // para más información sigue este tutorial
     //setPolylines();
   }
-  void updatePinOnMap() async {
 
+  void updatePinOnMap() async {
     // crea una nueva instancia de CameraPosition
     // cada vez que cambia la ubicación, entonces la cámara
     // sigue el pin mientras se mueve con una animación
@@ -328,8 +323,7 @@ class _ListTileHistoryState extends State<ListTileHistory> {
       zoom: CAMERA_ZOOM,
       tilt: CAMERA_TILT,
       bearing: CAMERA_BEARING,
-      target: LatLng(currentLocation.latitude,
-          currentLocation.longitude),
+      target: LatLng(currentLocation.latitude, currentLocation.longitude),
     );
 
     final GoogleMapController controller = await _controller.future;
@@ -339,17 +333,16 @@ class _ListTileHistoryState extends State<ListTileHistory> {
 
     setState(() {
       // updated position
-      var pinPosition = LatLng(currentLocation.latitude,
-          currentLocation.longitude);
+      var pinPosition =
+          LatLng(currentLocation.latitude, currentLocation.longitude);
 
       // el truco es eliminar el marcador (por id)
       // y agregarlo nuevamente en la ubicación actualizada
-      _markers.removeWhere(
-              (m) => m.markerId.toString() == 'sourcePin');                                                                    _markers.add(Marker(
+      _markers.removeWhere((m) => m.markerId.toString() == 'sourcePin');
+      _markers.add(Marker(
           markerId: MarkerId('sourcePin'),
           position: pinPosition, // posición actualizada
-          icon: sourceIcon
-      ));
+          icon: sourceIcon));
     });
   }
 }
@@ -361,28 +354,28 @@ class _SeguimientoState extends State<Seguimiento> {
   @override
   Widget build(BuildContext context) {
     Provider.of<LoginState>(context).actualizarHistorial();
-    screenlong = MediaQuery.of( context ).size.longestSide;
-    screenHeight = MediaQuery.of( context ).size.height;
+    screenlong = MediaQuery.of(context).size.longestSide;
+    screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       appBar: AppBar(
         title: Text("Pedidos Seguidos"),
         actions: <Widget>[
-          IconButton(icon: Icon(Icons.list),
+          IconButton(
+              icon: Icon(Icons.list),
               tooltip: 'Configuración',
-              onPressed: (){
+              onPressed: () {
                 configMenu(context);
-              }
-          ),
+              }),
         ],
-          leading: new IconButton(
-            icon: new Icon(Icons.arrow_back),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => MenuScreen()),
-              );
-            },
-          ),
+        leading: new IconButton(
+          icon: new Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => MenuScreen()),
+            );
+          },
+        ),
       ),
       body: Container(
         margin: EdgeInsets.only(top: screenHeight / 100),
@@ -396,14 +389,16 @@ class _SeguimientoState extends State<Seguimiento> {
 
   Widget _queryList(BuildContext context) {
     //Provider.of<LoginState>(context).actualizarHistorial();
-    var listDocuments = Provider.of<LoginState>(context).getHistorialPendientes();
+    var listDocuments =
+        Provider.of<LoginState>(context).getHistorialPendientes();
     if (listDocuments != null) {
       int historialLength = listDocuments.length;
       return ListView(
-          children: List.generate(historialLength, (i) => new ListTileHistory(index: i))
-      );
-    }else{
-      return Text("No se poseen productos pendientes",
+          children: List.generate(
+              historialLength, (i) => new ListTileHistory(index: i)));
+    } else {
+      return Text(
+        "No se poseen productos pendientes",
         style: TextStyle(
           color: Colors.red,
           fontSize: 28,
@@ -414,7 +409,7 @@ class _SeguimientoState extends State<Seguimiento> {
     }
   }
 
- /* void setPolylines() async {   List<PointLatLng> result = await
+  /* void setPolylines() async {   List<PointLatLng> result = await
   polylinePoints?.getRouteBetweenCoordinates(
       googleAPIKey,
       destinationLocation.latitude,
@@ -435,9 +430,11 @@ class _SeguimientoState extends State<Seguimiento> {
       ));
     });
   }
-  }*/
-  void goProductosTest(String test){
-    Navigator.push(
-        context, MaterialPageRoute(builder: (context) => AnadirProcutoCarrito(idTienda: tiendaTest)));
   }
+  void goProductosTest(String test) {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => AnadirProductoCarrito(idTienda: tiendaTest)));
+  }*/
 }

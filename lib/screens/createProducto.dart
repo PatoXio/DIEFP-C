@@ -295,6 +295,7 @@ class _CrearProductoState extends State<CrearProducto> {
         "Mg/u": peso,
         "Nombre": nombre,
         "Precio": precio,
+        "Cantidad": "0",
         "StockReservado": "0",
         "Tienda": _user.getEmail(),
         "nombreTienda": _user.getName(),

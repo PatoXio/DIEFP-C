@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:diefpc/Clases/Cliente.dart';
-import 'package:diefpc/Clases/Producto.dart';
 import 'package:diefpc/states/auth.dart';
 import 'package:flutter/material.dart';
 import 'package:diefpc/app/app.dart';
@@ -15,7 +14,6 @@ class CarritoCompras extends StatefulWidget {
 class _CarritoComprasState extends State<CarritoCompras> {
   final _saved = Set<String>();
   Cliente _user;
-  List<Producto> carrito;
   double screenlong;
   double screenHeight;
   @override
@@ -23,8 +21,6 @@ class _CarritoComprasState extends State<CarritoCompras> {
     screenlong = MediaQuery.of(context).size.longestSide;
     screenHeight = MediaQuery.of(context).size.height;
     _user = Provider.of<AuthService>(context).currentUser();
-    carrito = _user.getCarritoDeCompra();
-
     return Scaffold(
       appBar: AppBar(
         title: Text("Carrito de Compras"),
@@ -78,7 +74,7 @@ class _CarritoComprasState extends State<CarritoCompras> {
                 FloatingActionButton.extended(
                   heroTag: "boton1",
                   onPressed: () {
-                    borrarDelCarrito(_saved);
+                    borrarDelCarrito(_saved, _user);
                   },
                   label: Text("Eliminar", style: TextStyle(fontSize: 20)),
                   backgroundColor: Colors.red,
@@ -89,7 +85,7 @@ class _CarritoComprasState extends State<CarritoCompras> {
                 FloatingActionButton.extended(
                   heroTag: "boton2",
                   onPressed: () {
-                    if (carrito.length > 0) {
+                    if (_user.getCarritoDeCompra().length > 0) {
                       goToComprarCarrito(context);
                     } else
                       return _showAlert("Deben haber productos para comprar.");
@@ -114,7 +110,9 @@ class _CarritoComprasState extends State<CarritoCompras> {
           iconSize: 20,
           tooltip: 'Deleter',
           onPressed: () {
-            _saved.remove(id);
+            setState(() {
+              _saved.remove(id);
+            });
           });
     } else {
       return IconButton(
@@ -122,7 +120,9 @@ class _CarritoComprasState extends State<CarritoCompras> {
           iconSize: 20,
           tooltip: 'Checker',
           onPressed: () {
-            _saved.add(id);
+            setState(() {
+              _saved.add(id);
+            });
           });
     }
   }
@@ -133,10 +133,10 @@ class _CarritoComprasState extends State<CarritoCompras> {
   }
 
   Widget _queyList(BuildContext context) {
-    if (carrito != null) {
-      if (carrito.isNotEmpty) {
+    if (_user.getCarritoDeCompra() != null) {
+      if (_user.getCarritoDeCompra().isNotEmpty) {
         return ListView.builder(
-            itemCount: carrito.length,
+            itemCount: _user.getCarritoDeCompra().length,
             shrinkWrap: true,
             itemBuilder: (BuildContext context, int index) =>
                 buildBody(context, index));
@@ -173,9 +173,9 @@ class _CarritoComprasState extends State<CarritoCompras> {
           tooltip: 'Productos',
           onPressed: () {},
         ),
-        title: Text(carrito[index].getNombre()),
-        subtitle: Text(carrito[index].getDatos()),
-        trailing: _iconTravel(carrito[index].getCodigo()),
+        title: Text(_user.getCarritoDeCompra()[index].getNombre()),
+        subtitle: Text(_user.getCarritoDeCompra()[index].getDatos()),
+        trailing: _iconTravel(_user.getCarritoDeCompra()[index].getCodigo()),
         isThreeLine: true,
       ),
     );
@@ -203,7 +203,7 @@ class _CarritoComprasState extends State<CarritoCompras> {
     return Text("$info");
   }
 
-  void borrarDelCarrito(Set<String> _saved) {
+  void borrarDelCarrito(Set<String> _saved, Cliente user) {
     int largo = _saved.length;
     int i;
     print(largo);
@@ -216,8 +216,13 @@ class _CarritoComprasState extends State<CarritoCompras> {
               .collection('Carrito')
               .document(_saved.elementAt(i))
               .delete();
+          user.getCarritoDeCompra().removeWhere((element) =>
+              element.getCodigo().compareTo(_saved.elementAt(i)) == 0);
         }
-        _saved.clear();
+        setState(() {
+          _user = user;
+          _saved.clear();
+        });
       } catch (error) {
         return _showAlert('Ocurrió un error al borrar los productos.');
       }

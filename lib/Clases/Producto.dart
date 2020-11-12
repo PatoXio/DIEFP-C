@@ -41,6 +41,10 @@ class Producto {
     return "Nombre: $_nombre\nStock: $_stock\nPrecio: $_precio\nPeso: $_mgPorU Mg/U\nCodigo: $_codigo";
   }
 
+  String getDatosAlComprar() {
+    return "Precio: $_precio\nMg/U: $_mgPorU\nStock: $_stock";
+  }
+
   String getId() {
     return _id;
   }

@@ -1,12 +1,14 @@
 //import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:async';
+
+import 'package:diefpc/Clases/Cliente.dart';
 import 'package:diefpc/screens/seguimientoCompra.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:diefpc/states/login_state.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:diefpc/documents/documents_service.dart';
+import 'package:diefpc/states/auth.dart';
 import 'package:flutter/material.dart';
 import 'package:diefpc/app/app.dart';
 import 'package:provider/provider.dart';
-
 import 'carrito.dart';
 
 class ComprarCarrito extends StatefulWidget {
@@ -23,14 +25,14 @@ class ListTileItem extends StatefulWidget {
 }
 
 class _ListTileItemState extends State<ListTileItem> {
-  int count = 1;
+  int count;
   @override
   Widget build(BuildContext context) {
-    FirebaseUser _user = Provider.of<LoginState>(context).currentUser();
-    var listDocuments = Provider.of<LoginState>(context).getCarrito();
-    Provider.of<LoginState>(context).actualizarCarrito();
-    if (listDocuments[widget.index].data["Cantidad"] != null) {
-      count = int.parse(listDocuments[widget.index].data["Cantidad"]);
+    Cliente _user = Provider.of<AuthService>(context).currentUser();
+    if (_user.getCarritoDeCompra()[widget.index].getCantidad() != null) {
+      count = _user.getCarritoDeCompra()[widget.index].getCantidad();
+    } else {
+      count = 1;
     }
     return ListTile(
       leading: IconButton(
@@ -39,67 +41,57 @@ class _ListTileItemState extends State<ListTileItem> {
         tooltip: 'Productos',
         onPressed: () {},
       ),
-      title: Text(listDocuments[widget.index].data["Nombre"]),
-      subtitle: TextProducto(
-          context,
-          listDocuments[widget.index].data.keys.toList(),
-          listDocuments[widget.index].data.values.toList()),
+      title: Text(_user.getCarritoDeCompra()[widget.index].getNombre()),
+      subtitle:
+          Text(_user.getCarritoDeCompra()[widget.index].getDatosAlComprar()),
       trailing: new Row(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          count != 0
-              ? IconButton(
-                  icon: Icon(Icons.remove),
-                  onPressed: () => {
-                    setState(() => count--),
-                    actualizarCarritoCant(
-                        listDocuments[widget.index].documentID,
-                        _user.uid,
-                        count)
-                  },
-                )
-              : new Container(),
-          Text(count.toString()),
+          IconButton(
+              icon: Icon(Icons.remove),
+              onPressed: () => {
+                    if (_user.getCarritoDeCompra()[widget.index].getCantidad() >
+                        0)
+                      {
+                        setState(() {
+                          count--;
+                          _user
+                              .getCarritoDeCompra()[widget.index]
+                              .setCantidad(count);
+                          actualizarCarritoCant(
+                              _user
+                                  .getCarritoDeCompra()[widget.index]
+                                  .getCodigo(),
+                              _user.getEmail(),
+                              count);
+                        })
+                      }
+                  }),
+          Text("$count"),
           IconButton(
               icon: Icon(Icons.add),
               onPressed: () => {
-                    if (int.parse(listDocuments[widget.index].data["Stock"]) >
+                    if (_user.getCarritoDeCompra()[widget.index].getStock() >
                         count)
-                      setState(() => count++),
-                    actualizarCarritoCant(
-                        listDocuments[widget.index].documentID,
-                        _user.uid,
-                        count)
+                      {
+                        setState(() {
+                          count++;
+                          _user
+                              .getCarritoDeCompra()[widget.index]
+                              .setCantidad(count);
+                          actualizarCarritoCant(
+                              _user
+                                  .getCarritoDeCompra()[widget.index]
+                                  .getCodigo(),
+                              _user.getEmail(),
+                              count);
+                        })
+                      }
                   })
         ],
       ),
       isThreeLine: true,
     );
-  }
-
-  // ignore: non_constant_identifier_names
-  Widget TextProducto(BuildContext context, List listaKeys, List listaValues) {
-    int i = 0;
-    String info = '';
-    if (listaKeys != null) {
-      while (i < listaKeys.length) {
-        if (listaKeys[i].toString().compareTo("Tienda") != 0 &&
-            listaKeys[i].toString().compareTo("Codigo") != 0) {
-          if (i == 1)
-            info = "${listaKeys[i].toString()}: ${listaValues[i].toString()}\n";
-          if (i >= 2) {
-            if (listaKeys[i].toString().compareTo("nombreTienda") != 0)
-              info = info +
-                  "${listaKeys[i].toString()}: ${listaValues[i].toString()}\n";
-            else
-              info = info + "Tienda: ${listaValues[i].toString()}\n";
-          }
-        }
-        i = i + 1;
-      }
-    } else
-      info = "Este producto no posee datos";
-    return Text("$info");
   }
 
   void actualizarCarritoCant(String idProducto, String uid, int count) {
@@ -108,7 +100,7 @@ class _ListTileItemState extends State<ListTileItem> {
         .document(uid)
         .collection("Carrito")
         .document(idProducto)
-        .updateData({"Cantidad": count.toString()});
+        .setData({"Cantidad": count.toString()}, merge: true);
   }
 }
 
@@ -116,19 +108,28 @@ class _ComprarCarritoState extends State<ComprarCarrito> {
   double screenlong;
   double screenHeight;
   int costoTotal;
-  String medioDePago = 'WebPay';
-  FirebaseUser _user;
-  List<DocumentSnapshot> carrito;
+  int cont;
+  Timer timer;
+  int costoEnvio;
+  int costoCompleto;
+  String medioDePago = 'Efectivo';
+  Cliente _user;
   String nombre;
+
+  @override
+  void initState() {
+    super.initState();
+    timer = Timer.periodic(Duration(seconds: 2), (timer) => actualizarCobros());
+  }
 
   @override
   Widget build(BuildContext context) {
     screenlong = MediaQuery.of(context).size.longestSide;
     screenHeight = MediaQuery.of(context).size.height;
-    _user = Provider.of<LoginState>(context).currentUser();
-    Provider.of<LoginState>(context).actualizarCarrito();
-    carrito = Provider.of<LoginState>(context).getCarrito();
-    costoTotal = _totalCosto(carrito, _costoEnvio(), _user.uid);
+    _user = Provider.of<AuthService>(context).currentUser();
+    costoTotal = totalCosto();
+    costoEnvio = costoDeEnvio();
+    costoCompleto = costoTotal + costoEnvio;
     return Scaffold(
       appBar: AppBar(
         title: Text("Comprar Productos"),
@@ -140,152 +141,184 @@ class _ComprarCarritoState extends State<ComprarCarrito> {
                 configMenu(context);
               }),
         ],
+        leading: new IconButton(
+          icon: new Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            timer.cancel();
+            Navigator.pop(context);
+          },
+        ),
       ),
-      body: Container(
-          margin: EdgeInsets.only(top: screenHeight / 100),
-          padding: EdgeInsets.only(left: 10, right: 10),
-          child: Column(children: <Widget>[
-            Row(
-              children: <Widget>[
-                Divider(
-                  indent: screenlong / 65,
-                ),
-                Text(
-                  "Productos:",
-                  style: TextStyle(
-                      fontSize: 30,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.blue),
-                ),
-              ],
-            ),
-            Container(
-              height: screenHeight / 2.5,
-              child: Card(
-                //elevation: 5,
-                margin: EdgeInsets.all(10),
-                semanticContainer: true,
-                //color: Colors.transparent,
-                child: Theme(
-                  data: ThemeData(
-                    highlightColor: Colors.blue, //Does not work
+      body: SingleChildScrollView(
+        child: Container(
+            margin: EdgeInsets.only(top: screenHeight / 100),
+            //padding: EdgeInsets.only(left: 10, right: 10),
+            child: Column(children: <Widget>[
+              Row(
+                children: <Widget>[
+                  Divider(
+                    indent: screenlong / 65,
                   ),
-                  child: Scrollbar(child: _queyList(context)),
+                  Text(
+                    "Productos:",
+                    style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue),
+                  ),
+                ],
+              ),
+              Container(
+                height: screenHeight / 2.5,
+                child: Card(
+                  //elevation: 5,
+                  //margin: EdgeInsets.all(0),
+                  semanticContainer: true,
+                  //color: Colors.transparent,
+                  child: Theme(
+                    data: ThemeData(
+                      highlightColor: Colors.blue, //Does not work
+                    ),
+                    child: Scrollbar(child: _queyList(context)),
+                  ),
                 ),
               ),
-            ),
-            Container(
-              height: screenHeight / 3,
-              child: Card(
-                //elevation: 5,
-                margin: EdgeInsets.all(10),
-                semanticContainer: true,
-                //color: Colors.transparent,
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        Text("\n Costo de Envío:",
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 20,
-                                color: Colors.blue)),
-                        Divider(
-                          indent: screenlong / 20,
-                        ),
-                        Text("\n ${_costoEnvio()} Pesos",
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 20,
-                                color: Colors.blue)),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        Text("\n Costo Total:",
-                            style: TextStyle(fontSize: 20, color: Colors.blue)),
-                        Divider(
-                          indent: screenlong / 10,
-                        ),
-                        Text(
-                            "\n${_totalCosto(carrito, _costoEnvio(), _user.uid)} Pesos",
-                            style: TextStyle(fontSize: 20, color: Colors.blue)),
-                      ],
-                    ),
-                    Divider(
-                      height: screenHeight / 30,
-                    ),
-                    Row(
-                      children: [
-                        Text(" Pagar con:",
-                            style: TextStyle(fontSize: 20, color: Colors.blue)),
-                        Divider(
-                          indent: screenlong / 9,
-                        ),
-                        DropdownButton<String>(
-                          value: medioDePago,
-                          icon: Icon(
-                            Icons.arrow_downward,
-                            color: Colors.blue,
+              /* FloatingActionButton.extended(
+                        backgroundColor: Colors.blue,
+                        foregroundColor: Colors.white,
+                        onPressed: () {
+                          calcular();
+                        },
+                        icon: Icon(Icons.refresh),
+                        label: Text('Calcular'),
+                      ),*/
+              Container(
+                //height: screenHeight / 3,
+                child: Card(
+                  elevation: 5,
+                  //margin: EdgeInsets.fromLTRB(0, top, 0, 0),
+                  semanticContainer: true,
+                  //color: Colors.transparent,
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          Text(" Costo de Envío:",
+                              style: TextStyle(
+                                  //fontWeight: FontWeight.bold,
+                                  fontSize: 15,
+                                  color: Colors.blue)),
+                          Text(" $costoEnvio Pesos",
+                              style: TextStyle(
+                                  //fontWeight: FontWeight.bold,
+                                  fontSize: 15,
+                                  color: Colors.blue)),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Text("\n Costo Total Sin Envio:",
+                              style:
+                                  TextStyle(fontSize: 15, color: Colors.blue)),
+                          Text("\n $costoTotal Pesos",
+                              style:
+                                  TextStyle(fontSize: 15, color: Colors.blue)),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Text("\n Costo Total Con Envio:",
+                              style:
+                                  TextStyle(fontSize: 15, color: Colors.blue)),
+                          Text("\n $costoCompleto Pesos",
+                              style:
+                                  TextStyle(fontSize: 15, color: Colors.blue)),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Text(" Pagar con:",
+                              style:
+                                  TextStyle(fontSize: 15, color: Colors.blue)),
+                          Divider(
+                            indent: screenlong / 30,
                           ),
-                          iconSize: 24,
-                          elevation: 16,
-                          style: TextStyle(color: Colors.green),
-                          underline: Container(
-                            height: 2,
-                            color: Colors.green,
+                          DropdownButton<String>(
+                            value: medioDePago,
+                            icon: Icon(
+                              Icons.arrow_downward,
+                              color: Colors.blue,
+                            ),
+                            iconSize: 15,
+                            //elevation: 16,
+                            style: TextStyle(color: Colors.green),
+                            underline: Container(
+                              height: 2,
+                              color: Colors.green,
+                            ),
+                            onChanged: (String newValue) {
+                              setState(() {
+                                medioDePago = newValue;
+                              });
+                            },
+                            items: <String>['Efectivo']
+                                .map<DropdownMenuItem<String>>((String value) {
+                              return DropdownMenuItem<String>(
+                                value: value,
+                                child: Text("$value",
+                                    style: TextStyle(
+                                        fontSize: 15, color: Colors.blue)),
+                              );
+                            }).toList(),
                           ),
-                          onChanged: (String newValue) {
-                            setState(() {
-                              medioDePago = newValue;
-                            });
-                          },
-                          items: <String>['WebPay', 'Efectivo', 'Match']
-                              .map<DropdownMenuItem<String>>((String value) {
-                            return DropdownMenuItem<String>(
-                              value: value,
-                              child: Text("$value",
-                                  style: TextStyle(
-                                      fontSize: 20, color: Colors.blue)),
-                            );
-                          }).toList(),
-                        ),
-                      ],
-                    ),
-                  ],
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            Row(children: <Widget>[
+              FloatingActionButton.extended(
+                elevation: 0,
+                heroTag: "boton2",
+                icon: Icon(Icons.monetization_on),
+                onPressed: () {
+                  goToSeguimiento(context, _user.getEmail());
+                },
+                label: Text("Pagar"),
+                backgroundColor: Colors.blue,
+              ),
               Divider(
-                indent: screenlong / 90,
+                height: 2,
               ),
               FloatingActionButton.extended(
                 heroTag: "boton1",
+                elevation: 0,
+                icon: Icon(Icons.keyboard_backspace),
                 onPressed: () {
+                  timer.cancel();
                   Navigator.pop(context);
                 },
-                label: Text("Atras", style: TextStyle(fontSize: 15)),
+                label: Text("Volver al carrito"),
                 backgroundColor: Colors.blue,
               ),
               Divider(
-                indent: screenlong / 4,
+                height: 5,
               ),
-              FloatingActionButton.extended(
-                heroTag: "boton2",
-                onPressed: () {
-                  goToSeguimiento(context, _user.uid, carrito);
-                },
-                label: Text("Pagar", style: TextStyle(fontSize: 15)),
-                backgroundColor: Colors.blue,
-              ),
-            ]),
-          ])),
+            ])),
+      ),
     );
   }
 
+  void calcular() {
+    setState(() {
+      costoTotal = totalCosto();
+      costoEnvio = costoDeEnvio();
+      costoCompleto = costoTotal + costoEnvio;
+    });
+  }
+
   Widget _queyList(BuildContext context) {
-    var listDocuments = carrito;
+    var listDocuments = _user.getCarritoDeCompra();
     int carritoLength;
     if (listDocuments != null) {
       carritoLength = listDocuments.length;
@@ -305,53 +338,60 @@ class _ComprarCarritoState extends State<ComprarCarrito> {
     }
   }
 
-  int _totalCosto(List<DocumentSnapshot> carrito, int costoEnvio, String uid) {
+  int totalCosto() {
+    int count = 0;
     int length;
     int i;
     int suma = 0;
-    if (carrito.length > 0) {
-      length = carrito.length;
+    if (_user.getCarritoDeCompra().length > 0) {
+      length = _user.getCarritoDeCompra().length;
       for (i = 0; i < length; i++) {
-        if (carrito.elementAt(i).data["Precio"] != null &&
-            carrito.elementAt(i).data["Cantidad"] != null)
+        if (_user.getCarritoDeCompra().elementAt(i).getPrecio() != null &&
+            _user.getCarritoDeCompra().elementAt(i).getCantidad() != null)
           suma = suma +
-              (int.parse(carrito.elementAt(i).data["Precio"]) *
-                  int.parse(carrito.elementAt(i).data["Cantidad"]));
+              (_user.getCarritoDeCompra().elementAt(i).getPrecio() *
+                  _user.getCarritoDeCompra().elementAt(i).getCantidad());
+        count = count + _user.getCarritoDeCompra().elementAt(i).getCantidad();
       }
     } else
       return 0;
-    return suma + costoEnvio;
+    setState(() {
+      cont = count;
+    });
+    return suma;
   }
 
-  int _totalCostoEnvio(List<DocumentSnapshot> carrito, int costoEnvio,
-      String uid, String idTienda) {
+  int _totalCostoEnvio(int costoEnvio, String idTienda) {
     int length;
     int i;
     int suma = 0;
-    if (carrito.length > 0) {
-      length = carrito.length;
+    if (_user.getCarritoDeCompra().length > 0) {
+      length = _user.getCarritoDeCompra().length;
       for (i = 0; i < length; i++) {
-        if (carrito.elementAt(i).data["Precio"] != null) if (carrito
+        if (_user.getCarritoDeCompra().elementAt(i).getPrecio() !=
+            null) if (_user
+                .getCarritoDeCompra()
                 .elementAt(i)
-                .data["Tienda"]
+                .getIdTienda()
                 .toString()
                 .compareTo(idTienda) ==
             0)
           suma = suma +
-              (int.parse(carrito.elementAt(i).data["Precio"]) *
-                  int.parse(carrito.elementAt(i).data["Cantidad"]));
+              (_user.getCarritoDeCompra().elementAt(i).getPrecio() *
+                  _user.getCarritoDeCompra().elementAt(i).getCantidad());
       }
     } else
       return 0;
     return suma + costoEnvio;
   }
 
-  int _costoEnvio() {
-    return 1000;
+  int costoDeEnvio() {
+    return (1000 * (1 + (cont / 10))).round();
   }
 
-  void goToSeguimiento(
-      BuildContext context, String uid, List<DocumentSnapshot> carrito) {
+  void goToSeguimiento(BuildContext context, String uid) async {
+    List<DocumentSnapshot> carritoDocument =
+        await getListDocumentCarritoService(uid);
     final _saved = Set<String>();
     final _deleted = Set<String>();
     DateTime fecha = DateTime.now();
@@ -359,14 +399,14 @@ class _ComprarCarritoState extends State<ComprarCarrito> {
     int i;
     int j;
     int x;
-    if (carrito != null) {
-      for (i = 0; i < carrito.length; i++) {
-        pivot = carrito.elementAt(i).data["Tienda"].toString();
+    if (_user.getCarritoDeCompra() != null) {
+      for (i = 0; i < _user.getCarritoDeCompra().length; i++) {
+        pivot = _user.getCarritoDeCompra().elementAt(i).getIdTienda();
         if (_deleted.contains(pivot) == false) {
           _saved.add(i.toString());
-          for (j = i + 1; j < carrito.length; j++) {
+          for (j = i + 1; j < _user.getCarritoDeCompra().length; j++) {
             if (pivot.compareTo(
-                    carrito.elementAt(j).data["Tienda"].toString()) ==
+                    _user.getCarritoDeCompra().elementAt(j).getIdTienda()) ==
                 0) {
               _saved.add(j.toString());
             }
@@ -376,32 +416,34 @@ class _ComprarCarritoState extends State<ComprarCarrito> {
                 .collection('usuarios')
                 .document(uid)
                 .collection('Historial')
-                .document("$fecha:${carrito.elementAt(x).data["Tienda"]}")
+                .document(
+                    "$fecha:${_user.getCarritoDeCompra().elementAt(x).getIdTienda()}")
                 .setData({
               "Fecha": fecha.toString(),
               "Pendiente": true,
               "Entregado": false,
               "Medio de Pago": medioDePago,
-              "Total Pagado": _totalCostoEnvio(carrito, _costoEnvio(), uid,
-                  carrito.elementAt(x).data["Tienda"]),
-              "Costo de Envío": _costoEnvio(),
-              "Tienda": carrito.elementAt(x).data["Tienda"],
-              "nombreTienda": carrito.elementAt(x).data["nombreTienda"]
+              "Total Pagado": _totalCostoEnvio(costoDeEnvio(),
+                  _user.getCarritoDeCompra().elementAt(x).getIdTienda()),
+              "Costo de Envío": costoDeEnvio(),
+              "Tienda": _user.getCarritoDeCompra().elementAt(x).getIdTienda(),
+              "nombreTienda":
+                  _user.getCarritoDeCompra().elementAt(x).getNombreTienda()
             });
 
             Firestore.instance
                 .collection('usuarios')
-                .document(carrito.elementAt(x).data["Tienda"])
+                .document(_user.getCarritoDeCompra().elementAt(x).getIdTienda())
                 .collection('HistorialVentas')
                 .document(
-                    'Producto:$fecha:${carrito.elementAt(x).data["Codigo"]}')
+                    'Producto:$fecha:${_user.getCarritoDeCompra().elementAt(x).getCodigo()}')
                 .setData({
               "Fechas": fecha.toString(),
-              "Nombre": carrito.elementAt(x).data["Nombre"],
+              "Nombre": _user.getCarritoDeCompra().elementAt(x).getNombre(),
               "day": fecha.day.toString(),
               "month": fecha.month.toString(),
-              "Precio": (int.parse(carrito.elementAt(x).data["Precio"]) *
-                      int.parse(carrito.elementAt(x).data["Cantidad"]))
+              "Precio": (_user.getCarritoDeCompra().elementAt(x).getPrecio() *
+                      _user.getCarritoDeCompra().elementAt(x).getCantidad())
                   .toString(),
             });
 
@@ -409,27 +451,29 @@ class _ComprarCarritoState extends State<ComprarCarrito> {
                 .collection('usuarios')
                 .document(uid)
                 .collection('Historial')
-                .document("$fecha:${carrito.elementAt(x).data["Tienda"]}")
+                .document(
+                    "$fecha:${_user.getCarritoDeCompra().elementAt(x).getIdTienda()}")
                 .collection('ComprasRealizada')
                 .document(
-                    'Producto:$fecha:${carrito.elementAt(x).data["Codigo"]}')
-                .setData(carrito.elementAt(x).data);
+                    'Producto:$fecha:${_user.getCarritoDeCompra().elementAt(x).getCodigo()}')
+                .setData(carritoDocument.elementAt(x).data);
 
             Firestore.instance
                 .collection('usuarios')
                 .document(uid)
                 .collection('Historial')
-                .document("$fecha:${carrito.elementAt(x).data["Tienda"]}")
+                .document(
+                    "$fecha:${_user.getCarritoDeCompra().elementAt(x).getCodigo()}")
                 .collection('Pendientes')
                 .document(
-                    'Producto:$fecha:${carrito.elementAt(x).data["Codigo"]}')
-                .setData(carrito.elementAt(x).data);
+                    'Producto:$fecha:${_user.getCarritoDeCompra().elementAt(x).getCodigo()}')
+                .setData(carritoDocument.elementAt(x).data);
 
             Firestore.instance
                 .collection('usuarios')
                 .document(uid)
                 .collection('Carrito')
-                .document(carrito.elementAt(x).documentID)
+                .document(_user.getCarritoDeCompra().elementAt(x).getCodigo())
                 .delete();
           }
           _deleted.add(_saved.first);
@@ -471,28 +515,36 @@ class _ComprarCarritoState extends State<ComprarCarrito> {
   }
 
   /*void _showAlertExist(BuildContext context) {
-    // flutter defined function
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        // return object of type Dialog
-        return AlertDialog(
-          title: new Text("Aviso"),
-          content: new Text("Este Producto ya está añadido"),
-          actions: <Widget>[
-            // usually buttons at the bottom of the dialog
-            new FlatButton(
-              child: new Text("Ok"),
-              onPressed: () {
-                Navigator.pop(context);
+            // flutter defined function
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                // return object of type Dialog
+                return AlertDialog(
+                  title: new Text("Aviso"),
+                  content: new Text("Este Producto ya está añadido"),
+                  actions: <Widget>[
+                    // usually buttons at the bottom of the dialog
+                    new FlatButton(
+                      child: new Text("Ok"),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                    ),
+                  ],
+                );
               },
-            ),
-          ],
-        );
-      },
-    );
-  }*/
+            );
+          }*/
   bool idIntoCarrito(String id, BuildContext context) {
-    return carrito.contains(id);
+    return _user.getCarritoDeCompra().contains(id);
+  }
+
+  void actualizarCobros() {
+    setState(() {
+      costoTotal = totalCosto();
+      costoEnvio = costoDeEnvio();
+      costoCompleto = costoTotal + costoEnvio;
+    });
   }
 }

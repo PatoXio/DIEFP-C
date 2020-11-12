@@ -78,6 +78,10 @@ class Cliente extends Usuario {
     return _carritoDeCompra.getListProducto();
   }
 
+  Producto getProductoDeCarrito(String codigo) {
+    return _carritoDeCompra.getProducto(codigo);
+  }
+
   ListPedido getPedidosPendientes() {
     return _pedidosPendientes;
   }
@@ -116,5 +120,13 @@ class Cliente extends Usuario {
 
   void setPedidoPendiente(Pedido pedido) {
     _pedidosPendientes.setPedido(pedido);
+  }
+
+  bool deleteProductoDeCarrito(String codigo) {
+    return _carritoDeCompra.eliminarProducto(codigo);
+  }
+
+  void deleteCarrito() {
+    _carritoDeCompra = new ListProducto();
   }
 }

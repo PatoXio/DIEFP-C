@@ -1,39 +1,50 @@
 //import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:diefpc/states/login_state.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:diefpc/Clases/Cliente.dart';
+import 'package:diefpc/Clases/Producto.dart';
+import 'package:diefpc/documents/documents_service.dart';
+import 'package:diefpc/states/auth.dart';
 import 'package:flutter/material.dart';
 import 'package:diefpc/app/app.dart';
 import 'package:provider/provider.dart';
-
 import 'carrito.dart';
 import 'createProducto.dart';
 
 // ignore: must_be_immutable
-class AnadirProcutoCarrito extends StatelessWidget {
-  double screenlong;
-  String idTienda;
-  double screenHeight;
-  int carritoLength;
-  List<DocumentSnapshot> carrito;
-  var _saved = Set<String>();
-  AnadirProcutoCarrito({String idTienda}) {
+class AnadirProductoCarrito extends StatefulWidget {
+  String idTienda, nombre;
+
+  AnadirProductoCarrito({String idTienda, nombre}) {
     this.idTienda = idTienda;
+    this.nombre = nombre;
   }
+
+  @override
+  _AnadirProductoCarritoState createState() =>
+      new _AnadirProductoCarritoState();
+}
+
+class _AnadirProductoCarritoState extends State<AnadirProductoCarrito> {
+  double screenlong;
+
+  double screenHeight;
+
+  List<DocumentSnapshot> listDocuments;
+
+  Cliente _user;
+
+  Set<String> _saved = Set<String>();
+
   @override
   Widget build(BuildContext context) {
-    FirebaseUser _user = Provider.of<LoginState>(context).currentUser();
     screenlong = MediaQuery.of(context).size.longestSide;
     screenHeight = MediaQuery.of(context).size.height;
-    Provider.of<LoginState>(context).actualizarCarrito();
-    carrito = Provider.of<LoginState>(context).getCarrito();
-    if (carrito != null)
-      carritoLength = carrito.length;
-    else
-      carritoLength = 0;
+    setState(() {
+      _user = Provider.of<AuthService>(context).currentUser();
+    });
     return Scaffold(
       appBar: AppBar(
-        title: Text("Productos De La Tienda"),
+        title: Text("Productos de\n${widget.nombre}"),
         actions: <Widget>[
           IconButton(
               icon: Icon(Icons.list),
@@ -47,70 +58,51 @@ class AnadirProcutoCarrito extends StatelessWidget {
         margin: EdgeInsets.only(top: screenHeight / 100),
         padding: EdgeInsets.only(left: 10, right: 10),
         child: Column(children: <Widget>[
-          Row(
-            children: <Widget>[
-              Divider(
-                indent: screenlong / 65,
-              ),
-              Card(
-                  color: Colors.blue,
-                  child: Text(
-                    " Productos ",
-                    style: _styleText(),
-                  )),
-              Divider(
-                indent: screenlong / 4.6,
-              ),
-              Card(
-                  color: Colors.blue,
-                  child: Text(" Seleccionar ", style: _styleText())),
-            ],
-          ),
-          Container(
-            height: screenHeight / 1.3,
-            child: Card(
-              //elevation: 5,
-              margin: EdgeInsets.all(10),
-              semanticContainer: true,
-              //color: Colors.transparent,
+          Expanded(
+            flex: 7,
+            child: Container(
+              height: screenHeight / 1.4,
               child: Theme(
                 data: ThemeData(
                   highlightColor: Colors.blue, //Does not work
                 ),
-                child: Scrollbar(child: _queyList(context, idTienda)),
+                child: Scrollbar(child: _queyList(context)),
               ),
             ),
           ),
-          Row(children: <Widget>[
-            Divider(
-              indent: screenlong / 90,
-            ),
-            FloatingActionButton.extended(
-              heroTag: "boton1",
-              onPressed: () {
-                if (_saved.length != 0)
-                  AnadirAlCarrito(context, _saved, _user, idTienda);
-                else
-                  return _showAlert(
-                      context, "Debes elegir productos para agregarlos.");
-              },
-              label: Text("Añadir al\nCarrito (${_saved.length})",
-                  style: TextStyle(fontSize: 15)),
-              backgroundColor: Colors.blue,
-            ),
-            Divider(
-              indent: screenlong / 7,
-            ),
-            FloatingActionButton.extended(
-              heroTag: "boton2",
-              onPressed: () {
-                goToCarrito(context);
-              },
-              label: Text("Ver Carrito\n\t\t\t\t($carritoLength)",
-                  style: TextStyle(fontSize: 15)),
-              backgroundColor: Colors.blue,
-            ),
-          ]),
+          Expanded(
+            child: Row(children: <Widget>[
+              Divider(
+                indent: screenlong / 90,
+              ),
+              FloatingActionButton.extended(
+                heroTag: "boton1",
+                onPressed: () {
+                  if (_saved.length != 0)
+                    AnadirAlCarrito(context, _saved, _user);
+                  else
+                    return _showAlert(
+                        context, "Debes elegir productos para agregarlos.");
+                },
+                label: Text("Añadir al\nCarrito (${_saved.length})",
+                    style: TextStyle(fontSize: 15)),
+                backgroundColor: Colors.blue,
+              ),
+              Divider(
+                indent: screenlong / 7,
+              ),
+              FloatingActionButton.extended(
+                heroTag: "boton2",
+                onPressed: () {
+                  goToCarrito(context);
+                },
+                label: Text(
+                    "Ver Carrito\n\t\t\t\t(${_user.getCarritoDeCompra().length})",
+                    style: TextStyle(fontSize: 15)),
+                backgroundColor: Colors.blue,
+              ),
+            ]),
+          ),
         ]),
       ),
     );
@@ -121,103 +113,155 @@ class AnadirProcutoCarrito extends StatelessWidget {
         fontSize: 15, fontWeight: FontWeight.bold, color: Colors.white);
   }
 
-  Widget _queyList(BuildContext context, String idTienda) {
-    var listDocuments = Provider.of<LoginState>(context).getProductosTienda();
+  Widget _queyList(BuildContext context) {
+    cargarListDocument();
     if (listDocuments != null) {
-      return ListView.builder(
-          itemCount: listDocuments.length,
-          shrinkWrap: true,
-          itemBuilder: (BuildContext context, int index) =>
-              buildBody(context, index));
-    } else {
-      return Text(
-        "La tienda no posee Productos",
-        style: TextStyle(
-          color: Colors.red,
-          fontSize: 28,
-          fontWeight: FontWeight.w600,
-        ),
-        textAlign: TextAlign.center,
-      );
-    }
-  }
-
-  Widget buildBody(BuildContext context, int index) {
-    var listDocuments = Provider.of<LoginState>(context).getProductosTienda();
-    double screenHeight = MediaQuery.of(context).size.height;
-    return Container(
-      margin: EdgeInsets.only(top: screenHeight / 1000),
-      padding: EdgeInsets.only(left: 10, right: 10),
-      child: Card(
-        child: ListTile(
-          leading: IconButton(
-            icon: Icon(Icons.local_hospital),
-            iconSize: 40,
-            tooltip: 'Productos',
-            onPressed: () {},
-          ),
-          title: Text(listDocuments[index].data["Nombre"]),
-          subtitle: TextProducto(
-              context,
-              listDocuments[index].data.keys.toList(),
-              listDocuments[index].data.values.toList()),
-          trailing: _iconTravel(listDocuments[index].documentID, context,
-              listDocuments[index].data["Nombre"]),
-          isThreeLine: true,
-        ),
-      ),
-    );
-  }
-
-  IconButton _iconTravel(String id, BuildContext context, String nombre) {
-    final alreadySaved = _saved.contains(id);
-    if (idIntoCarrito(context, nombre) == true) {
-      return IconButton(
-          icon: Icon(Icons.indeterminate_check_box),
-          color: Colors.blue,
-          iconSize: 25,
-          tooltip: 'Ya añadido',
-          onPressed: () {
-            _showAlertExist(context);
-          });
-    } else {
-      if (alreadySaved) {
-        return IconButton(
-            icon: Icon(Icons.indeterminate_check_box),
-            color: Colors.red,
-            iconSize: 25,
-            tooltip: 'Deleter',
-            onPressed: () {
-              _saved.remove(id);
-            });
+      if (listDocuments.isNotEmpty) {
+        return ListView.builder(
+            itemCount: listDocuments.length,
+            shrinkWrap: true,
+            itemBuilder: (BuildContext context, int index) =>
+                buildBody(context, index));
       } else {
-        return IconButton(
-            icon: Icon(Icons.check_box_outline_blank),
-            iconSize: 25,
-            tooltip: 'Checker',
-            onPressed: () {
-              _saved.add(id);
-            });
+        return Text(
+          "La tienda no posee Productos",
+          style: TextStyle(
+            color: Colors.red,
+            fontSize: 28,
+            fontWeight: FontWeight.w600,
+          ),
+          textAlign: TextAlign.center,
+        );
       }
     }
   }
 
-  // ignore: non_constant_identifier_names
+  void cargarListDocument() async {
+    var documentos = await getListDocumentProductoService(widget.idTienda);
+    setState(() {
+      listDocuments = documentos;
+    });
+  }
+
+  Widget buildBody(BuildContext context, int index) {
+    if (estaCargados() == false) {
+      return Container(
+        margin: EdgeInsets.only(top: screenHeight / 1000),
+        padding: EdgeInsets.only(left: 10, right: 10),
+        child: Card(child: CircularProgressIndicator()),
+      );
+    } else
+      return Container(
+        margin: EdgeInsets.only(top: screenHeight / 1000),
+        padding: EdgeInsets.only(left: 10, right: 10),
+        child: Card(
+          child: ListTile(
+            leading: IconButton(
+              icon: Icon(Icons.local_hospital),
+              iconSize: 40,
+              tooltip: 'Productos',
+              onPressed: () {},
+            ),
+            title: Text(listDocuments[index].data["Nombre"]),
+            subtitle: TextProducto(
+                context,
+                listDocuments[index].data.keys.toList(),
+                listDocuments[index].data.values.toList()),
+            trailing: _iconTravel(listDocuments[index].documentID, context,
+                listDocuments[index].data["Nombre"]),
+            isThreeLine: true,
+          ),
+        ),
+      );
+  }
+
+  bool estaCargados() {
+    if (listDocuments == null) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
+  Column _iconTravel(String id, BuildContext context, String nombre) {
+    bool alreadySaved = _saved.contains(id);
+    if (idIntoCarrito(context, nombre) == true) {
+      return Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Text("Seleccionar"),
+          Expanded(
+            child: IconButton(
+                icon: Icon(Icons.indeterminate_check_box),
+                color: Colors.green,
+                iconSize: 25,
+                tooltip: 'Ya añadido',
+                onPressed: () {
+                  _showAlertExist(context);
+                }),
+          ),
+        ],
+      );
+    } else {
+      if (alreadySaved) {
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text("Seleccionar"),
+            Expanded(
+              child: IconButton(
+                  icon: Icon(Icons.indeterminate_check_box),
+                  color: Colors.red,
+                  iconSize: 25,
+                  tooltip: 'Deleter',
+                  onPressed: () {
+                    setState(() {
+                      _saved.remove(id);
+                    });
+                  }),
+            ),
+          ],
+        );
+      } else {
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text("Seleccionar"),
+            Expanded(
+              child: IconButton(
+                  icon: Icon(Icons.check_box_outline_blank),
+                  iconSize: 25,
+                  tooltip: 'Checker',
+                  onPressed: () {
+                    setState(() {
+                      _saved.add(id);
+                      print(_saved.length);
+                    });
+                  }),
+            ),
+          ],
+        );
+      }
+    }
+  }
+
   Widget TextProducto(BuildContext context, List listaKeys, List listaValues) {
     int i = 0;
     String info = '';
     if (listaKeys != null) {
       while (i < listaKeys.length) {
         if (listaKeys[i].toString().compareTo("Tienda") != 0 &&
-            listaKeys[i].toString().compareTo("Codigo") != 0) {
-          if (i == 1)
+            listaKeys[i].toString().compareTo("Codigo") != 0 &&
+            listaKeys[i].toString().compareTo("nombreTienda") != 0 &&
+            listaKeys[i].toString().compareTo("Nombre") != 0 &&
+            listaKeys[i].toString().compareTo("StockReservado") != 0 &&
+            listaKeys[i].toString().compareTo("Categorias") != 0 &&
+            listaKeys[i].toString().compareTo("Cantidad") != 0) {
+          if (i == 0)
             info = "${listaKeys[i].toString()}: ${listaValues[i].toString()}\n";
-          if (i >= 2) {
-            if (listaKeys[i].toString().compareTo("nombreTienda") != 0)
-              info = info +
-                  "${listaKeys[i].toString()}: ${listaValues[i].toString()}\n";
-            else
-              info = info + "Tienda: ${listaValues[i].toString()}\n";
+          if (i > 0) {
+            info = info +
+                "${listaKeys[i].toString()}: ${listaValues[i].toString()}\n";
           }
         }
         i = i + 1;
@@ -232,40 +276,70 @@ class AnadirProcutoCarrito extends StatelessWidget {
         context, MaterialPageRoute(builder: (context) => CrearProducto()));
   }
 
-  // ignore: non_constant_identifier_names
-  void AnadirAlCarrito(BuildContext context, Set<String> _saved,
-      FirebaseUser _user, String idTienda) {
+  void AnadirAlCarrito(
+      BuildContext context, Set<String> _saved, Cliente user) async {
     int largo = _saved.length;
     int i;
-    if (carrito.isNotEmpty) {
-      if (carrito.first.data["Tienda"].compareTo(idTienda) != 0) {
-        _showAlertBorrarCarrito(
-            context, _saved, _user, carrito.first.data["Tienda"]);
+    if (_user.getCarritoDeCompra().isNotEmpty) {
+      if (_user
+              .getCarritoDeCompra()
+              .last
+              .getIdTienda()
+              .compareTo(widget.idTienda) !=
+          0) {
+        _showAlertBorrarCarrito(context);
         return;
       }
     }
     try {
       for (i = 0; i < largo; i++) {
+        print("index: $i");
+        print("Valor:" + _saved.elementAt(i));
+        print("id: " + widget.idTienda);
+        print("largo: $largo");
         Firestore.instance
             .collection('usuarios')
-            .document(idTienda)
+            .document(widget.idTienda)
             .collection('Productos')
             .document(_saved.elementAt(i))
             .get()
             // ignore: missing_return
-            .then((DocumentSnapshot ds) {
+            .then((DocumentSnapshot ds) async {
           Firestore.instance
               .collection('usuarios')
-              .document(_user.uid)
+              .document(_user.getEmail())
               .collection('Carrito')
-              .add(ds.data);
+              .document(ds.data["Codigo"])
+              .setData(ds.data);
+          Firestore.instance
+              .collection('usuarios')
+              .document(_user.getEmail())
+              .collection('Carrito')
+              .document(ds.data["Codigo"])
+              .setData({"Cantidad": "1"}, merge: true);
+          Producto producto = new Producto.carga(
+              ds.data["Codigo"],
+              ds.data["Codigo"],
+              ds.data["Tienda"],
+              ds.data["nombreTienda"],
+              ds.data["Nombre"],
+              1,
+              int.parse(ds.data["Precio"]),
+              int.parse(ds.data["Stock"]),
+              int.parse(ds.data["StockReservado"]),
+              double.parse(ds.data["Mg/u"]));
+          user.setProductoACarrito(producto);
         });
       }
-      _saved.clear();
+      //print(_user.getCarritoDeCompra().first);
+      setState(() {
+        _user = user;
+        _saved.clear();
+      });
+      return _showAlert(context, "Se agregaron los productos");
     } catch (error) {
       return _showAlert(context, 'Ocurrió un error al agregar los productos');
     }
-    return _showAlert(context, "Se agregaron los productos");
   }
 
   void goToCarrito(BuildContext context) {
@@ -287,6 +361,12 @@ class AnadirProcutoCarrito extends StatelessWidget {
             new FlatButton(
               child: new Text("Ok"),
               onPressed: () {
+                /*Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => AnadirProductoCarrito(
+                            idTienda: widget.idTienda, nombre: widget.nombre)));
+              */
                 Navigator.pop(context);
               },
             ),
@@ -296,8 +376,7 @@ class AnadirProcutoCarrito extends StatelessWidget {
     );
   }
 
-  void _showAlertBorrarCarrito(BuildContext context, Set<String> _saved,
-      FirebaseUser _user, String idTienda) {
+  void _showAlertBorrarCarrito(BuildContext context) {
     int i;
     //int largo = _saved.length;
     showDialog(
@@ -313,15 +392,17 @@ class AnadirProcutoCarrito extends StatelessWidget {
             new FlatButton(
               child: new Text("SI"),
               onPressed: () {
-                print(idTienda);
-                for (i = 0; i < carritoLength; i++) {
-                  Firestore.instance
-                      .collection('usuarios')
-                      .document(_user.uid)
-                      .collection('Carrito')
-                      .document(carrito[i].documentID)
-                      .delete();
-                }
+                Firestore.instance
+                    .collection('usuarios')
+                    .document(_user.getEmail())
+                    .collection('Carrito')
+                    .getDocuments()
+                    .then((snapshot) {
+                  for (DocumentSnapshot ds in snapshot.documents) {
+                    ds.reference.delete();
+                  }
+                });
+                _user.deleteCarrito();
                 Navigator.pop(context);
               },
             ),
@@ -363,9 +444,10 @@ class AnadirProcutoCarrito extends StatelessWidget {
 
   bool idIntoCarrito(BuildContext context, String nombre) {
     int i;
-    if (carritoLength > 0) {
-      for (i = 0; i < carritoLength; i++) {
-        if (carrito[i].data["Nombre"].compareTo(nombre) == 0) return true;
+    if (_user.getCarritoDeCompra().length > 0) {
+      for (i = 0; i < _user.getCarritoDeCompra().length; i++) {
+        if (_user.getCarritoDeCompra()[i].getNombre().compareTo(nombre) == 0)
+          return true;
       }
     }
     return false;

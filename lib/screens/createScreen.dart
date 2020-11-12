@@ -15,7 +15,6 @@ import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 import 'package:diefpc/Maps/place_service.dart';
 import 'package:diefpc/Maps/adressSearch.dart';
-import 'createTienda1.dart';
 
 TextEditingController _rutController = TextEditingController();
 
@@ -989,8 +988,9 @@ class _CreateScreenState extends State<CreateScreen> {
       "region": direccion.getRegion(),
       "codigoPostal": direccion.getCodigoPostal(),
       "numero": direccion.getNumero(),
+      "LatLng": direccion.getLatLng(),
       "lat": direccion.getLatitud(),
-      "lng": direccion.getLongitud(),
+      "lng": direccion.getLongitud()
     });
   }
 

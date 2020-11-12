@@ -40,6 +40,7 @@ class ListProducto {
   }
 
   bool eliminarProducto(String id) {
+    print(id);
     return _listProducto.remove(getProducto(id));
   }
 
