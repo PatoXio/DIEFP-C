@@ -1,7 +1,7 @@
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class Direccion {
-  int _id;
+  String _id;
   String _calle;
   String _depto;
   String _ciudad;
@@ -12,10 +12,9 @@ class Direccion {
   String _numero;
   double _lat;
   double _lng;
-  LatLng _latLng;
 
   Direccion() {
-    _id = -1;
+    _id = null;
     _calle = null;
     _depto = null;
     _ciudad = null;
@@ -26,11 +25,10 @@ class Direccion {
     _numero = null;
     _lat = 0;
     _lng = 0;
-    _latLng = new LatLng(0, 0);
   }
 
   Direccion.carga(
-      int _id,
+      String _id,
       String _calle,
       String _depto,
       String _ciudad,
@@ -40,8 +38,7 @@ class Direccion {
       String _codigoPostal,
       String _numero,
       double _lat,
-      double _lng,
-      LatLng latLng) {
+      double _lng) {
     this._id = _id;
     this._calle = _calle;
     this._depto = _depto;
@@ -53,10 +50,9 @@ class Direccion {
     this._numero = _numero;
     this._lat = _lat;
     this._lng = _lng;
-    this._latLng = latLng;
   }
 
-  int getId() {
+  String getId() {
     return _id;
   }
 
@@ -68,10 +64,6 @@ class Direccion {
 
   String getCodigoPostal() {
     return _codigoPostal;
-  }
-
-  LatLng getLatLng() {
-    return _latLng;
   }
 
   double getLatitud() {
@@ -110,7 +102,7 @@ class Direccion {
     return _numero;
   }
 
-  void setId(int id) {
+  void setId(String id) {
     this._id = id;
   }
 
@@ -144,10 +136,6 @@ class Direccion {
 
   void setNumero(String numero) {
     this._numero = numero;
-  }
-
-  void setLatLng(LatLng latLng) {
-    this._latLng = latLng;
   }
 
   void setLat(double lat) {

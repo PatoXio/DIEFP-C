@@ -85,7 +85,8 @@ class _CarritoComprasState extends State<CarritoCompras> {
                 FloatingActionButton.extended(
                   heroTag: "boton2",
                   onPressed: () {
-                    if (_user.getCarritoDeCompra().length > 0) {
+                    if (_user.getCarritoDeCompra().getListProducto().length >
+                        0) {
                       goToComprarCarrito(context);
                     } else
                       return _showAlert("Deben haber productos para comprar.");
@@ -134,9 +135,9 @@ class _CarritoComprasState extends State<CarritoCompras> {
 
   Widget _queyList(BuildContext context) {
     if (_user.getCarritoDeCompra() != null) {
-      if (_user.getCarritoDeCompra().isNotEmpty) {
+      if (_user.getCarritoDeCompra().getListProducto().isNotEmpty) {
         return ListView.builder(
-            itemCount: _user.getCarritoDeCompra().length,
+            itemCount: _user.getCarritoDeCompra().getListProducto().length,
             shrinkWrap: true,
             itemBuilder: (BuildContext context, int index) =>
                 buildBody(context, index));
@@ -173,9 +174,14 @@ class _CarritoComprasState extends State<CarritoCompras> {
           tooltip: 'Productos',
           onPressed: () {},
         ),
-        title: Text(_user.getCarritoDeCompra()[index].getNombre()),
-        subtitle: Text(_user.getCarritoDeCompra()[index].getDatos()),
-        trailing: _iconTravel(_user.getCarritoDeCompra()[index].getCodigo()),
+        title: Text(
+            _user.getCarritoDeCompra().getListProducto()[index].getNombre()),
+        subtitle: Text(_user
+            .getCarritoDeCompra()
+            .getListProducto()[index]
+            .getDatosAlComprar()),
+        trailing: _iconTravel(
+            _user.getCarritoDeCompra().getListProducto()[index].getCodigo()),
         isThreeLine: true,
       ),
     );
@@ -216,7 +222,7 @@ class _CarritoComprasState extends State<CarritoCompras> {
               .collection('Carrito')
               .document(_saved.elementAt(i))
               .delete();
-          user.getCarritoDeCompra().removeWhere((element) =>
+          user.getCarritoDeCompra().getListProducto().removeWhere((element) =>
               element.getCodigo().compareTo(_saved.elementAt(i)) == 0);
         }
         setState(() {

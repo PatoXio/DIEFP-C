@@ -1,17 +1,19 @@
+import 'package:date_format/date_format.dart';
+import 'package:diefpc/Clases/Cliente.dart';
+import 'package:diefpc/Clases/ListPedido.dart';
 import 'package:diefpc/app/app.dart';
 import 'package:diefpc/screens/Menu.dart';
 import 'package:diefpc/screens/historialProductosUser.dart';
-import 'package:diefpc/states/login_state.dart';
+import 'package:diefpc/states/auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
+import 'package:intl/intl.dart';
 import 'package:analog_clock/analog_clock.dart';
 import 'package:provider/provider.dart';
-
-import 'anadirProductoCarrito.dart';
 
 const double CAMERA_ZOOM = 16;
 const double CAMERA_TILT = 80;
@@ -33,10 +35,11 @@ class ListTileHistory extends StatefulWidget {
 
 class _ListTileHistoryState extends State<ListTileHistory> {
   double screenlong;
-  var _tiempoDeEntrega;
-
+  String _tiempoDeEntrega;
+  Cliente _user;
+  DateFormat formatter = DateFormat('HH:mm:ss');
   int count = 0;
-  var _difTiempos;
+  String _difTiempos;
   double screenHeight;
   Completer<GoogleMapController> _controller = Completer();
   Set<Marker> _markers = Set<Marker>();
@@ -101,11 +104,11 @@ class _ListTileHistoryState extends State<ListTileHistory> {
 
   @override
   Widget build(BuildContext context) {
-    Provider.of<LoginState>(context).actualizarHistorial();
+    Provider.of<AuthService>(context).actualizarPendientes();
+    _user = Provider.of<AuthService>(context).currentUser();
     screenlong = MediaQuery.of(context).size.longestSide;
     screenHeight = MediaQuery.of(context).size.height;
-    var listDocuments =
-        Provider.of<LoginState>(context).getHistorialPendientes();
+    ListPedido listPedido = _user.getPedidosPendientes();
     DateTime horaActual = DateTime.now();
 
     CameraPosition initialCameraPosition = CameraPosition(
@@ -120,169 +123,189 @@ class _ListTileHistoryState extends State<ListTileHistory> {
           tilt: CAMERA_TILT,
           bearing: CAMERA_BEARING);
     }
-    if (listDocuments.elementAt(widget.index).data["Pendiente"] == true) {
-      _tiempoDeEntrega = "Su pedido se está preparando";
-      _difTiempos = "Indefinidos";
+    if (listPedido.getListPedido().elementAt(widget.index).getPorAceptar() ==
+        true) {
+      _tiempoDeEntrega = "Su pedido se;está preparando";
+      _difTiempos = "";
     } else {
-      if (listDocuments.elementAt(widget.index).data["HoraEntrega"] != null) {
-        _tiempoDeEntrega = DateTime.parse(
-            listDocuments.elementAt(widget.index).data["HoraEntrega"]);
-        if (_tiempoDeEntrega.difference(horaActual).inMinutes > 0) {
-          _difTiempos = _tiempoDeEntrega.difference(horaActual).inMinutes;
+      if (listPedido.getListPedido().elementAt(widget.index).getHoraEntrega() !=
+          null) {
+        _tiempoDeEntrega = "LLegará a las:;" +
+            formatter
+                .format(listPedido
+                    .getListPedido()
+                    .elementAt(widget.index)
+                    .getHoraEntrega())
+                .toString();
+        if (listPedido
+                .getListPedido()
+                .elementAt(widget.index)
+                .getHoraEntrega()
+                .difference(horaActual)
+                .inMinutes >
+            0) {
+          _difTiempos = "Quedan " +
+              listPedido
+                  .getListPedido()
+                  .elementAt(widget.index)
+                  .getHoraEntrega()
+                  .difference(horaActual)
+                  .inMinutes
+                  .toString() +
+              " minutos para la entrega de su pedido.";
         } else {
-          _tiempoDeEntrega = "Su pedido está por llegar";
-          _difTiempos = "solo unos";
+          _tiempoDeEntrega = "Su pedido;está por llegar";
+          _difTiempos = "Quedan solo unos minutos";
         }
       } else {
-        _tiempoDeEntrega = "Aún no se define\nla hora de llegada";
-        _difTiempos = "(Por definir)";
+        _tiempoDeEntrega = "Aún no se define;la hora de llegada";
+        _difTiempos = "";
       }
     }
-    if (listDocuments.elementAt(widget.index).data["Entregado"] == false) {
-      return Container(
-          child: Column(children: [
-        FloatingActionButton.extended(
-          heroTag: "hero${widget.index}",
-          label: Text("Pedido ${widget.index + 1}",
-              style: TextStyle(
-                  fontSize: 15,
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold)),
-          onPressed: () {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => HistorialProductos(
-                        listDocuments[widget.index].data["Tienda"],
-                        "${listDocuments[widget.index].data["Fecha"]}:${listDocuments[widget.index].data["Tienda"]}",
-                        listDocuments[widget.index]
-                            .data["Total Pagado"]
-                            .toString(),
-                        listDocuments[widget.index]
-                            .data["Costo de Envío"]
-                            .toString())));
-          },
-        ),
-        Container(
-          height: screenHeight / 2,
-          child: Card(
-            //elevation: 5,
-            margin: EdgeInsets.all(10),
-            semanticContainer: true,
-            color: Colors.transparent,
-            child: GoogleMap(
-                myLocationEnabled: true,
-                compassEnabled: true,
-                tiltGesturesEnabled: false,
-                markers: _markers,
-                polylines: _polylines,
-                mapType: MapType.normal,
-                initialCameraPosition: initialCameraPosition,
-                onMapCreated: (GoogleMapController controller) {
-                  _controller.complete(controller);
-                  // mi mapa ha terminado de ser creado;
-                  // estoy listo para mostrar los pines en el mapa
-                  showPinsOnMap();
-                }),
-          ),
-        ),
-        Container(
-          margin: EdgeInsets.only(top: screenHeight / 100),
-          padding: EdgeInsets.only(left: 30, right: 30),
-          child: Card(
-            margin: EdgeInsets.all(10),
-            semanticContainer: true,
-            child: Row(
-              children: [
-                Divider(
-                  indent: screenlong / 38,
+    if (listPedido.getListPedido().elementAt(widget.index).getPorEntregar() ==
+        true) {
+      return Card(
+        child: Column(
+          children: [
+            Container(
+                child: Column(children: [
+              FloatingActionButton.extended(
+                heroTag: "hero${widget.index}",
+                label: Text("Pedido ${widget.index + 1}",
+                    style: TextStyle(
+                        fontSize: 15,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold)),
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => HistorialProductos(
+                              listPedido
+                                  .getListPedido()[widget.index]
+                                  .getIdTienda(),
+                              "${listPedido.getListPedido()[widget.index].getFecha()}:${listPedido.getListPedido()[widget.index].getIdTienda()}",
+                              listPedido
+                                  .getListPedido()[widget.index]
+                                  .getTotalPagado()
+                                  .toString(),
+                              listPedido
+                                  .getListPedido()[widget.index]
+                                  .getCostoDeEnvio()
+                                  .toString())));
+                },
+              ),
+              Container(
+                height: screenHeight / 3.5,
+                child: Card(
+                  //elevation: 5,
+                  margin: EdgeInsets.all(10),
+                  semanticContainer: true,
+                  color: Colors.transparent,
+                  child: GoogleMap(
+                      myLocationEnabled: true,
+                      compassEnabled: true,
+                      tiltGesturesEnabled: false,
+                      markers: _markers,
+                      polylines: _polylines,
+                      mapType: MapType.normal,
+                      initialCameraPosition: initialCameraPosition,
+                      onMapCreated: (GoogleMapController controller) {
+                        _controller.complete(controller);
+                        // mi mapa ha terminado de ser creado;
+                        // estoy listo para mostrar los pines en el mapa
+                        showPinsOnMap();
+                      }),
                 ),
-                Center(
-                    child: Icon(
-                  Icons.departure_board,
-                  size: 30,
-                  color: Colors.grey,
-                )),
-                Divider(
-                  indent: screenlong / 60,
-                ),
-                Center(
-                    child: Text("Enviando sus productos",
+              ),
+              Container(
+                padding: EdgeInsets.only(left: 30, right: 30),
+                child: Row(
+                  children: [
+                    Divider(
+                      indent: screenlong / 38,
+                    ),
+                    Icon(
+                      Icons.departure_board,
+                      size: 30,
+                      color: Colors.grey,
+                    ),
+                    Divider(
+                      indent: screenlong / 60,
+                    ),
+                    Text("Enviando sus productos",
                         style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 20,
-                            color: Colors.blue))),
-              ],
-            ),
-          ),
-        ),
-        Container(
-          height: screenHeight / 3.6,
-          child: Card(
-            //elevation: 10,
-            margin: EdgeInsets.all(10),
-            semanticContainer: true,
-            //color: Colors.transparent,
-            child: Theme(
-              data: ThemeData(
-                highlightColor: Colors.blue, //Does not work
-              ),
-              child: Scrollbar(
-                //isAlwaysShown: true,
-                child: Row(
-                  children: [
-                    AnalogClock(
-                      decoration: BoxDecoration(
-                          border: Border.all(width: 2.0, color: Colors.black),
-                          color: Colors.transparent,
-                          shape: BoxShape.circle),
-                      width: 150,
-                      isLive: true,
-                      hourHandColor: Colors.black,
-                      minuteHandColor: Colors.black,
-                      showSecondHand: false,
-                      numberColor: Colors.black87,
-                      showNumbers: true,
-                      textScaleFactor: 1.4,
-                      showTicks: true,
-                      showDigitalClock: false,
-                    ),
-                    Column(
-                      children: [
-                        Divider(
-                          height: screenHeight / 30,
-                        ),
-                        Card(
-                            child: Text(
-                                "Son las ${horaActual.hour} horas y ${horaActual.minute} minutos")),
-                        Divider(
-                          height: screenHeight / 15,
-                        ),
-                        Text("LLegará a las:"),
-                        Card(child: Text("$_tiempoDeEntrega")),
-                      ],
-                    )
+                            color: Colors.blue)),
                   ],
                 ),
               ),
-            ),
-          ),
-        ),
-        Card(
-            semanticContainer: true,
-            child: Column(
-              children: [
-                Center(
-                  child: Text(
-                      "\nQuedan ${_difTiempos} minutos para la\nentrega de su pedido.\n",
-                      style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.blue)),
+              Container(
+                height: screenHeight / 3.6,
+                padding: EdgeInsets.only(left: 40),
+                child: Theme(
+                  data: ThemeData(
+                    highlightColor: Colors.blue, //Does not work
+                  ),
+                  child: Scrollbar(
+                    //isAlwaysShown: true,
+                    child: Row(
+                      children: [
+                        AnalogClock(
+                          decoration: BoxDecoration(
+                              border:
+                                  Border.all(width: 2.0, color: Colors.black),
+                              color: Colors.transparent,
+                              shape: BoxShape.circle),
+                          width: 150,
+                          isLive: true,
+                          hourHandColor: Colors.black,
+                          minuteHandColor: Colors.black,
+                          showSecondHand: false,
+                          numberColor: Colors.black87,
+                          showNumbers: true,
+                          textScaleFactor: 1.4,
+                          showTicks: true,
+                          showDigitalClock: false,
+                        ),
+                        Expanded(
+                          child: Column(
+                            children: [
+                              Divider(
+                                height: screenHeight / 30,
+                              ),
+                              Text(
+                                  "Son las: ${horaActual.hour}:${horaActual.minute}"),
+                              Divider(
+                                height: screenHeight / 15,
+                              ),
+                              Text("${_tiempoDeEntrega.split(";")[0]}"),
+                              Text("${_tiempoDeEntrega.split(";")[1]}"),
+                            ],
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
                 ),
-              ],
-            ))
-      ]));
+              ),
+              Column(
+                children: [
+                  Container(
+                    padding: EdgeInsets.only(bottom: 10),
+                    child: Text("$_difTiempos",
+                        style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.blue)),
+                  ),
+                ],
+              )
+            ])),
+          ],
+        ),
+      );
     } else {
       return Container(
           child:
@@ -350,10 +373,11 @@ class _ListTileHistoryState extends State<ListTileHistory> {
 class _SeguimientoState extends State<Seguimiento> {
   double screenlong;
   double screenHeight;
+  Cliente _user;
   String tiendaTest = "TiendaTest";
   @override
   Widget build(BuildContext context) {
-    Provider.of<LoginState>(context).actualizarHistorial();
+    _user = Provider.of<AuthService>(context).currentUser();
     screenlong = MediaQuery.of(context).size.longestSide;
     screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
@@ -388,17 +412,14 @@ class _SeguimientoState extends State<Seguimiento> {
   }
 
   Widget _queryList(BuildContext context) {
-    //Provider.of<LoginState>(context).actualizarHistorial();
-    var listDocuments =
-        Provider.of<LoginState>(context).getHistorialPendientes();
-    if (listDocuments != null) {
-      int historialLength = listDocuments.length;
+    if (_user.getPedidosPendientes().getListPedido() != null) {
+      int historialLength = _user.getPedidosPendientes().getListPedido().length;
       return ListView(
           children: List.generate(
               historialLength, (i) => new ListTileHistory(index: i)));
     } else {
       return Text(
-        "No se poseen productos pendientes",
+        "No se poseen pedidos pendientes",
         style: TextStyle(
           color: Colors.red,
           fontSize: 28,

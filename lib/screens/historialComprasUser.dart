@@ -1,117 +1,127 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:diefpc/states/login_state.dart';
+import 'package:diefpc/Clases/Cliente.dart';
+import 'package:diefpc/states/auth.dart';
 import 'package:flutter/material.dart';
 import 'package:diefpc/app/app.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'historialProductosUser.dart';
 
-class HistorialCompras extends StatefulWidget{
+class HistorialCompras extends StatefulWidget {
   @override
   _HistorialComprasState createState() => _HistorialComprasState();
 }
 
-class _HistorialComprasState extends State<HistorialCompras>{
-  List<DocumentSnapshot> listDocuments;
+class _HistorialComprasState extends State<HistorialCompras> {
+  Cliente _user;
   double screenlong;
   double screenHeight;
   @override
   Widget build(BuildContext context) {
     screenlong = MediaQuery.of(context).size.longestSide;
     screenHeight = MediaQuery.of(context).size.height;
-    Provider.of<LoginState>(context).actualizarHistorial();
+    _user = Provider.of<AuthService>(context).currentUser();
     return Scaffold(
       appBar: AppBar(
         title: Text("Historial Compras"),
         actions: <Widget>[
-          IconButton(icon: Icon(Icons.list),
+          IconButton(
+              icon: Icon(Icons.list),
               tooltip: 'Configuración',
-              onPressed: (){
+              onPressed: () {
                 configMenu(context);
-              }
-          ),
+              }),
         ],
       ),
-      body: Container(
-        margin: EdgeInsets.only(top: screenHeight / 100),
-        padding: EdgeInsets.only(left: 10, right: 10),
-        child: Column(
-          children: <Widget> [
-            Card(child: Text("Search")),
-            Container(
-              height: screenHeight / 1.2,
-              child: Card(
-                //elevation: 5,
-                margin: EdgeInsets.all(10),
-                semanticContainer: true,
-                //color: Colors.transparent,
+      body: Center(
+        child: Container(
+          //margin: EdgeInsets.only(top: screenHeight / 100),
+          //padding: EdgeInsets.only(left: 10, right: 10),
+          child: Column(
+            children: <Widget>[
+              Text("Buscador"),
+              Container(
+                //height: screenHeight / 1.2,
                 child: Theme(
                   data: ThemeData(
                     highlightColor: Colors.blue, //Does not work
                   ),
-                  child: Scrollbar(
-                      child:
-                      _queyList(context)
-                  ),
+                  child: Scrollbar(child: _queyList(context)),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
 
   Widget _queyList(BuildContext context) {
-    listDocuments = Provider.of<LoginState>(context).getHistorial();
-    if (listDocuments != null) {
+    if (_user.getHistorialDeCompras() != null) {
       return ListView.builder(
-          itemCount: listDocuments.length,
+          itemCount: _user.getHistorialDeCompras().getListPedido().length,
           shrinkWrap: true,
-          itemBuilder: (BuildContext context, int index) => buildBody(context, index)
-      );
-    } else{
-      return Text("No posees productos en tu carrito");
+          itemBuilder: (BuildContext context, int index) =>
+              buildBody(context, index));
+    } else {
+      return Text("Aún no has comprado algun medicamento");
     }
   }
+
   Widget buildBody(BuildContext context, int index) {
-     List<DocumentSnapshot> listDocuments = Provider.of<LoginState>(context).getHistorial();
-     String fecha = DateFormat('yyyy-MM-dd – kk:mm').format(DateTime.parse(listDocuments[index].data["Fecha"].toString()));
-     String idDocument = listDocuments[index].documentID;
-     return Card(
-      child: ListTile(
-        leading: IconButton(
-          icon: Icon(Icons.shop_two, size: 40,),
-          iconSize: 20,
-          tooltip: 'Productos', onPressed: () {
-        },
+    String fecha = DateFormat('yyyy-MM-dd – kk:mm').format(DateTime.parse(_user
+        .getHistorialDeCompras()
+        .getListPedido()[index]
+        .getFecha()
+        .toString()));
+    String idDocument =
+        _user.getHistorialDeCompras().getListPedido()[index].getId();
+    return Card(
+        child: ListTile(
+      leading: IconButton(
+        icon: Icon(
+          Icons.shop_two,
+          size: 40,
         ),
-        title: Text("$fecha"),
-        subtitle: Text("Tienda: ${listDocuments[index].data["nombreTienda"]}\n"
-            "Total Pagado: ${listDocuments[index].data["Total Pagado"].toString()}\n"
-            "Medio de Pago: ${listDocuments[index].data["Medio de Pago"]}\n"
-            "Confirmada: ${listDocuments[index].data["Pendiente"] == true ? 'Aún no' : 'Si'}\n"
-            "Entrega: ${listDocuments[index].data["Entregado"] == true ? 'Entregado' : 'Pendiente'}"),
-        trailing: FloatingActionButton(
-          heroTag: "hero$index",
-          child: Text("Ver"),
-          onPressed: () {
-            goToComprasHechas(
-                context,
-                listDocuments[index].data["Tienda"],
-                idDocument,
-                listDocuments[index].data["Total Pagado"].toString(),
-                listDocuments[index].data["Costo de Envío"].toString());
-          },
-          ),
-        isThreeLine: true,
-    )
-    );
+        iconSize: 20,
+        tooltip: 'Productos',
+        onPressed: () {},
+      ),
+      title: Text("$fecha"),
+      subtitle:
+          Text(_user.getHistorialDeCompras().getListPedido()[index].getDatos()),
+      trailing: FloatingActionButton(
+        heroTag: "hero$index",
+        child: Text("Ver"),
+        onPressed: () {
+          goToComprasHechas(
+              context,
+              _user
+                  .getHistorialDeCompras()
+                  .getListPedido()[index]
+                  .getIdTienda(),
+              idDocument,
+              _user
+                  .getHistorialDeCompras()
+                  .getListPedido()[index]
+                  .getTotalPagado()
+                  .toString(),
+              _user
+                  .getHistorialDeCompras()
+                  .getListPedido()[index]
+                  .getCostoDeEnvio()
+                  .toString());
+        },
+      ),
+      isThreeLine: true,
+    ));
   }
 
-  void goToComprasHechas(BuildContext context, String idTienda, String idDocument, String totalPagado, String costoEnvio){
+  void goToComprasHechas(BuildContext context, String idTienda,
+      String idDocument, String totalPagado, String costoEnvio) {
     Navigator.push(
         context,
-        MaterialPageRoute( builder: (context) => new HistorialProductos(idTienda, idDocument, totalPagado, costoEnvio)));
+        MaterialPageRoute(
+            builder: (context) => new HistorialProductos(
+                idTienda, idDocument, totalPagado, costoEnvio)));
   }
 }

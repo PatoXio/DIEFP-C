@@ -2,12 +2,14 @@
 import 'dart:async';
 
 import 'package:diefpc/Clases/Cliente.dart';
+import 'package:diefpc/Clases/Pedido.dart';
 import 'package:diefpc/screens/seguimientoCompra.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:diefpc/documents/documents_service.dart';
 import 'package:diefpc/states/auth.dart';
 import 'package:flutter/material.dart';
 import 'package:diefpc/app/app.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'carrito.dart';
 
@@ -29,8 +31,15 @@ class _ListTileItemState extends State<ListTileItem> {
   @override
   Widget build(BuildContext context) {
     Cliente _user = Provider.of<AuthService>(context).currentUser();
-    if (_user.getCarritoDeCompra()[widget.index].getCantidad() != null) {
-      count = _user.getCarritoDeCompra()[widget.index].getCantidad();
+    if (_user
+            .getCarritoDeCompra()
+            .getListProducto()[widget.index]
+            .getCantidad() !=
+        null) {
+      count = _user
+          .getCarritoDeCompra()
+          .getListProducto()[widget.index]
+          .getCantidad();
     } else {
       count = 1;
     }
@@ -41,26 +50,36 @@ class _ListTileItemState extends State<ListTileItem> {
         tooltip: 'Productos',
         onPressed: () {},
       ),
-      title: Text(_user.getCarritoDeCompra()[widget.index].getNombre()),
-      subtitle:
-          Text(_user.getCarritoDeCompra()[widget.index].getDatosAlComprar()),
+      title: Text(_user
+          .getCarritoDeCompra()
+          .getListProducto()[widget.index]
+          .getNombre()),
+      subtitle: Text(_user
+          .getCarritoDeCompra()
+          .getListProducto()[widget.index]
+          .getDatosAlComprar()),
       trailing: new Row(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           IconButton(
               icon: Icon(Icons.remove),
               onPressed: () => {
-                    if (_user.getCarritoDeCompra()[widget.index].getCantidad() >
+                    if (_user
+                            .getCarritoDeCompra()
+                            .getListProducto()[widget.index]
+                            .getCantidad() >
                         0)
                       {
                         setState(() {
                           count--;
                           _user
-                              .getCarritoDeCompra()[widget.index]
+                              .getCarritoDeCompra()
+                              .getListProducto()[widget.index]
                               .setCantidad(count);
                           actualizarCarritoCant(
                               _user
-                                  .getCarritoDeCompra()[widget.index]
+                                  .getCarritoDeCompra()
+                                  .getListProducto()[widget.index]
                                   .getCodigo(),
                               _user.getEmail(),
                               count);
@@ -71,17 +90,22 @@ class _ListTileItemState extends State<ListTileItem> {
           IconButton(
               icon: Icon(Icons.add),
               onPressed: () => {
-                    if (_user.getCarritoDeCompra()[widget.index].getStock() >
+                    if (_user
+                            .getCarritoDeCompra()
+                            .getListProducto()[widget.index]
+                            .getStock() >
                         count)
                       {
                         setState(() {
                           count++;
                           _user
-                              .getCarritoDeCompra()[widget.index]
+                              .getCarritoDeCompra()
+                              .getListProducto()[widget.index]
                               .setCantidad(count);
                           actualizarCarritoCant(
                               _user
-                                  .getCarritoDeCompra()[widget.index]
+                                  .getCarritoDeCompra()
+                                  .getListProducto()[widget.index]
                                   .getCodigo(),
                               _user.getEmail(),
                               count);
@@ -321,7 +345,7 @@ class _ComprarCarritoState extends State<ComprarCarrito> {
     var listDocuments = _user.getCarritoDeCompra();
     int carritoLength;
     if (listDocuments != null) {
-      carritoLength = listDocuments.length;
+      carritoLength = listDocuments.getListProducto().length;
       return ListView(
           children:
               List.generate(carritoLength, (i) => new ListTileItem(index: i)));
@@ -343,15 +367,38 @@ class _ComprarCarritoState extends State<ComprarCarrito> {
     int length;
     int i;
     int suma = 0;
-    if (_user.getCarritoDeCompra().length > 0) {
-      length = _user.getCarritoDeCompra().length;
+    if (_user.getCarritoDeCompra().getListProducto().length > 0) {
+      length = _user.getCarritoDeCompra().getListProducto().length;
       for (i = 0; i < length; i++) {
-        if (_user.getCarritoDeCompra().elementAt(i).getPrecio() != null &&
-            _user.getCarritoDeCompra().elementAt(i).getCantidad() != null)
+        if (_user
+                    .getCarritoDeCompra()
+                    .getListProducto()
+                    .elementAt(i)
+                    .getPrecio() !=
+                null &&
+            _user
+                    .getCarritoDeCompra()
+                    .getListProducto()
+                    .elementAt(i)
+                    .getCantidad() !=
+                null)
           suma = suma +
-              (_user.getCarritoDeCompra().elementAt(i).getPrecio() *
-                  _user.getCarritoDeCompra().elementAt(i).getCantidad());
-        count = count + _user.getCarritoDeCompra().elementAt(i).getCantidad();
+              (_user
+                      .getCarritoDeCompra()
+                      .getListProducto()
+                      .elementAt(i)
+                      .getPrecio() *
+                  _user
+                      .getCarritoDeCompra()
+                      .getListProducto()
+                      .elementAt(i)
+                      .getCantidad());
+        count = count +
+            _user
+                .getCarritoDeCompra()
+                .getListProducto()
+                .elementAt(i)
+                .getCantidad();
       }
     } else
       return 0;
@@ -365,20 +412,33 @@ class _ComprarCarritoState extends State<ComprarCarrito> {
     int length;
     int i;
     int suma = 0;
-    if (_user.getCarritoDeCompra().length > 0) {
-      length = _user.getCarritoDeCompra().length;
+    if (_user.getCarritoDeCompra().getListProducto().length > 0) {
+      length = _user.getCarritoDeCompra().getListProducto().length;
       for (i = 0; i < length; i++) {
-        if (_user.getCarritoDeCompra().elementAt(i).getPrecio() !=
+        if (_user
+                .getCarritoDeCompra()
+                .getListProducto()
+                .elementAt(i)
+                .getPrecio() !=
             null) if (_user
                 .getCarritoDeCompra()
+                .getListProducto()
                 .elementAt(i)
                 .getIdTienda()
                 .toString()
                 .compareTo(idTienda) ==
             0)
           suma = suma +
-              (_user.getCarritoDeCompra().elementAt(i).getPrecio() *
-                  _user.getCarritoDeCompra().elementAt(i).getCantidad());
+              (_user
+                      .getCarritoDeCompra()
+                      .getListProducto()
+                      .elementAt(i)
+                      .getPrecio() *
+                  _user
+                      .getCarritoDeCompra()
+                      .getListProducto()
+                      .elementAt(i)
+                      .getCantidad());
       }
     } else
       return 0;
@@ -395,48 +455,110 @@ class _ComprarCarritoState extends State<ComprarCarrito> {
     final _saved = Set<String>();
     final _deleted = Set<String>();
     DateTime fecha = DateTime.now();
+    String format = DateFormat('yyyy-MM-dd – kk:mm').format(fecha);
     String pivot;
     int i;
     int j;
     int x;
     if (_user.getCarritoDeCompra() != null) {
-      for (i = 0; i < _user.getCarritoDeCompra().length; i++) {
-        pivot = _user.getCarritoDeCompra().elementAt(i).getIdTienda();
+      for (i = 0;
+          i < _user.getCarritoDeCompra().getListProducto().length;
+          i++) {
+        pivot = _user
+            .getCarritoDeCompra()
+            .getListProducto()
+            .elementAt(i)
+            .getIdTienda();
         if (_deleted.contains(pivot) == false) {
           _saved.add(i.toString());
-          for (j = i + 1; j < _user.getCarritoDeCompra().length; j++) {
-            if (pivot.compareTo(
-                    _user.getCarritoDeCompra().elementAt(j).getIdTienda()) ==
+          for (j = i + 1;
+              j < _user.getCarritoDeCompra().getListProducto().length;
+              j++) {
+            if (pivot.compareTo(_user
+                    .getCarritoDeCompra()
+                    .getListProducto()
+                    .elementAt(j)
+                    .getIdTienda()) ==
                 0) {
               _saved.add(j.toString());
             }
           }
           for (x = 0; x < _saved.length; x++) {
+            String horaPedido =
+                "$format:${_user.getCarritoDeCompra().getListProducto().elementAt(x).getIdTienda()}";
             Firestore.instance
                 .collection('usuarios')
                 .document(uid)
-                .collection('Historial')
-                .document(
-                    "$fecha:${_user.getCarritoDeCompra().elementAt(x).getIdTienda()}")
+                .collection('Pedidos')
+                .document(horaPedido)
                 .setData({
               "Fecha": fecha.toString(),
-              "Pendiente": true,
-              "Entregado": false,
+              "PorAceptar": true,
+              "PorEntregar": true,
               "Medio de Pago": medioDePago,
-              "Total Pagado": _totalCostoEnvio(costoDeEnvio(),
-                  _user.getCarritoDeCompra().elementAt(x).getIdTienda()),
+              "Total Pagado": _totalCostoEnvio(
+                  costoDeEnvio(),
+                  _user
+                      .getCarritoDeCompra()
+                      .getListProducto()
+                      .elementAt(x)
+                      .getIdTienda()),
               "Costo de Envío": costoDeEnvio(),
-              "Tienda": _user.getCarritoDeCompra().elementAt(x).getIdTienda(),
-              "nombreTienda":
-                  _user.getCarritoDeCompra().elementAt(x).getNombreTienda()
+              "Tienda": _user
+                  .getCarritoDeCompra()
+                  .getListProducto()
+                  .elementAt(x)
+                  .getIdTienda(),
+              "Categorias": _user
+                  .getCarritoDeCompra()
+                  .getListProducto()
+                  .elementAt(x)
+                  .getCategoria(),
+              "nombreTienda": _user
+                  .getCarritoDeCompra()
+                  .getListProducto()
+                  .elementAt(x)
+                  .getNombreTienda()
             });
-
             Firestore.instance
+                .collection('usuarios')
+                .document(uid)
+                .collection('Pedidos')
+                .document(horaPedido)
+                .collection('Productos')
+                .document('Producto:$horaPedido')
+                .setData(carritoDocument.elementAt(x).data);
+
+            Pedido newPedido = new Pedido.carga(
+                horaPedido,
+                medioDePago,
+                _user
+                    .getCarritoDeCompra()
+                    .getListProducto()
+                    .elementAt(x)
+                    .getIdTienda(),
+                _user.getEmail(),
+                _user
+                    .getCarritoDeCompra()
+                    .getListProducto()
+                    .elementAt(x)
+                    .getNombreTienda(),
+                costoEnvio,
+                costoTotal,
+                true,
+                true,
+                fecha,
+                null,
+                _user.getCarritoDeCompra());
+
+            _user.setPedidoPendiente(newPedido);
+
+            /*Firestore.instance
                 .collection('usuarios')
                 .document(_user.getCarritoDeCompra().elementAt(x).getIdTienda())
                 .collection('HistorialVentas')
                 .document(
-                    'Producto:$fecha:${_user.getCarritoDeCompra().elementAt(x).getCodigo()}')
+                    'Producto:$format:${_user.getCarritoDeCompra().elementAt(x).getCodigo()}')
                 .setData({
               "Fechas": fecha.toString(),
               "Nombre": _user.getCarritoDeCompra().elementAt(x).getNombre(),
@@ -445,41 +567,35 @@ class _ComprarCarritoState extends State<ComprarCarrito> {
               "Precio": (_user.getCarritoDeCompra().elementAt(x).getPrecio() *
                       _user.getCarritoDeCompra().elementAt(x).getCantidad())
                   .toString(),
+              "Categorias":
+                  _user.getCarritoDeCompra().elementAt(x).getCategoria(),
             });
-
             Firestore.instance
                 .collection('usuarios')
                 .document(uid)
                 .collection('Historial')
                 .document(
-                    "$fecha:${_user.getCarritoDeCompra().elementAt(x).getIdTienda()}")
+                    "$format:${_user.getCarritoDeCompra().elementAt(x).getIdTienda()}")
                 .collection('ComprasRealizada')
                 .document(
-                    'Producto:$fecha:${_user.getCarritoDeCompra().elementAt(x).getCodigo()}')
-                .setData(carritoDocument.elementAt(x).data);
-
-            Firestore.instance
-                .collection('usuarios')
-                .document(uid)
-                .collection('Historial')
-                .document(
-                    "$fecha:${_user.getCarritoDeCompra().elementAt(x).getCodigo()}")
-                .collection('Pendientes')
-                .document(
-                    'Producto:$fecha:${_user.getCarritoDeCompra().elementAt(x).getCodigo()}')
-                .setData(carritoDocument.elementAt(x).data);
-
-            Firestore.instance
-                .collection('usuarios')
-                .document(uid)
-                .collection('Carrito')
-                .document(_user.getCarritoDeCompra().elementAt(x).getCodigo())
-                .delete();
+                    'Producto:$format:${_user.getCarritoDeCompra().elementAt(x).getCodigo()}')
+                .setData(carritoDocument.elementAt(x).data);*/
           }
           _deleted.add(_saved.first);
           _saved.clear();
         }
       }
+      Firestore.instance
+          .collection('usuarios')
+          .document(uid)
+          .collection('Carrito')
+          .getDocuments()
+          .then((snapshot) {
+        for (DocumentSnapshot ds in snapshot.documents) {
+          ds.reference.delete();
+        }
+      });
+      _user.deleteCarrito();
     }
     Navigator.push(
         context, MaterialPageRoute(builder: (context) => Seguimiento()));
@@ -537,7 +653,7 @@ class _ComprarCarritoState extends State<ComprarCarrito> {
             );
           }*/
   bool idIntoCarrito(String id, BuildContext context) {
-    return _user.getCarritoDeCompra().contains(id);
+    return _user.getCarritoDeCompra().getListProducto().contains(id);
   }
 
   void actualizarCobros() {

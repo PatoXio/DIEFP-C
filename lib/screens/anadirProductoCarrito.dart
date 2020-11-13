@@ -97,7 +97,7 @@ class _AnadirProductoCarritoState extends State<AnadirProductoCarrito> {
                   goToCarrito(context);
                 },
                 label: Text(
-                    "Ver Carrito\n\t\t\t\t(${_user.getCarritoDeCompra().length})",
+                    "Ver Carrito\n\t\t\t\t(${_user.getCarritoDeCompra().getListProducto().length})",
                     style: TextStyle(fontSize: 15)),
                 backgroundColor: Colors.blue,
               ),
@@ -138,9 +138,11 @@ class _AnadirProductoCarritoState extends State<AnadirProductoCarrito> {
 
   void cargarListDocument() async {
     var documentos = await getListDocumentProductoService(widget.idTienda);
-    setState(() {
-      listDocuments = documentos;
-    });
+    if (documentos != null) {
+      setState(() {
+        listDocuments = documentos;
+      });
+    }
   }
 
   Widget buildBody(BuildContext context, int index) {
@@ -235,7 +237,6 @@ class _AnadirProductoCarritoState extends State<AnadirProductoCarrito> {
                   onPressed: () {
                     setState(() {
                       _saved.add(id);
-                      print(_saved.length);
                     });
                   }),
             ),
@@ -276,13 +277,15 @@ class _AnadirProductoCarritoState extends State<AnadirProductoCarrito> {
         context, MaterialPageRoute(builder: (context) => CrearProducto()));
   }
 
+  // ignore: non_constant_identifier_names
   void AnadirAlCarrito(
       BuildContext context, Set<String> _saved, Cliente user) async {
     int largo = _saved.length;
     int i;
-    if (_user.getCarritoDeCompra().isNotEmpty) {
+    if (_user.getCarritoDeCompra().getListProducto().isNotEmpty) {
       if (_user
               .getCarritoDeCompra()
+              .getListProducto()
               .last
               .getIdTienda()
               .compareTo(widget.idTienda) !=
@@ -293,10 +296,6 @@ class _AnadirProductoCarritoState extends State<AnadirProductoCarrito> {
     }
     try {
       for (i = 0; i < largo; i++) {
-        print("index: $i");
-        print("Valor:" + _saved.elementAt(i));
-        print("id: " + widget.idTienda);
-        print("largo: $largo");
         Firestore.instance
             .collection('usuarios')
             .document(widget.idTienda)
@@ -317,12 +316,18 @@ class _AnadirProductoCarritoState extends State<AnadirProductoCarrito> {
               .collection('Carrito')
               .document(ds.data["Codigo"])
               .setData({"Cantidad": "1"}, merge: true);
+          int l = ds.data["Categorias"].length;
+          List<String> newList = new List<String>();
+          for (int u = 0; u < l; u++) {
+            newList.add(ds.data["Categorias"][u]);
+          }
           Producto producto = new Producto.carga(
               ds.data["Codigo"],
               ds.data["Codigo"],
               ds.data["Tienda"],
               ds.data["nombreTienda"],
               ds.data["Nombre"],
+              newList,
               1,
               int.parse(ds.data["Precio"]),
               int.parse(ds.data["Stock"]),
@@ -331,7 +336,6 @@ class _AnadirProductoCarritoState extends State<AnadirProductoCarrito> {
           user.setProductoACarrito(producto);
         });
       }
-      //print(_user.getCarritoDeCompra().first);
       setState(() {
         _user = user;
         _saved.clear();
@@ -444,10 +448,16 @@ class _AnadirProductoCarritoState extends State<AnadirProductoCarrito> {
 
   bool idIntoCarrito(BuildContext context, String nombre) {
     int i;
-    if (_user.getCarritoDeCompra().length > 0) {
-      for (i = 0; i < _user.getCarritoDeCompra().length; i++) {
-        if (_user.getCarritoDeCompra()[i].getNombre().compareTo(nombre) == 0)
-          return true;
+    if (_user.getCarritoDeCompra().getListProducto().length > 0) {
+      for (i = 0;
+          i < _user.getCarritoDeCompra().getListProducto().length;
+          i++) {
+        if (_user
+                .getCarritoDeCompra()
+                .getListProducto()[i]
+                .getNombre()
+                .compareTo(nombre) ==
+            0) return true;
       }
     }
     return false;

@@ -57,7 +57,6 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       );
     } else {
-      print(user.getTipo());
       document = Provider.of<AuthService>(context).getDocument();
       elTiempo = _elTiempo();
       screenHeight = MediaQuery.of(context).size.height;

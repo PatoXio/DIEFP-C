@@ -8,7 +8,7 @@ import 'Usuario.dart';
 
 class Cliente extends Usuario {
   String _rut;
-  int _idDireccion;
+  String _idDireccion;
   ListDireccion _listDireccion;
   ListPedido _historialCompra;
   ListProducto _carritoDeCompra;
@@ -16,7 +16,7 @@ class Cliente extends Usuario {
 
   Cliente() {
     _rut = null;
-    _idDireccion = -1;
+    _idDireccion = null;
     _listDireccion = new ListDireccion();
     _historialCompra = new ListPedido();
     _carritoDeCompra = new ListProducto();
@@ -31,7 +31,7 @@ class Cliente extends Usuario {
       password,
       codigoVerificacion,
       codigoDeInvitacion,
-      int idDireccion,
+      idDireccion,
       ListDireccion listDireccion,
       ListPedido historialCompra,
       pedidosPendientes,
@@ -54,7 +54,7 @@ class Cliente extends Usuario {
     return _rut;
   }
 
-  int getIdDireccion() {
+  String getIdDireccion() {
     return _idDireccion;
   }
 
@@ -74,8 +74,8 @@ class Cliente extends Usuario {
     return _historialCompra.getPedido(id);
   }
 
-  List<Producto> getCarritoDeCompra() {
-    return _carritoDeCompra.getListProducto();
+  ListProducto getCarritoDeCompra() {
+    return _carritoDeCompra;
   }
 
   Producto getProductoDeCarrito(String codigo) {
@@ -94,7 +94,7 @@ class Cliente extends Usuario {
     this._rut = rut;
   }
 
-  void setIdDireccion(int idDireccion) {
+  void setIdDireccion(String idDireccion) {
     this._idDireccion = idDireccion;
   }
 
@@ -120,6 +120,14 @@ class Cliente extends Usuario {
 
   void setPedidoPendiente(Pedido pedido) {
     _pedidosPendientes.setPedido(pedido);
+  }
+
+  void setHistorialDeCompras(ListPedido historialCompra) {
+    this._historialCompra = historialCompra;
+  }
+
+  void setCompra(Pedido pedido) {
+    _historialCompra.setPedido(pedido);
   }
 
   bool deleteProductoDeCarrito(String codigo) {

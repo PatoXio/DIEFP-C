@@ -606,7 +606,7 @@ class _CreateScreenState extends State<CreateScreen> {
               direccion.setRegion(placeDetails.region);
               direccion.setProvincia(placeDetails.provincia);
               direccion.setPais(placeDetails.country);
-              direccion.setId(0);
+              direccion.setId("0");
               modelTienda.setDireccion(direccion);
             }
           },
@@ -988,7 +988,6 @@ class _CreateScreenState extends State<CreateScreen> {
       "region": direccion.getRegion(),
       "codigoPostal": direccion.getCodigoPostal(),
       "numero": direccion.getNumero(),
-      "LatLng": direccion.getLatLng(),
       "lat": direccion.getLatitud(),
       "lng": direccion.getLongitud()
     });

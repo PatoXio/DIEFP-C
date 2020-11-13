@@ -1,7 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:diefpc/Clases/Cliente.dart';
 import 'package:diefpc/Clases/Delivery.dart';
+import 'package:diefpc/Clases/Direccion.dart';
+import 'package:diefpc/Clases/ListDireccion.dart';
+import 'package:diefpc/Clases/ListPedido.dart';
 import 'package:diefpc/Clases/ListProducto.dart';
+import 'package:diefpc/Clases/Pedido.dart';
 import 'package:diefpc/Clases/Producto.dart';
 import 'package:diefpc/Clases/Tienda.dart';
 import 'package:diefpc/Clases/Usuario.dart';
@@ -19,6 +23,8 @@ class AuthService with ChangeNotifier {
   DocumentSnapshot document;
   List<DocumentSnapshot> pedidosPendientes;
   List<DocumentSnapshot> listProducto;
+  List<DocumentSnapshot> listPedido;
+  List<DocumentSnapshot> listDireccion;
   List<DocumentSnapshot> tiendas;
 
   bool _loggedIn = false;
@@ -42,6 +48,8 @@ class AuthService with ChangeNotifier {
   DocumentSnapshot getDocument() => document;
   List<DocumentSnapshot> getPedidosPendientes() => pedidosPendientes;
   List<DocumentSnapshot> getProductos() => listProducto;
+  List<DocumentSnapshot> getPedidos() => listPedido;
+  List<DocumentSnapshot> getDirecciones() => listDireccion;
 
   bool isLoggedIn() => _loggedIn;
   bool isLoading() => _loading;
@@ -116,19 +124,48 @@ class AuthService with ChangeNotifier {
     notifyListeners();
     if (document.data["tipo"].compareTo("Cliente") == 0) {
       this.listProducto = await getListDocumentCarritoService(_user.email);
+      this.listPedido = await getListDocumentPedidosService(_user.email);
+      this.listDireccion = await getListDocumentDireccionService(_user.email);
       ListProducto carrito = crearListaProductos(listProducto);
+      ListPedido pedidos = new ListPedido();
+      if (listPedido != null) {
+        List<Pedido> listaPedidos = new List<Pedido>();
+        for (int i = 0; i < listPedido.length; i++) {
+          List<DocumentSnapshot> listDocumentProducto =
+              await getListDocumentProductosPedidoService(
+                  _user.email, listPedido[i].documentID);
+          Pedido pedido = Pedido.carga(
+              listPedido[i].documentID,
+              listPedido[i].data["Medio de Pago"],
+              listPedido[i].data["Tienda"],
+              listPedido[i].data[_user.email],
+              listPedido[i].data["nombreTienda"],
+              listPedido[i].data["Costo de Envío"],
+              listPedido[i].data["Total Pagado"],
+              listPedido[i].data["PorAceptar"],
+              listPedido[i].data["PorEntregar"],
+              DateTime.parse(listPedido[i].data["Fecha"]),
+              listPedido[i].data["HoraEntrega"] == null
+                  ? null
+                  : DateTime.parse(listPedido[i].data["HoraEntrega"]),
+              crearListaProductos(listDocumentProducto));
+          listaPedidos.add(pedido);
+        }
+        pedidos = new ListPedido.carga(listaPedidos);
+      }
+      ListDireccion direcciones = crearListaDireccion(listDireccion);
       Cliente cliente = new Cliente.carga(
           document.data["Rut"],
           document.data["nombre"],
           document.data["tipo"],
           document.data["email"],
           document.data["password"],
-          null, //codigoVerificacion
-          document.data["codigo"],
-          null, //idDireccion
-          null, //listDireccion
+          document.data["codigoVerificación"], //codigoVerificacion
+          document.data["codigo"], //invitación
+          document.data["Direccion"], //idDireccion
+          direcciones, //listDireccion
           null, //historialCompra
-          null, //pedidosPendientes
+          pedidos, //pedidosPendientes
           carrito); //carritoDeCompra
       _usuario = cliente;
       _prefs.setBool("isCreated", true);
@@ -198,7 +235,35 @@ class AuthService with ChangeNotifier {
   }
 
   Future<void> actualizarPendientes() async {
-    pedidosPendientes = await getListDocumentPedidosPendientes(_user.email);
+    this.listPedido = await getListDocumentPedidosService(_user.email);
+    ListPedido pedidos = new ListPedido();
+    if (listPedido != null) {
+      List<Pedido> listaPedidos = new List<Pedido>();
+      for (int i = 0; i < listPedido.length; i++) {
+        List<DocumentSnapshot> listDocumentProducto =
+            await getListDocumentProductosPedidoService(
+                _user.email, listPedido[i].documentID);
+        Pedido pedido = Pedido.carga(
+            listPedido[i].documentID,
+            listPedido[i].data["Medio de Pago"],
+            listPedido[i].data["Tienda"],
+            listPedido[i].data[_user.email],
+            listPedido[i].data["nombreTienda"],
+            listPedido[i].data["Costo de Envío"],
+            listPedido[i].data["Total Pagado"],
+            listPedido[i].data["PorAceptar"],
+            listPedido[i].data["PorEntregar"],
+            DateTime.parse(listPedido[i].data["Fecha"]),
+            listPedido[i].data["HoraEntrega"] == null
+                ? null
+                : DateTime.parse(listPedido[i].data["HoraEntrega"]),
+            crearListaProductos(listDocumentProducto));
+        listaPedidos.add(pedido);
+      }
+      pedidos = new ListPedido.carga(listaPedidos);
+    }
+    _usuario.setPedidosPendientes(pedidos);
+    notifyListeners();
   }
 
   Future<void> actualizarTiendas() async {
@@ -231,5 +296,29 @@ class AuthService with ChangeNotifier {
       }
     }
     return ListProducto.carga(listProductos);
+  }
+
+  ListDireccion crearListaDireccion(List<DocumentSnapshot> listDireccion) {
+    List<Direccion> listDirecciones = new List<Direccion>();
+    int i;
+    if (listDireccion != null) {
+      for (i = 0; i < listDireccion.length; i++) {
+        DocumentSnapshot document = listDireccion[i];
+        Direccion direccion = new Direccion.carga(
+            document.documentID,
+            document.data["calle"],
+            document.data["depto"],
+            document.data["ciudad"],
+            document.data["provincia"],
+            document.data["country"],
+            document.data["region"],
+            document.data["codigoPostal"],
+            document.data["numero"],
+            document.data["lat"],
+            document.data["lng"]);
+        listDirecciones.add(direccion);
+      }
+    }
+    return ListDireccion.carga(listDirecciones);
   }
 }

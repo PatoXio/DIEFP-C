@@ -15,12 +15,17 @@ class ListDireccion {
     return _listDireccion;
   }
 
-  Direccion getDireccion(int idDireccion) {
+  Direccion getDireccion(String idDireccion) {
     int i;
     if (_listDireccion != null) {
       for (i = 0; i < _listDireccion.length; i++) {
         if (_listDireccion.elementAt(i) != null) {
-          if (_listDireccion.elementAt(i).getId() == idDireccion) {
+          if (_listDireccion
+                  .elementAt(i)
+                  .getId()
+                  .toString()
+                  .compareTo(idDireccion) ==
+              0) {
             return _listDireccion.elementAt(i);
           }
         }
