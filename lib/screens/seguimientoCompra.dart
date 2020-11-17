@@ -1,4 +1,3 @@
-import 'package:date_format/date_format.dart';
 import 'package:diefpc/Clases/Cliente.dart';
 import 'package:diefpc/Clases/ListPedido.dart';
 import 'package:diefpc/app/app.dart';
@@ -37,7 +36,7 @@ class _ListTileHistoryState extends State<ListTileHistory> {
   double screenlong;
   String _tiempoDeEntrega;
   Cliente _user;
-  DateFormat formatter = DateFormat('HH:mm:ss');
+  DateFormat formatter = DateFormat('HH:mm');
   int count = 0;
   String _difTiempos;
   double screenHeight;
@@ -195,7 +194,7 @@ class _ListTileHistoryState extends State<ListTileHistory> {
                                   .toString())));
                 },
               ),
-              Container(
+              /* Container(
                 height: screenHeight / 3.5,
                 child: Card(
                   //elevation: 5,
@@ -217,7 +216,7 @@ class _ListTileHistoryState extends State<ListTileHistory> {
                         showPinsOnMap();
                       }),
                 ),
-              ),
+              ),*/
               Container(
                 padding: EdgeInsets.only(left: 30, right: 30),
                 child: Row(
@@ -275,8 +274,7 @@ class _ListTileHistoryState extends State<ListTileHistory> {
                               Divider(
                                 height: screenHeight / 30,
                               ),
-                              Text(
-                                  "Son las: ${horaActual.hour}:${horaActual.minute}"),
+                              Text("Son las: ${formatter.format(horaActual)}"),
                               Divider(
                                 height: screenHeight / 15,
                               ),
@@ -374,12 +372,28 @@ class _SeguimientoState extends State<Seguimiento> {
   double screenlong;
   double screenHeight;
   Cliente _user;
+  var isSeguimientoPedidos;
   String tiendaTest = "TiendaTest";
   @override
   Widget build(BuildContext context) {
     _user = Provider.of<AuthService>(context).currentUser();
     screenlong = MediaQuery.of(context).size.longestSide;
     screenHeight = MediaQuery.of(context).size.height;
+    if (_user.getPedidosPendientes() != null) {
+      if (_user.getPedidosPendientes().getListPedido().isNotEmpty) {
+        isSeguimientoPedidos = Container(
+          margin: EdgeInsets.only(top: screenHeight / 100),
+          padding: EdgeInsets.only(left: 10, right: 10),
+          child: Scrollbar(
+            child: _queryList(context),
+          ),
+        );
+      } else {
+        isSeguimientoPedidos = Text("No tienes pedidos pendientes.");
+      }
+    } else {
+      isSeguimientoPedidos = CircularProgressIndicator();
+    }
     return Scaffold(
       appBar: AppBar(
         title: Text("Pedidos Seguidos"),
@@ -394,20 +408,14 @@ class _SeguimientoState extends State<Seguimiento> {
         leading: new IconButton(
           icon: new Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.push(
+            Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (context) => MenuScreen()),
             );
           },
         ),
       ),
-      body: Container(
-        margin: EdgeInsets.only(top: screenHeight / 100),
-        padding: EdgeInsets.only(left: 10, right: 10),
-        child: Scrollbar(
-          child: _queryList(context),
-        ),
-      ),
+      body: isSeguimientoPedidos,
     );
   }
 

@@ -1,5 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+String dbCarrito = "Carrito",
+    dbPedidos = "Pedidos",
+    dbDireccion = "Direccion",
+    dbHistorialCompras = "HistorialCompras",
+    dbProductos = "Productos",
+    dbPedidosPendientes = "PedidosPendientes";
+
 Future<DocumentSnapshot> getDataDocumentService(String email) async {
   DocumentSnapshot document =
       await Firestore.instance.collection("usuarios").document(email).get();
@@ -17,71 +24,27 @@ Future<List<DocumentSnapshot>> getListDocumentTiendasService() async {
   return listDocument;
 }
 
-Future<List<DocumentSnapshot>> getListDocumentCarritoService(String id) async {
+Future<List<DocumentSnapshot>> getListDocumentOneCollecionService(
+    String id, collection) async {
   List<DocumentSnapshot> listDocument;
   listDocument = (await Firestore.instance
           .collection("usuarios")
           .document(id)
-          .collection("Carrito")
+          .collection(collection)
           .getDocuments())
       .documents;
 
   return listDocument;
 }
 
-Future<List<DocumentSnapshot>> getListDocumentPedidosService(String id) async {
+Future<List<DocumentSnapshot>> getListDocumentCollectionDocumentService(
+    String id, collection, idDocument) async {
   List<DocumentSnapshot> listDocument;
   listDocument = (await Firestore.instance
           .collection("usuarios")
           .document(id)
-          .collection("Pedidos")
-          .getDocuments())
-      .documents;
-
-  return listDocument;
-}
-
-Future<List<DocumentSnapshot>> getListDocumentDireccionService(
-    String id) async {
-  List<DocumentSnapshot> listDocument;
-  listDocument = (await Firestore.instance
-          .collection("usuarios")
-          .document(id)
-          .collection("Direccion")
-          .getDocuments())
-      .documents;
-
-  return listDocument;
-}
-
-Future<List<DocumentSnapshot>> getListDocumentProductosPedidoService(
-    String id, String idDocument) async {
-  List<DocumentSnapshot> listDocument;
-  listDocument = (await Firestore.instance
-          .collection("usuarios")
-          .document(id)
-          .collection("Pedidos")
+          .collection(collection)
           .document(idDocument)
-          .collection("Productos")
-          .getDocuments())
-      .documents;
-
-  return listDocument;
-}
-
-Future<List<DocumentSnapshot>> getListDocumentPedidosPendientes(
-    String email) async {
-  List<DocumentSnapshot> listDocument;
-
-  return listDocument;
-}
-
-Future<List<DocumentSnapshot>> getListDocumentProductoService(
-    String email) async {
-  List<DocumentSnapshot> listDocument;
-  listDocument = (await Firestore.instance
-          .collection("usuarios")
-          .document(email)
           .collection("Productos")
           .getDocuments())
       .documents;

@@ -171,7 +171,7 @@ class _CarritoComprasState extends State<CarritoCompras> {
         leading: IconButton(
           icon: Icon(Icons.local_hospital),
           iconSize: 40,
-          tooltip: 'Productos',
+          tooltip: 'Producto',
           onPressed: () {},
         ),
         title: Text(

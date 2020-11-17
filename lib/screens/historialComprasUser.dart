@@ -14,12 +14,31 @@ class HistorialCompras extends StatefulWidget {
 class _HistorialComprasState extends State<HistorialCompras> {
   Cliente _user;
   double screenlong;
+  var isHistorialCompra;
   double screenHeight;
   @override
   Widget build(BuildContext context) {
     screenlong = MediaQuery.of(context).size.longestSide;
     screenHeight = MediaQuery.of(context).size.height;
     _user = Provider.of<AuthService>(context).currentUser();
+    if (_user.getHistorialDeCompras() != null) {
+      if (_user.getHistorialDeCompras().getListPedido().isNotEmpty) {
+        isHistorialCompra = Expanded(
+          child: Container(
+            height: screenHeight / 1.5,
+            child: Theme(
+              data: ThemeData(
+                highlightColor: Colors.blue, //Does not work
+              ),
+              child: Scrollbar(child: _queyList(context)),
+            ),
+          ),
+        );
+      } else
+        isHistorialCompra = Text("Aún no compras ningún producto.");
+    } else {
+      isHistorialCompra = CircularProgressIndicator();
+    }
     return Scaffold(
       appBar: AppBar(
         title: Text("Historial Compras"),
@@ -35,19 +54,17 @@ class _HistorialComprasState extends State<HistorialCompras> {
       body: Center(
         child: Container(
           //margin: EdgeInsets.only(top: screenHeight / 100),
-          //padding: EdgeInsets.only(left: 10, right: 10),
+          padding: EdgeInsets.only(left: 10, right: 10),
           child: Column(
             children: <Widget>[
-              Text("Buscador"),
-              Container(
-                //height: screenHeight / 1.2,
-                child: Theme(
-                  data: ThemeData(
-                    highlightColor: Colors.blue, //Does not work
-                  ),
-                  child: Scrollbar(child: _queyList(context)),
+              /*TextFormField(
+                maxLength: 20,
+                decoration: InputDecoration(
+                  labelText: "Nombre Completo",
                 ),
-              ),
+                onChanged: (String value) {},
+              ),*/
+              isHistorialCompra,
             ],
           ),
         ),

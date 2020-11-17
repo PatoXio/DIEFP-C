@@ -24,6 +24,7 @@ class AuthService with ChangeNotifier {
   List<DocumentSnapshot> pedidosPendientes;
   List<DocumentSnapshot> listProducto;
   List<DocumentSnapshot> listPedido;
+  List<DocumentSnapshot> historial;
   List<DocumentSnapshot> listDireccion;
   List<DocumentSnapshot> tiendas;
 
@@ -32,6 +33,7 @@ class AuthService with ChangeNotifier {
   bool _isCreated = false;
   bool _isLoadData = false;
   bool _isComplete = false;
+  bool _isDireccion = false;
 
   AuthService() {
     loginState();
@@ -50,11 +52,23 @@ class AuthService with ChangeNotifier {
   List<DocumentSnapshot> getProductos() => listProducto;
   List<DocumentSnapshot> getPedidos() => listPedido;
   List<DocumentSnapshot> getDirecciones() => listDireccion;
+  List<DocumentSnapshot> getHistorial() => historial;
 
   bool isLoggedIn() => _loggedIn;
   bool isLoading() => _loading;
   bool isLoadData() => _isLoadData;
   bool isComplete() => _isComplete;
+  bool isDireccion() => _isDireccion;
+
+  void setDireccion() {
+    _isDireccion = true;
+    notifyListeners();
+  }
+
+  void actualizarUser(Usuario _user) {
+    _usuario = _user;
+    notifyListeners();
+  }
 
   void loginState() async {
     _prefs = await SharedPreferences.getInstance();
@@ -123,17 +137,24 @@ class AuthService with ChangeNotifier {
     this.document = await getDataDocumentService(_user.email);
     notifyListeners();
     if (document.data["tipo"].compareTo("Cliente") == 0) {
-      this.listProducto = await getListDocumentCarritoService(_user.email);
-      this.listPedido = await getListDocumentPedidosService(_user.email);
-      this.listDireccion = await getListDocumentDireccionService(_user.email);
+      this.listProducto =
+          await getListDocumentOneCollecionService(_user.email, dbCarrito);
+      this.listPedido =
+          await getListDocumentOneCollecionService(_user.email, dbPedidos);
+      this.listDireccion =
+          await getListDocumentOneCollecionService(_user.email, dbDireccion);
+      this.historial = await getListDocumentOneCollecionService(
+          _user.email, dbHistorialCompras);
       ListProducto carrito = crearListaProductos(listProducto);
+      ListDireccion direcciones = crearListaDireccion(listDireccion);
       ListPedido pedidos = new ListPedido();
+      ListPedido histo = new ListPedido();
       if (listPedido != null) {
         List<Pedido> listaPedidos = new List<Pedido>();
         for (int i = 0; i < listPedido.length; i++) {
           List<DocumentSnapshot> listDocumentProducto =
-              await getListDocumentProductosPedidoService(
-                  _user.email, listPedido[i].documentID);
+              await getListDocumentCollectionDocumentService(
+                  _user.email, dbPedidos, listPedido[i].documentID);
           Pedido pedido = Pedido.carga(
               listPedido[i].documentID,
               listPedido[i].data["Medio de Pago"],
@@ -148,12 +169,38 @@ class AuthService with ChangeNotifier {
               listPedido[i].data["HoraEntrega"] == null
                   ? null
                   : DateTime.parse(listPedido[i].data["HoraEntrega"]),
+              List<String>.from(listPedido[i].data["Categorias"]),
               crearListaProductos(listDocumentProducto));
           listaPedidos.add(pedido);
         }
         pedidos = new ListPedido.carga(listaPedidos);
       }
-      ListDireccion direcciones = crearListaDireccion(listDireccion);
+      if (historial != null) {
+        List<Pedido> listaPedidos = new List<Pedido>();
+        for (int i = 0; i < historial.length; i++) {
+          List<DocumentSnapshot> listDocumentProducto =
+              await getListDocumentCollectionDocumentService(
+                  _user.email, dbHistorialCompras, historial[i].documentID);
+          Pedido pedido = Pedido.carga(
+              historial[i].documentID,
+              historial[i].data["Medio de Pago"],
+              historial[i].data["Tienda"],
+              historial[i].data["Cliente"],
+              historial[i].data["nombreTienda"],
+              historial[i].data["Costo de Envío"],
+              historial[i].data["Total Pagado"],
+              historial[i].data["PorAceptar"],
+              historial[i].data["PorEntregar"],
+              DateTime.parse(historial[i].data["Fecha"]),
+              historial[i].data["HoraEntrega"] == null
+                  ? null
+                  : DateTime.parse(historial[i].data["HoraEntrega"]),
+              List<String>.from(historial[i].data["Categorias"]),
+              crearListaProductos(listDocumentProducto));
+          listaPedidos.add(pedido);
+        }
+        histo = new ListPedido.carga(listaPedidos);
+      }
       Cliente cliente = new Cliente.carga(
           document.data["Rut"],
           document.data["nombre"],
@@ -164,10 +211,11 @@ class AuthService with ChangeNotifier {
           document.data["codigo"], //invitación
           document.data["Direccion"], //idDireccion
           direcciones, //listDireccion
-          null, //historialCompra
+          histo, //historialCompra
           pedidos, //pedidosPendientes
           carrito); //carritoDeCompra
       _usuario = cliente;
+      _isDireccion = (_usuario as Cliente).getIdDireccion() != null;
       _prefs.setBool("isCreated", true);
     } else if (document.data["tipo"].compareTo("Delivery") == 0) {
       Delivery delivery = new Delivery.carga(
@@ -186,7 +234,8 @@ class AuthService with ChangeNotifier {
       _usuario = delivery;
       _prefs.setBool("isCreated", true);
     } else {
-      this.listProducto = await getListDocumentProductoService(_user.email);
+      this.listProducto =
+          await getListDocumentOneCollecionService(_user.email, dbProductos);
       ListProducto productos = crearListaProductos(listProducto);
       Tienda tienda = new Tienda.carga(
           document.data["patente"],
@@ -234,20 +283,21 @@ class AuthService with ChangeNotifier {
     }
   }
 
-  Future<void> actualizarPendientes() async {
-    this.listPedido = await getListDocumentPedidosService(_user.email);
+  Future<void> actualizarHistorial() async {
+    this.listPedido = await getListDocumentOneCollecionService(
+        _user.email, dbHistorialCompras);
     ListPedido pedidos = new ListPedido();
     if (listPedido != null) {
       List<Pedido> listaPedidos = new List<Pedido>();
       for (int i = 0; i < listPedido.length; i++) {
         List<DocumentSnapshot> listDocumentProducto =
-            await getListDocumentProductosPedidoService(
-                _user.email, listPedido[i].documentID);
+            await getListDocumentCollectionDocumentService(
+                _user.email, dbHistorialCompras, listPedido[i].documentID);
         Pedido pedido = Pedido.carga(
             listPedido[i].documentID,
             listPedido[i].data["Medio de Pago"],
             listPedido[i].data["Tienda"],
-            listPedido[i].data[_user.email],
+            listPedido[i].data["Cliente"],
             listPedido[i].data["nombreTienda"],
             listPedido[i].data["Costo de Envío"],
             listPedido[i].data["Total Pagado"],
@@ -257,6 +307,41 @@ class AuthService with ChangeNotifier {
             listPedido[i].data["HoraEntrega"] == null
                 ? null
                 : DateTime.parse(listPedido[i].data["HoraEntrega"]),
+            List<String>.from(listPedido[i].data["Categorias"]),
+            crearListaProductos(listDocumentProducto));
+        listaPedidos.add(pedido);
+      }
+      pedidos = new ListPedido.carga(listaPedidos);
+    }
+    _usuario.setHistorialDeCompras(pedidos);
+    notifyListeners();
+  }
+
+  Future<void> actualizarPendientes() async {
+    this.listPedido =
+        await getListDocumentOneCollecionService(_user.email, dbPedidos);
+    ListPedido pedidos = new ListPedido();
+    if (listPedido != null) {
+      List<Pedido> listaPedidos = new List<Pedido>();
+      for (int i = 0; i < listPedido.length; i++) {
+        List<DocumentSnapshot> listDocumentProducto =
+            await getListDocumentCollectionDocumentService(
+                _user.email, dbPedidos, listPedido[i].documentID);
+        Pedido pedido = Pedido.carga(
+            listPedido[i].documentID,
+            listPedido[i].data["Medio de Pago"],
+            listPedido[i].data["Tienda"],
+            listPedido[i].data["Cliente"],
+            listPedido[i].data["nombreTienda"],
+            listPedido[i].data["Costo de Envío"],
+            listPedido[i].data["Total Pagado"],
+            listPedido[i].data["PorAceptar"],
+            listPedido[i].data["PorEntregar"],
+            DateTime.parse(listPedido[i].data["Fecha"]),
+            listPedido[i].data["HoraEntrega"] == null
+                ? null
+                : DateTime.parse(listPedido[i].data["HoraEntrega"]),
+            List<String>.from(listPedido[i].data["Categorias"]),
             crearListaProductos(listDocumentProducto));
         listaPedidos.add(pedido);
       }
@@ -271,7 +356,7 @@ class AuthService with ChangeNotifier {
   }
 
   Future<void> actualizarProductosTienda(String id) async {
-    listProducto = await getListDocumentProductoService(id);
+    listProducto = await getListDocumentOneCollecionService(id, dbProductos);
   }
 
   ListProducto crearListaProductos(List<DocumentSnapshot> listDocument) {

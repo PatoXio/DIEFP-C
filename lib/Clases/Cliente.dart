@@ -62,8 +62,17 @@ class Cliente extends Usuario {
     return _listDireccion;
   }
 
+  Direccion getDireccionEspecifica(String id) {
+    return _listDireccion.getDireccion(id);
+  }
+
   Direccion getDireccion() {
-    return _listDireccion.getDireccion(_idDireccion);
+    if (_idDireccion != null) return _listDireccion.getDireccion(_idDireccion);
+    if (_idDireccion == null && _listDireccion.getListDireccion().isNotEmpty) {
+      _idDireccion = _listDireccion.getListDireccion().first.getId();
+      return _listDireccion.getDireccion(_idDireccion);
+    }
+    return null;
   }
 
   ListPedido getHistorialDeCompras() {
@@ -76,6 +85,10 @@ class Cliente extends Usuario {
 
   ListProducto getCarritoDeCompra() {
     return _carritoDeCompra;
+  }
+
+  String getDireccionIdLibre() {
+    return _listDireccion.getDireccionIdLibre();
   }
 
   Producto getProductoDeCarrito(String codigo) {
@@ -103,7 +116,7 @@ class Cliente extends Usuario {
   }
 
   void setDireccion(Direccion direccion) {
-    _listDireccion.setDireccion(direccion);
+    this._listDireccion.setDireccion(direccion);
   }
 
   void setCarritoDeCompra(ListProducto carritoDeCompra) {
@@ -136,5 +149,9 @@ class Cliente extends Usuario {
 
   void deleteCarrito() {
     _carritoDeCompra = new ListProducto();
+  }
+
+  void deleteDireccion(String id) {
+    _listDireccion.deleteDireccion(id);
   }
 }

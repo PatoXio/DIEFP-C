@@ -39,6 +39,26 @@ class ListDireccion {
   }
 
   void setDireccion(Direccion direccion) {
-    _listDireccion.add(direccion);
+    this._listDireccion.add(direccion);
+  }
+
+  String getDireccionIdLibre() {
+    int i;
+    if (_listDireccion.length == 0) return "0";
+    for (i = 0; i < _listDireccion.length; i++) {
+      if (_listDireccion[i].getId() == null) {
+        return i.toString();
+      }
+    }
+    return (_listDireccion.length).toString();
+  }
+
+  void deleteDireccion(String id) {
+    int i;
+    for (i = 0; i < _listDireccion.length; i++) {
+      if (_listDireccion[i].getId().compareTo(id) == 0) {
+        _listDireccion.removeAt(i);
+      }
+    }
   }
 }

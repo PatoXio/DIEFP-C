@@ -1,5 +1,6 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:diefpc/Clases/Direccion.dart';
 import 'package:diefpc/screens/Menu.dart';
+import 'package:diefpc/screens/anadirDireccion.dart';
 import 'package:diefpc/states/auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -18,16 +19,14 @@ class _HomeScreenState extends State<HomeScreen> {
   var isComplete;
   String elTiempo;
   var user;
-  DocumentSnapshot document;
-  @override
-  void initState() {
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
     screenHeight = MediaQuery.of(context).size.height;
-    user = Provider.of<AuthService>(context).currentUser();
+    setState(() {
+      user = Provider.of<AuthService>(context).currentUser();
+    });
+
     if (user == null) {
       return Material(
         color: Colors.white,
@@ -57,7 +56,6 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       );
     } else {
-      document = Provider.of<AuthService>(context).getDocument();
       elTiempo = _elTiempo();
       screenHeight = MediaQuery.of(context).size.height;
       return Scaffold(
@@ -142,7 +140,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 if (value.isLoading())
                   return CircularProgressIndicator();
                 else
-                  return _boton(context, value.isComplete(), user.getTipo());
+                  return _boton(context, value.isDireccion(), user.getTipo());
               },
             ),
           ],
@@ -161,29 +159,39 @@ class _HomeScreenState extends State<HomeScreen> {
       return Icons.supervised_user_circle;
   }
 
-  Widget _boton(BuildContext context, bool isComplete, String rol) {
-    if (Provider.of<AuthService>(context).isComplete() == false) {
-      return FloatingActionButton.extended(
-        onPressed: () {
-          /*Navigator.push(
-                context, MaterialPageRoute(builder: (context) => CreateScreen()));*/
-        },
-        label: Text("  Añadir\nDireccion", style: TextStyle(fontSize: 20)),
-        icon: Icon(
-          Icons.widgets,
-          size: 40,
-        ),
-        backgroundColor: Colors.blue,
-      );
+  Widget _boton(BuildContext context, bool isDireccion, String rol) {
+    if (user.getTipo() == "Cliente") {
+      if (isDireccion == false) {
+        return FloatingActionButton.extended(
+          onPressed: () {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => CrearDireccion()));
+          },
+          label: Text("  Añadir\nDireccion", style: TextStyle(fontSize: 20)),
+          icon: Icon(
+            Icons.widgets,
+            size: 40,
+          ),
+          backgroundColor: Colors.blue,
+        );
+      } else
+        return FloatingActionButton.extended(
+          onPressed: () {
+            goToMenuUsuario(context);
+          },
+          label: Text("Menú", style: TextStyle(fontSize: 20)),
+          icon: Icon(
+            Icons.widgets,
+            size: 40,
+          ),
+          backgroundColor: Colors.blue,
+        );
     } else
       return FloatingActionButton.extended(
         onPressed: () {
           if (rol.compareTo("Tienda") == 0)
             goToMenuTienda(context);
-          else if (rol.compareTo("Delivery") == 0)
-            goToMenuDelivery(context);
-          else
-            goToMenuUsuario(context);
+          else if (rol.compareTo("Delivery") == 0) goToMenuDelivery(context);
         },
         label: Text("Menú", style: TextStyle(fontSize: 20)),
         icon: Icon(

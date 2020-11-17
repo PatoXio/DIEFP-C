@@ -207,7 +207,7 @@ class _LocalesScreenState extends State<LocalesScreen> {
 
   Widget buildBody(BuildContext context, int index) {
     if (currentLocation == null) {
-      Future.delayed(Duration(seconds: 3),
+      Future.delayed(Duration(seconds: 5),
           () => obtenerDistancia(_query[index].documentID));
     } else
       obtenerDistancia(_query[index].documentID);

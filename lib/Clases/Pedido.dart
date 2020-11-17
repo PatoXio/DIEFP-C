@@ -13,6 +13,7 @@ class Pedido {
   String _idUsuario;
   String _nombreTienda;
   int _totalPagado;
+  List<String> _categorias;
   ListProducto _listProducto;
 
   Pedido() {
@@ -32,7 +33,7 @@ class Pedido {
 
   Pedido.carga(
       String _id,
-      medioDePado,
+      _medioDePago,
       _idTienda,
       _idUsuario,
       _nombreTienda,
@@ -42,6 +43,7 @@ class Pedido {
       _porEntregar,
       DateTime _fecha,
       _horaEntrega,
+      List<String> _categorias,
       ListProducto _listProducto) {
     this._id = _id;
     this._costoDeEnvio = _costoDeEnvio;
@@ -54,15 +56,20 @@ class Pedido {
     this._idUsuario = _idUsuario;
     this._nombreTienda = _nombreTienda;
     this._totalPagado = _totalPagado;
+    this._categorias = _categorias;
     this._listProducto = _listProducto;
   }
 
   String getDatos() {
-    return "Tienda: $_nombreTienda\nTotal pagado: $_totalPagado\nMedio de Pago: $_medioDePago\nConfirmada: $_porAceptar\nEntrega: $_porEntregar";
+    return "Tienda: $_nombreTienda\nTotal pagado: $_totalPagado\nCosto de envío: $_costoDeEnvio\nMedio de Pago: $_medioDePago";
   }
 
   String getId() {
     return _id;
+  }
+
+  List<String> getCategorias() {
+    return _categorias;
   }
 
   int getCostoDeEnvio() {
@@ -133,6 +140,14 @@ class Pedido {
 
   void setMedioDePago(String _medioDePago) {
     this._medioDePago = _medioDePago;
+  }
+
+  void setCategorias(List<String> _categorias) {
+    this._categorias = _categorias;
+  }
+
+  void setCategoria(String categoria) {
+    if (_categorias.contains(categoria) == false) _categorias.add(categoria);
   }
 
   void setPorAceptar(bool _porAceptar) {

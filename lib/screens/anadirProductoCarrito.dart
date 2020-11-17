@@ -133,11 +133,14 @@ class _AnadirProductoCarritoState extends State<AnadirProductoCarrito> {
           textAlign: TextAlign.center,
         );
       }
+    } else {
+      return ListView(children: <Widget>[CircularProgressIndicator()]);
     }
   }
 
   void cargarListDocument() async {
-    var documentos = await getListDocumentProductoService(widget.idTienda);
+    var documentos =
+        await getListDocumentOneCollecionService(widget.idTienda, dbProductos);
     if (documentos != null) {
       setState(() {
         listDocuments = documentos;

@@ -3,6 +3,7 @@ import 'dart:async';
 
 import 'package:diefpc/Clases/Cliente.dart';
 import 'package:diefpc/Clases/Pedido.dart';
+import 'package:diefpc/Clases/Producto.dart';
 import 'package:diefpc/screens/seguimientoCompra.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:diefpc/documents/documents_service.dart';
@@ -451,9 +452,10 @@ class _ComprarCarritoState extends State<ComprarCarrito> {
 
   void goToSeguimiento(BuildContext context, String uid) async {
     List<DocumentSnapshot> carritoDocument =
-        await getListDocumentCarritoService(uid);
+        await getListDocumentOneCollecionService(uid, dbCarrito);
     final _saved = Set<String>();
     final _deleted = Set<String>();
+    List<String> categorias = List();
     DateTime fecha = DateTime.now();
     String format = DateFormat('yyyy-MM-dd – kk:mm').format(fecha);
     String pivot;
@@ -486,6 +488,15 @@ class _ComprarCarritoState extends State<ComprarCarrito> {
           for (x = 0; x < _saved.length; x++) {
             String horaPedido =
                 "$format:${_user.getCarritoDeCompra().getListProducto().elementAt(x).getIdTienda()}";
+            List<String> listCatego = _user
+                .getCarritoDeCompra()
+                .getListProducto()
+                .elementAt(x)
+                .getCategoria();
+            for (int v = 0; v < listCatego.length; v++) {
+              if (categorias.contains(listCatego.elementAt(v)) == false)
+                categorias.add(listCatego.elementAt(v));
+            }
             Firestore.instance
                 .collection('usuarios')
                 .document(uid)
@@ -509,11 +520,8 @@ class _ComprarCarritoState extends State<ComprarCarrito> {
                   .getListProducto()
                   .elementAt(x)
                   .getIdTienda(),
-              "Categorias": _user
-                  .getCarritoDeCompra()
-                  .getListProducto()
-                  .elementAt(x)
-                  .getCategoria(),
+              "Cliente": _user.email,
+              "Categorias": categorias,
               "nombreTienda": _user
                   .getCarritoDeCompra()
                   .getListProducto()
@@ -526,7 +534,8 @@ class _ComprarCarritoState extends State<ComprarCarrito> {
                 .collection('Pedidos')
                 .document(horaPedido)
                 .collection('Productos')
-                .document('Producto:$horaPedido')
+                .document(
+                    'Producto:$horaPedido:${carritoDocument.elementAt(x).documentID}')
                 .setData(carritoDocument.elementAt(x).data);
 
             Pedido newPedido = new Pedido.carga(
@@ -549,37 +558,106 @@ class _ComprarCarritoState extends State<ComprarCarrito> {
                 true,
                 fecha,
                 null,
+                categorias,
                 _user.getCarritoDeCompra());
 
             _user.setPedidoPendiente(newPedido);
 
-            /*Firestore.instance
-                .collection('usuarios')
-                .document(_user.getCarritoDeCompra().elementAt(x).getIdTienda())
-                .collection('HistorialVentas')
-                .document(
-                    'Producto:$format:${_user.getCarritoDeCompra().elementAt(x).getCodigo()}')
-                .setData({
-              "Fechas": fecha.toString(),
-              "Nombre": _user.getCarritoDeCompra().elementAt(x).getNombre(),
-              "day": fecha.day.toString(),
-              "month": fecha.month.toString(),
-              "Precio": (_user.getCarritoDeCompra().elementAt(x).getPrecio() *
-                      _user.getCarritoDeCompra().elementAt(x).getCantidad())
-                  .toString(),
-              "Categorias":
-                  _user.getCarritoDeCompra().elementAt(x).getCategoria(),
-            });
             Firestore.instance
                 .collection('usuarios')
-                .document(uid)
-                .collection('Historial')
+                .document(_user
+                    .getCarritoDeCompra()
+                    .getListProducto()
+                    .elementAt(x)
+                    .getIdTienda())
+                .collection('PedidosPendientes')
+                .document(horaPedido)
+                .setData({
+              "Fecha": fecha.toString(),
+              "PorAceptar": true,
+              "PorEntregar": true,
+              "Medio de Pago": medioDePago,
+              "Total Pagado": _totalCostoEnvio(
+                  costoDeEnvio(),
+                  _user
+                      .getCarritoDeCompra()
+                      .getListProducto()
+                      .elementAt(x)
+                      .getIdTienda()),
+              "Costo de Envío": costoDeEnvio(),
+              "Tienda": _user
+                  .getCarritoDeCompra()
+                  .getListProducto()
+                  .elementAt(x)
+                  .getIdTienda(),
+              "Cliente": _user.email,
+              "Categorias": categorias,
+              "nombreTienda": _user
+                  .getCarritoDeCompra()
+                  .getListProducto()
+                  .elementAt(x)
+                  .getNombreTienda()
+            });
+
+            Firestore.instance
+                .collection('usuarios')
+                .document(_user
+                    .getCarritoDeCompra()
+                    .getListProducto()
+                    .elementAt(x)
+                    .getIdTienda())
+                .collection('PedidosPendientes')
+                .document(horaPedido)
+                .collection('Productos')
                 .document(
-                    "$format:${_user.getCarritoDeCompra().elementAt(x).getIdTienda()}")
-                .collection('ComprasRealizada')
+                    'Producto:$horaPedido:${carritoDocument.elementAt(x).documentID}')
+                .setData(carritoDocument.elementAt(x).data);
+
+            /*/Testing compra
+            Firestore.instance
+                .collection('usuarios')
+                .document(_user.getEmail())
+                .collection('HistorialCompras')
+                .document(horaPedido)
+                .setData({
+              "Fecha": fecha.toString(),
+              "PorAceptar": false, //aceptado
+              "PorEntregar": false, //entregado
+              "Medio de Pago": medioDePago,
+              "HoraEntrega": fecha.add(new Duration(hours: 2)).toString(),
+              "Total Pagado": _totalCostoEnvio(
+                  costoDeEnvio(),
+                  _user
+                      .getCarritoDeCompra()
+                      .getListProducto()
+                      .elementAt(x)
+                      .getIdTienda()),
+              "Costo de Envío": costoDeEnvio(),
+              "Tienda": _user
+                  .getCarritoDeCompra()
+                  .getListProducto()
+                  .elementAt(x)
+                  .getIdTienda(),
+              "Cliente": _user.email,
+              "Categorias": categorias,
+              "nombreTienda": _user
+                  .getCarritoDeCompra()
+                  .getListProducto()
+                  .elementAt(x)
+                  .getNombreTienda()
+            });
+
+            Firestore.instance
+                .collection('usuarios')
+                .document(_user.getEmail())
+                .collection('HistorialCompras')
+                .document(horaPedido)
+                .collection('Productos')
                 .document(
-                    'Producto:$format:${_user.getCarritoDeCompra().elementAt(x).getCodigo()}')
-                .setData(carritoDocument.elementAt(x).data);*/
+                    'Producto:$horaPedido:${carritoDocument.elementAt(x).documentID}')
+                .setData(carritoDocument.elementAt(x).data);
+
+            _user.setCompra(newPedido);*/
           }
           _deleted.add(_saved.first);
           _saved.clear();

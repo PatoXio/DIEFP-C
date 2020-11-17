@@ -1,3 +1,4 @@
+import 'package:diefpc/screens/Direcciones.dart';
 import 'package:diefpc/screens/home.dart';
 import 'package:diefpc/screens/seguimientoCompra.dart';
 import 'package:diefpc/states/auth.dart';
@@ -41,96 +42,128 @@ class _MenuScreenState extends State<MenuScreen> {
           },
         ),
       ),
-      body: Column(
-        children: <Widget>[
-          Container(
-            margin: EdgeInsets.only(top: screenHeight / 100),
-            padding: EdgeInsets.only(left: 10, right: 10),
-            child: Card(
-              child: ListTile(
-                leading: IconButton(
-                  icon: Icon(Icons.shopping_cart),
-                  iconSize: 40,
-                  tooltip: 'Carrito',
-                  onPressed: () {
-                    goToCarrito(context);
-                  },
+      body: SingleChildScrollView(
+        child: Container(
+          margin: EdgeInsets.only(top: screenHeight / 100),
+          child: Column(
+            children: <Widget>[
+              Container(
+                margin: EdgeInsets.only(top: screenHeight / 100),
+                padding: EdgeInsets.only(left: 10, right: 10),
+                child: Card(
+                  child: ListTile(
+                    leading: IconButton(
+                      icon: Icon(Icons.shopping_cart),
+                      iconSize: 40,
+                      tooltip: 'Carrito',
+                      onPressed: () {
+                        goToCarrito(context);
+                      },
+                    ),
+                    title: Text('Carrito de Compras'),
+                    subtitle: Text(
+                        'Aquí puedes ver todas las compras que llevas antes de pagar.'),
+                    /*trailing: Icon(Icons.more_vert),
+                    // isThreeLine: true,*/
+                  ),
                 ),
-                title: Text('Carrito de Compras'),
-                subtitle: Text(
-                    'Aquí puedes ver todas las compras que llevas antes de pagar'),
-                /*trailing: Icon(Icons.more_vert),
-                // isThreeLine: true,*/
               ),
-            ),
-          ),
-          Container(
-            margin: EdgeInsets.only(top: screenHeight / 100),
-            padding: EdgeInsets.only(left: 10, right: 10),
-            child: Card(
-              child: ListTile(
-                leading: IconButton(
-                  icon: Icon(Icons.local_hospital),
-                  iconSize: 40,
-                  tooltip: 'Locales',
-                  onPressed: () {
-                    Provider.of<AuthService>(context).actualizarTiendas();
-                    goToLocales(context);
-                  },
+              Container(
+                margin: EdgeInsets.only(top: screenHeight / 100),
+                padding: EdgeInsets.only(left: 10, right: 10),
+                child: Card(
+                  child: ListTile(
+                    leading: IconButton(
+                      icon: Icon(Icons.local_hospital),
+                      iconSize: 40,
+                      tooltip: 'Locales',
+                      onPressed: () {
+                        Provider.of<AuthService>(context).actualizarTiendas();
+                        goToLocales(context);
+                      },
+                    ),
+                    title: Text('Menú Locales'),
+                    subtitle:
+                        Text('Aquí puedes ver todos los locales cercanos.'),
+                    //trailing: Icon(Icons.more_vert),
+                    isThreeLine: true,
+                  ),
                 ),
-                title: Text('Menú Locales'),
-                subtitle: Text('Aquí puedes ver todos los locales cercanos'),
-                //trailing: Icon(Icons.more_vert),
-                isThreeLine: true,
               ),
-            ),
-          ),
-          Container(
-            margin: EdgeInsets.only(top: screenHeight / 100),
-            padding: EdgeInsets.only(left: 10, right: 10),
-            child: Card(
-              child: ListTile(
-                leading: IconButton(
-                  icon: Icon(Icons.access_time),
-                  iconSize: 40,
-                  tooltip: 'Historial',
-                  onPressed: () {
-                    goToHistorialCompras(context);
-                  },
+              Container(
+                margin: EdgeInsets.only(top: screenHeight / 100),
+                padding: EdgeInsets.only(left: 10, right: 10),
+                child: Card(
+                  child: ListTile(
+                    leading: IconButton(
+                      icon: Icon(Icons.access_time),
+                      iconSize: 40,
+                      tooltip: 'Historial',
+                      onPressed: () {
+                        goToHistorialCompras(context);
+                      },
+                    ),
+                    title: Text('Historial de Compras'),
+                    subtitle: Text(
+                        'Aquí puedes ver todas las compras que llevas antes de pagar.'),
+                    /*trailing: Icon(Icons.more_vert),
+                    // isThreeLine: true,*/
+                  ),
                 ),
-                title: Text('Historial de Compras'),
-                subtitle: Text(
-                    'Aquí puedes ver todas las compras que llevas antes de pagar'),
-                /*trailing: Icon(Icons.more_vert),
-                // isThreeLine: true,*/
               ),
-            ),
-          ),
-          Container(
-            margin: EdgeInsets.only(top: screenHeight / 100),
-            padding: EdgeInsets.only(left: 10, right: 10),
-            child: Card(
-              child: ListTile(
-                leading: IconButton(
-                  icon: Icon(Icons.map),
-                  iconSize: 40,
-                  tooltip: 'Seguimiento',
-                  onPressed: () {
-                    goToSeguimiento(context);
-                  },
+              Container(
+                margin: EdgeInsets.only(top: screenHeight / 100),
+                padding: EdgeInsets.only(left: 10, right: 10),
+                child: Card(
+                  child: ListTile(
+                    leading: IconButton(
+                      icon: Icon(Icons.map),
+                      iconSize: 40,
+                      tooltip: 'Seguimiento',
+                      onPressed: () {
+                        goToSeguimiento(context);
+                      },
+                    ),
+                    title: Text('Seguimiento Compras'),
+                    subtitle: Text(
+                        'Aquí puedes ver los pedidos que vienen en camino.'),
+                    /*trailing: Icon(Icons.more_vert),
+                    // isThreeLine: true,*/
+                  ),
                 ),
-                title: Text('Seguimiento Compras'),
-                subtitle:
-                    Text('Aquí puedes ver los pedidos que vienen en camino'),
-                /*trailing: Icon(Icons.more_vert),
-                // isThreeLine: true,*/
               ),
-            ),
+              Container(
+                margin: EdgeInsets.only(top: screenHeight / 100),
+                padding: EdgeInsets.only(left: 10, right: 10),
+                child: Card(
+                  child: ListTile(
+                    leading: IconButton(
+                      icon: Icon(Icons.directions),
+                      iconSize: 40,
+                      tooltip: 'Direcciones',
+                      onPressed: () {
+                        goToDirecciones(context);
+                      },
+                    ),
+                    title: Text('Direcciones'),
+                    subtitle: Text(
+                        'Aquí puedes ver todas tus direcciones y seleccionar una.'),
+                    /*trailing: Icon(Icons.more_vert),
+                                            // isThreeLine: true,*/
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
+}
+
+void goToDirecciones(BuildContext context) {
+  Navigator.push(
+      context, MaterialPageRoute(builder: (context) => Direcciones()));
 }
 
 void goToSeguimiento(BuildContext context) {
