@@ -21,7 +21,6 @@ class AuthService with ChangeNotifier {
   var _usuario;
 
   DocumentSnapshot document;
-  List<DocumentSnapshot> pedidosPendientes;
   List<DocumentSnapshot> listProducto;
   List<DocumentSnapshot> listPedido;
   List<DocumentSnapshot> historial;
@@ -48,7 +47,6 @@ class AuthService with ChangeNotifier {
   currentUser() => _usuario;
   List<DocumentSnapshot> getTiendas() => tiendas;
   DocumentSnapshot getDocument() => document;
-  List<DocumentSnapshot> getPedidosPendientes() => pedidosPendientes;
   List<DocumentSnapshot> getProductos() => listProducto;
   List<DocumentSnapshot> getPedidos() => listPedido;
   List<DocumentSnapshot> getDirecciones() => listDireccion;
@@ -170,6 +168,8 @@ class AuthService with ChangeNotifier {
                   ? null
                   : DateTime.parse(listPedido[i].data["HoraEntrega"]),
               List<String>.from(listPedido[i].data["Categorias"]),
+              listPedido[i].data["lat"],
+              listPedido[i].data["lng"],
               crearListaProductos(listDocumentProducto));
           listaPedidos.add(pedido);
         }
@@ -196,6 +196,8 @@ class AuthService with ChangeNotifier {
                   ? null
                   : DateTime.parse(historial[i].data["HoraEntrega"]),
               List<String>.from(historial[i].data["Categorias"]),
+              listPedido[i].data["lat"],
+              listPedido[i].data["lng"],
               crearListaProductos(listDocumentProducto));
           listaPedidos.add(pedido);
         }
@@ -214,8 +216,21 @@ class AuthService with ChangeNotifier {
           histo, //historialCompra
           pedidos, //pedidosPendientes
           carrito); //carritoDeCompra
+      if (cliente.getListDireccion().getListDireccion() != null) {
+        if (cliente.getListDireccion().getListDireccion().length > 0) {
+          if (cliente.getDireccion() == null) {
+            cliente.setIdDireccion(
+                cliente.getListDireccion().getListDireccion().first.getId());
+            actualizarIdDireccion(cliente.getIdDireccion());
+            _isDireccion = true;
+          } else if (cliente.getIdDireccion() == null) {
+            actualizarIdDireccion(cliente.getIdDireccion());
+          }
+        }
+      }
+      actualizarIdDireccion(cliente.getIdDireccion());
+      _isDireccion = cliente.getDireccion() != null;
       _usuario = cliente;
-      _isDireccion = (_usuario as Cliente).getIdDireccion() != null;
       _prefs.setBool("isCreated", true);
     } else if (document.data["tipo"].compareTo("Delivery") == 0) {
       Delivery delivery = new Delivery.carga(
@@ -234,9 +249,43 @@ class AuthService with ChangeNotifier {
       _usuario = delivery;
       _prefs.setBool("isCreated", true);
     } else {
+      this.listDireccion =
+          await getListDocumentOneCollecionService(_user.email, dbDireccion);
       this.listProducto =
           await getListDocumentOneCollecionService(_user.email, dbProductos);
+      this.listPedido = await getListDocumentOneCollecionService(
+          _user.email, dbPedidosPendientes);
+      ListDireccion direcciones = crearListaDireccion(listDireccion);
       ListProducto productos = crearListaProductos(listProducto);
+      ListPedido pedidos = new ListPedido();
+      if (listPedido != null) {
+        List<Pedido> listaPedidos = new List<Pedido>();
+        for (int i = 0; i < listPedido.length; i++) {
+          List<DocumentSnapshot> listDocumentProducto =
+              await getListDocumentCollectionDocumentService(
+                  _user.email, dbPedidosPendientes, listPedido[i].documentID);
+          Pedido pedido = Pedido.carga(
+              listPedido[i].documentID,
+              listPedido[i].data["Medio de Pago"],
+              listPedido[i].data["Tienda"],
+              listPedido[i].data[_user.email],
+              listPedido[i].data["nombreTienda"],
+              listPedido[i].data["Costo de Envío"],
+              listPedido[i].data["Total Pagado"],
+              listPedido[i].data["PorAceptar"],
+              listPedido[i].data["PorEntregar"],
+              DateTime.parse(listPedido[i].data["Fecha"]),
+              listPedido[i].data["HoraEntrega"] == null
+                  ? null
+                  : DateTime.parse(listPedido[i].data["HoraEntrega"]),
+              List<String>.from(listPedido[i].data["Categorias"]),
+              listPedido[i].data["lat"],
+              listPedido[i].data["lng"],
+              crearListaProductos(listDocumentProducto));
+          listaPedidos.add(pedido);
+        }
+        pedidos = new ListPedido.carga(listaPedidos);
+      }
       Tienda tienda = new Tienda.carga(
           document.data["patente"],
           document.data["nombre"],
@@ -245,10 +294,10 @@ class AuthService with ChangeNotifier {
           document.data["password"],
           null, //codigoVerificacion
           null, //codigoDeInvitacion
-          null, //direccion
+          direcciones.getListDireccion().first, //direccion
           productos, //listProducto
           null, //listVenta
-          null, //listPedidoPendiente
+          pedidos, //listPedidoPendiente
           null); //verificado
       _usuario = tienda;
       _prefs.setBool("isCreated", true);
@@ -308,12 +357,50 @@ class AuthService with ChangeNotifier {
                 ? null
                 : DateTime.parse(listPedido[i].data["HoraEntrega"]),
             List<String>.from(listPedido[i].data["Categorias"]),
+            listPedido[i].data["lat"],
+            listPedido[i].data["lng"],
             crearListaProductos(listDocumentProducto));
         listaPedidos.add(pedido);
       }
       pedidos = new ListPedido.carga(listaPedidos);
     }
     _usuario.setHistorialDeCompras(pedidos);
+    notifyListeners();
+  }
+
+  Future<void> actualizarPedidosPendientes() async {
+    this.listPedido = await getListDocumentOneCollecionService(
+        _user.email, dbPedidosPendientes);
+    ListPedido pedidos = new ListPedido();
+    if (listPedido != null) {
+      List<Pedido> listaPedidos = new List<Pedido>();
+      for (int i = 0; i < listPedido.length; i++) {
+        List<DocumentSnapshot> listDocumentProducto =
+            await getListDocumentCollectionDocumentService(
+                _user.email, dbPedidosPendientes, listPedido[i].documentID);
+        Pedido pedido = Pedido.carga(
+            listPedido[i].documentID,
+            listPedido[i].data["Medio de Pago"],
+            listPedido[i].data["Tienda"],
+            listPedido[i].data["Cliente"],
+            listPedido[i].data["nombreTienda"],
+            listPedido[i].data["Costo de Envío"],
+            listPedido[i].data["Total Pagado"],
+            listPedido[i].data["PorAceptar"],
+            listPedido[i].data["PorEntregar"],
+            DateTime.parse(listPedido[i].data["Fecha"]),
+            listPedido[i].data["HoraEntrega"] == null
+                ? null
+                : DateTime.parse(listPedido[i].data["HoraEntrega"]),
+            List<String>.from(listPedido[i].data["Categorias"]),
+            listPedido[i].data["lat"],
+            listPedido[i].data["lng"],
+            crearListaProductos(listDocumentProducto));
+        listaPedidos.add(pedido);
+      }
+      pedidos = new ListPedido.carga(listaPedidos);
+    }
+    _usuario.setListPedidoPendiente(pedidos);
     notifyListeners();
   }
 
@@ -342,6 +429,8 @@ class AuthService with ChangeNotifier {
                 ? null
                 : DateTime.parse(listPedido[i].data["HoraEntrega"]),
             List<String>.from(listPedido[i].data["Categorias"]),
+            listPedido[i].data["lat"],
+            listPedido[i].data["lng"],
             crearListaProductos(listDocumentProducto));
         listaPedidos.add(pedido);
       }
@@ -405,5 +494,12 @@ class AuthService with ChangeNotifier {
       }
     }
     return ListDireccion.carga(listDirecciones);
+  }
+
+  void actualizarIdDireccion(String id) {
+    Firestore.instance
+        .collection("usuarios")
+        .document(_user.email)
+        .setData({"Direccion": id}, merge: true);
   }
 }

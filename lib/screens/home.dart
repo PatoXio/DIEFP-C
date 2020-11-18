@@ -74,76 +74,82 @@ class _HomeScreenState extends State<HomeScreen> {
             onPressed: () {},
           ),
         ),
-        body: Column(
-          children: <Widget>[
-            SizedBox(
-              height: 5,
-            ),
-            Container(
-                margin: EdgeInsets.only(top: screenHeight / 100),
-                padding: EdgeInsets.only(left: 10, right: 10),
-                child: Column(children: <Widget>[
-                  Card(
-                    child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: <Widget>[
-                          ListTile(
-                            leading: Icon(
-                              Icons.account_box,
-                              size: 45,
-                            ),
-                            title: Text(
-                              "Hola, ${user.getName()}.",
-                              style: TextStyle(
-                                fontSize: 30,
-                                fontWeight: FontWeight.bold,
+        body: SingleChildScrollView(
+          child: Container(
+            child: Column(
+              children: <Widget>[
+                SizedBox(
+                  height: 5,
+                ),
+                Container(
+                    margin: EdgeInsets.only(top: screenHeight / 100),
+                    padding: EdgeInsets.only(left: 10, right: 10),
+                    child: Column(children: <Widget>[
+                      Card(
+                        child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: <Widget>[
+                              ListTile(
+                                leading: Icon(
+                                  Icons.account_box,
+                                  size: 45,
+                                ),
+                                title: Text(
+                                  "Hola, ${user.getName()}.",
+                                  style: TextStyle(
+                                    fontSize: 30,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                subtitle: Text("${_elTiempo()}",
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold)),
                               ),
-                            ),
-                            subtitle: Text("${_elTiempo()}",
-                                style: TextStyle(fontWeight: FontWeight.bold)),
-                          ),
-                          ListTile(
-                            leading: Icon(
-                              _selectIcon(user.getTipo()),
-                              size: 45,
-                            ),
-                            title: Text(
-                              "Tu rol de Usuario es: ${user.getTipo()}.",
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
+                              ListTile(
+                                leading: Icon(
+                                  _selectIcon(user.getTipo()),
+                                  size: 45,
+                                ),
+                                title: Text(
+                                  "Tu rol de Usuario es: ${user.getTipo()}.",
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
                               ),
-                            ),
-                          ),
-                          ListTile(
-                            leading: Icon(
-                              Icons.email,
-                              size: 45,
-                            ),
-                            title: Text(
-                              "Correo: ${user.getEmail()}.",
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
+                              ListTile(
+                                leading: Icon(
+                                  Icons.email,
+                                  size: 45,
+                                ),
+                                title: Text(
+                                  "Correo: ${user.getEmail()}.",
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
                               ),
-                            ),
-                          ),
-                        ]),
-                  )
-                ])),
-            SizedBox(
-              height: 5,
+                            ]),
+                      )
+                    ])),
+                SizedBox(
+                  height: 5,
+                ),
+                Consumer<AuthService>(
+                  // ignore: missing_return
+                  builder: (BuildContext context, AuthService value, child) {
+                    if (value.isLoading())
+                      return CircularProgressIndicator();
+                    else
+                      return _boton(
+                          context, value.isDireccion(), user.getTipo());
+                  },
+                ),
+              ],
             ),
-            Consumer<AuthService>(
-              // ignore: missing_return
-              builder: (BuildContext context, AuthService value, child) {
-                if (value.isLoading())
-                  return CircularProgressIndicator();
-                else
-                  return _boton(context, value.isDireccion(), user.getTipo());
-              },
-            ),
-          ],
+          ),
         ),
       );
     }

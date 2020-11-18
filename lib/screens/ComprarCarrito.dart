@@ -1,9 +1,6 @@
-//import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:async';
-
 import 'package:diefpc/Clases/Cliente.dart';
 import 'package:diefpc/Clases/Pedido.dart';
-import 'package:diefpc/Clases/Producto.dart';
 import 'package:diefpc/screens/seguimientoCompra.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:diefpc/documents/documents_service.dart';
@@ -219,9 +216,10 @@ class _ComprarCarritoState extends State<ComprarCarrito> {
                       ),*/
               Container(
                 //height: screenHeight / 3,
+                //padding: EdgeInsets.only(top: 10),
                 child: Card(
                   elevation: 5,
-                  //margin: EdgeInsets.fromLTRB(0, top, 0, 0),
+                  margin: EdgeInsets.fromLTRB(0, 10, 0, 10),
                   semanticContainer: true,
                   //color: Colors.transparent,
                   child: Column(
@@ -312,7 +310,7 @@ class _ComprarCarritoState extends State<ComprarCarrito> {
                 label: Text("Pagar"),
                 backgroundColor: Colors.blue,
               ),
-              Divider(
+              /*Divider(
                 height: 2,
               ),
               FloatingActionButton.extended(
@@ -328,7 +326,7 @@ class _ComprarCarritoState extends State<ComprarCarrito> {
               ),
               Divider(
                 height: 5,
-              ),
+              ),*/
             ])),
       ),
     );
@@ -485,135 +483,109 @@ class _ComprarCarritoState extends State<ComprarCarrito> {
               _saved.add(j.toString());
             }
           }
-          for (x = 0; x < _saved.length; x++) {
-            String horaPedido =
-                "$format:${_user.getCarritoDeCompra().getListProducto().elementAt(x).getIdTienda()}";
-            List<String> listCatego = _user
-                .getCarritoDeCompra()
-                .getListProducto()
-                .elementAt(x)
-                .getCategoria();
-            for (int v = 0; v < listCatego.length; v++) {
-              if (categorias.contains(listCatego.elementAt(v)) == false)
-                categorias.add(listCatego.elementAt(v));
-            }
-            Firestore.instance
-                .collection('usuarios')
-                .document(uid)
-                .collection('Pedidos')
-                .document(horaPedido)
-                .setData({
-              "Fecha": fecha.toString(),
-              "PorAceptar": true,
-              "PorEntregar": true,
-              "Medio de Pago": medioDePago,
-              "Total Pagado": _totalCostoEnvio(
-                  costoDeEnvio(),
-                  _user
-                      .getCarritoDeCompra()
-                      .getListProducto()
-                      .elementAt(x)
-                      .getIdTienda()),
-              "Costo de Envío": costoDeEnvio(),
-              "Tienda": _user
-                  .getCarritoDeCompra()
-                  .getListProducto()
-                  .elementAt(x)
-                  .getIdTienda(),
-              "Cliente": _user.email,
-              "Categorias": categorias,
-              "nombreTienda": _user
-                  .getCarritoDeCompra()
-                  .getListProducto()
-                  .elementAt(x)
-                  .getNombreTienda()
-            });
-            Firestore.instance
-                .collection('usuarios')
-                .document(uid)
-                .collection('Pedidos')
-                .document(horaPedido)
-                .collection('Productos')
-                .document(
-                    'Producto:$horaPedido:${carritoDocument.elementAt(x).documentID}')
-                .setData(carritoDocument.elementAt(x).data);
+        }
+      }
 
-            Pedido newPedido = new Pedido.carga(
-                horaPedido,
-                medioDePago,
-                _user
-                    .getCarritoDeCompra()
-                    .getListProducto()
-                    .elementAt(x)
-                    .getIdTienda(),
-                _user.getEmail(),
-                _user
-                    .getCarritoDeCompra()
-                    .getListProducto()
-                    .elementAt(x)
-                    .getNombreTienda(),
-                costoEnvio,
-                costoTotal,
-                true,
-                true,
-                fecha,
-                null,
-                categorias,
-                _user.getCarritoDeCompra());
+      for (x = 0; x < _saved.length; x++) {
+        List<String> listCatego = List<String>.from(_user
+            .getCarritoDeCompra()
+            .getListProducto()
+            .elementAt(x)
+            .getCategoria());
+        print(listCatego);
+        for (int v = 0; v < listCatego.length; v++) {
+          if (categorias.contains(listCatego.elementAt(v)) == false)
+            categorias.add(listCatego.elementAt(v));
+        }
+      }
 
-            _user.setPedidoPendiente(newPedido);
+      String idTienda =
+          _user.getCarritoDeCompra().getListProducto().first.getIdTienda();
+      String nombreTienda =
+          _user.getCarritoDeCompra().getListProducto().first.getNombreTienda();
+      String horaPedido =
+          "$format:${_user.getCarritoDeCompra().getListProducto().first.getIdTienda()}";
+      Firestore.instance
+          .collection('usuarios')
+          .document(uid)
+          .collection('Pedidos')
+          .document(horaPedido)
+          .setData({
+        "Fecha": fecha.toString(),
+        "PorAceptar": true,
+        "PorEntregar": true,
+        "Medio de Pago": medioDePago,
+        "Total Pagado": _totalCostoEnvio(costoDeEnvio(), idTienda),
+        "Costo de Envío": costoDeEnvio(),
+        "Tienda": idTienda,
+        "Cliente": _user.email,
+        "Categorias": categorias,
+        "nombreTienda": nombreTienda,
+        "lat": _user.getDireccion().getLatitud().toString(),
+        "lng": _user.getDireccion().getLongitud().toString()
+      });
 
-            Firestore.instance
-                .collection('usuarios')
-                .document(_user
-                    .getCarritoDeCompra()
-                    .getListProducto()
-                    .elementAt(x)
-                    .getIdTienda())
-                .collection('PedidosPendientes')
-                .document(horaPedido)
-                .setData({
-              "Fecha": fecha.toString(),
-              "PorAceptar": true,
-              "PorEntregar": true,
-              "Medio de Pago": medioDePago,
-              "Total Pagado": _totalCostoEnvio(
-                  costoDeEnvio(),
-                  _user
-                      .getCarritoDeCompra()
-                      .getListProducto()
-                      .elementAt(x)
-                      .getIdTienda()),
-              "Costo de Envío": costoDeEnvio(),
-              "Tienda": _user
-                  .getCarritoDeCompra()
-                  .getListProducto()
-                  .elementAt(x)
-                  .getIdTienda(),
-              "Cliente": _user.email,
-              "Categorias": categorias,
-              "nombreTienda": _user
-                  .getCarritoDeCompra()
-                  .getListProducto()
-                  .elementAt(x)
-                  .getNombreTienda()
-            });
+      Firestore.instance
+          .collection('usuarios')
+          .document(idTienda)
+          .collection('PedidosPendientes')
+          .document(horaPedido)
+          .setData({
+        "Fecha": fecha.toString(),
+        "PorAceptar": true,
+        "PorEntregar": true,
+        "Medio de Pago": medioDePago,
+        "Total Pagado": _totalCostoEnvio(costoDeEnvio(), idTienda),
+        "Costo de Envío": costoDeEnvio(),
+        "Tienda": idTienda,
+        "Cliente": _user.email,
+        "Categorias": categorias,
+        "nombreTienda": nombreTienda,
+        "lat": _user.getDireccion().getLatitud().toString(),
+        "lng": _user.getDireccion().getLongitud().toString()
+      });
 
-            Firestore.instance
-                .collection('usuarios')
-                .document(_user
-                    .getCarritoDeCompra()
-                    .getListProducto()
-                    .elementAt(x)
-                    .getIdTienda())
-                .collection('PedidosPendientes')
-                .document(horaPedido)
-                .collection('Productos')
-                .document(
-                    'Producto:$horaPedido:${carritoDocument.elementAt(x).documentID}')
-                .setData(carritoDocument.elementAt(x).data);
+      for (x = 0; x < _saved.length; x++) {
+        Firestore.instance
+            .collection('usuarios')
+            .document(uid)
+            .collection('Pedidos')
+            .document(horaPedido)
+            .collection('Productos')
+            .document(
+                'Producto:$horaPedido:${carritoDocument.elementAt(x).documentID}')
+            .setData(carritoDocument.elementAt(x).data);
 
-            /*/Testing compra
+        Firestore.instance
+            .collection('usuarios')
+            .document(idTienda)
+            .collection('PedidosPendientes')
+            .document(horaPedido)
+            .collection('Productos')
+            .document(
+                'Producto:$horaPedido:${carritoDocument.elementAt(x).documentID}')
+            .setData(carritoDocument.elementAt(x).data);
+      }
+      Pedido newPedido = new Pedido.carga(
+          horaPedido,
+          medioDePago,
+          idTienda,
+          _user.getEmail(),
+          nombreTienda,
+          costoEnvio,
+          costoTotal,
+          true,
+          true,
+          fecha,
+          null,
+          categorias,
+          _user.getDireccion().getLatitud().toString(),
+          _user.getDireccion().getLongitud().toString(),
+          _user.getCarritoDeCompra());
+
+      _user.setPedidoPendiente(newPedido);
+
+      /*/Testing compra
             Firestore.instance
                 .collection('usuarios')
                 .document(_user.getEmail())
@@ -658,11 +630,7 @@ class _ComprarCarritoState extends State<ComprarCarrito> {
                 .setData(carritoDocument.elementAt(x).data);
 
             _user.setCompra(newPedido);*/
-          }
-          _deleted.add(_saved.first);
-          _saved.clear();
-        }
-      }
+
       Firestore.instance
           .collection('usuarios')
           .document(uid)
@@ -674,6 +642,8 @@ class _ComprarCarritoState extends State<ComprarCarrito> {
         }
       });
       _user.deleteCarrito();
+      _deleted.add(_saved.first);
+      _saved.clear();
     }
     Navigator.push(
         context, MaterialPageRoute(builder: (context) => Seguimiento()));

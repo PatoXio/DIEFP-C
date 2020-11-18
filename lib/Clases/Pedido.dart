@@ -14,6 +14,8 @@ class Pedido {
   String _nombreTienda;
   int _totalPagado;
   List<String> _categorias;
+  String _lat;
+  String _lng;
   ListProducto _listProducto;
 
   Pedido() {
@@ -28,6 +30,8 @@ class Pedido {
     _idUsuario = null;
     _nombreTienda = null;
     _totalPagado = 0;
+    _lat = null;
+    _lng = null;
     _listProducto = new ListProducto();
   }
 
@@ -44,6 +48,8 @@ class Pedido {
       DateTime _fecha,
       _horaEntrega,
       List<String> _categorias,
+      String _lat,
+      String _lng,
       ListProducto _listProducto) {
     this._id = _id;
     this._costoDeEnvio = _costoDeEnvio;
@@ -57,11 +63,17 @@ class Pedido {
     this._nombreTienda = _nombreTienda;
     this._totalPagado = _totalPagado;
     this._categorias = _categorias;
+    this._lat = _lat;
+    this._lng = _lng;
     this._listProducto = _listProducto;
   }
 
   String getDatos() {
-    return "Tienda: $_nombreTienda\nTotal pagado: $_totalPagado\nCosto de envío: $_costoDeEnvio\nMedio de Pago: $_medioDePago";
+    return "Tienda: $_nombreTienda\nMonto: $_totalPagado\nEnvío: $_costoDeEnvio\nPago: $_medioDePago";
+  }
+
+  String getDatosTienda() {
+    return "Monto: $_totalPagado\nEnvío: $_costoDeEnvio\nPago: $_medioDePago";
   }
 
   String getId() {
@@ -108,6 +120,14 @@ class Pedido {
 
   String getNombreTienda() {
     return _nombreTienda;
+  }
+
+  String getLat() {
+    return _lat;
+  }
+
+  String getLng() {
+    return _lng;
   }
 
   int getTotalPagado() {
@@ -172,6 +192,14 @@ class Pedido {
 
   void setTotalPagado(int _totalPagado) {
     this._totalPagado = _totalPagado;
+  }
+
+  void setLat(String _lat) {
+    this._lat = _lat;
+  }
+
+  void setLng(String _lng) {
+    this._lng = _lng;
   }
 
   void setListProducto(ListProducto _listProducto) {

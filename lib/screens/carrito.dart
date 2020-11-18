@@ -38,25 +38,6 @@ class _CarritoComprasState extends State<CarritoCompras> {
         padding: EdgeInsets.only(left: 10, right: 10),
         child: Column(
           children: <Widget>[
-            Row(
-              children: <Widget>[
-                Divider(
-                  indent: screenlong / 65,
-                ),
-                Card(
-                    color: Colors.white,
-                    child: Text(
-                      " Productos ",
-                      style: _styleText(),
-                    )),
-                Divider(
-                  indent: screenlong / 4.6,
-                ),
-                Card(
-                    color: Colors.white,
-                    child: Text(" Seleccionar ", style: _styleText())),
-              ],
-            ),
             Expanded(
               flex: 7,
               child: Container(
@@ -102,29 +83,45 @@ class _CarritoComprasState extends State<CarritoCompras> {
     );
   }
 
-  IconButton _iconTravel(String id) {
+  Column _iconTravel(String id) {
     final alreadySaved = _saved.contains(id);
     if (alreadySaved) {
-      return IconButton(
-          icon: Icon(Icons.indeterminate_check_box),
-          color: Colors.red,
-          iconSize: 20,
-          tooltip: 'Deleter',
-          onPressed: () {
-            setState(() {
-              _saved.remove(id);
-            });
-          });
+      return Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text("Seleccionar"),
+          Expanded(
+            child: IconButton(
+                icon: Icon(Icons.indeterminate_check_box),
+                color: Colors.red,
+                iconSize: 20,
+                tooltip: 'Deleter',
+                onPressed: () {
+                  setState(() {
+                    _saved.remove(id);
+                  });
+                }),
+          ),
+        ],
+      );
     } else {
-      return IconButton(
-          icon: Icon(Icons.check_box_outline_blank),
-          iconSize: 20,
-          tooltip: 'Checker',
-          onPressed: () {
-            setState(() {
-              _saved.add(id);
-            });
-          });
+      return Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text("Seleccionar"),
+          Expanded(
+            child: IconButton(
+                icon: Icon(Icons.check_box_outline_blank),
+                iconSize: 20,
+                tooltip: 'Checker',
+                onPressed: () {
+                  setState(() {
+                    _saved.add(id);
+                  });
+                }),
+          ),
+        ],
+      );
     }
   }
 

@@ -147,10 +147,13 @@ class _CrearDireccionState extends State<CrearDireccion> {
                         onPressed: () {
                           if (direccion.getId() != null) {
                             _user.setDireccion(direccion);
-                            if (_user.getIdDireccion() == null) {
+                            if (_user.getDireccion() == null) {
                               _user.setIdDireccion(direccion.getId());
-                              actualizarIdDireccion(direccion);
                               Provider.of<AuthService>(context).setDireccion();
+                              actualizarIdDireccion(direccion);
+                            } else {
+                              Provider.of<AuthService>(context).setDireccion();
+                              actualizarIdDireccion(direccion);
                             }
                             _createDireccion(direccion, _user.getEmail());
                             Provider.of<AuthService>(context)
