@@ -1,4 +1,3 @@
-import 'package:diefpc/Clases/Direccion.dart';
 import 'package:diefpc/screens/Menu.dart';
 import 'package:diefpc/screens/anadirDireccion.dart';
 import 'package:diefpc/states/auth.dart';
@@ -7,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:diefpc/app/app.dart';
 import 'package:provider/provider.dart';
 import 'dart:core';
+import 'MenuDelivery.dart';
 import 'MenuTienda.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -213,7 +213,10 @@ class _HomeScreenState extends State<HomeScreen> {
         context, MaterialPageRoute(builder: (context) => MenuScreen()));
   }
 
-  void goToMenuDelivery(BuildContext context) {}
+  void goToMenuDelivery(BuildContext context) {
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => MenuScreenDelivery()));
+  }
 
   void goToMenuTienda(BuildContext context) {
     Navigator.push(

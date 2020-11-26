@@ -25,6 +25,7 @@ class _CrearProductoState extends State<CrearProducto> {
     _controller.dispose();
     super.dispose();
   }
+
   // Set intial mode to login
   @override
   void initState() {
@@ -45,7 +46,7 @@ class _CrearProductoState extends State<CrearProducto> {
 
   List<String> selectedReportList = List();
 
-_showReportDialog() {
+  _showReportDialog() {
     showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -189,9 +190,9 @@ _showReportDialog() {
                           return null;
                         },
                         keyboardType: TextInputType.number,
-                        inputFormatters: <TextInputFormatter>[
-                          WhitelistingTextInputFormatter.digitsOnly
-                        ],
+                        /*inputFormatters: <TextInputFormatter>[
+                          WhitelistingTextInputFormatter.digitsOnly;
+                        ]*/
                         decoration: InputDecoration(
                           labelText: "Peso en mg/u",
                         ),
@@ -224,15 +225,16 @@ _showReportDialog() {
                       FloatingActionButton.extended(
                         onPressed: () {
                           _showReportDialog();
-                          },
+                        },
                         label: Text("Seleccionar Categorías"),
                         icon: Icon(Icons.category),
-
                       ),
                       SizedBox(
                         height: 15,
                       ),
-                      Text(selectedReportList.isEmpty ? "Debe seleccionar al menos una categoría" : "Categorías: "+selectedReportList.join(", ")),
+                      Text(selectedReportList.isEmpty
+                          ? "Debe seleccionar al menos una categoría"
+                          : "Categorías: " + selectedReportList.join(", ")),
                       SizedBox(
                         height: 15,
                       ),
@@ -284,35 +286,38 @@ _showReportDialog() {
                                   borderRadius: BorderRadius.circular(15)),
                               onPressed: () {
                                 if (_formKey.currentState.validate()) {
-                                    if (selectedReportList.isNotEmpty) {
-                                      String value = _createProducto(
-                                          modelProducto.getStock().toString(),
-                                          modelProducto.getNombre(),
+                                  if (selectedReportList.isNotEmpty) {
+                                    String value = _createProducto(
+                                        modelProducto.getStock().toString(),
+                                        modelProducto.getNombre(),
+                                        modelProducto.getCodigo(),
+                                        modelProducto.getMgPorU().toString(),
+                                        modelProducto.getPrecio().toString(),
+                                        selectedReportList);
+                                    if (value == null) {
+                                      Producto producto = new Producto.carga(
                                           modelProducto.getCodigo(),
-                                          modelProducto.getMgPorU().toString(),
-                                          modelProducto.getPrecio().toString(),
-                                      selectedReportList);
-                                      if (value == null) {
-                                        Producto producto = new Producto.carga(
-                                            modelProducto.getCodigo(),
-                                            modelProducto.getCodigo(),
-                                            _user.getEmail(),
-                                            _user.getName(),
-                                            modelProducto.getNombre(),
-                                            selectedReportList,//categoria
-                                            modelProducto.getCantidad(),
-                                            modelProducto.getPrecio(),
-                                            modelProducto.getStock(),
-                                            modelProducto.getStockReservado(),
-                                            modelProducto.getMgPorU());
-                                        _user.setProducto(producto);
-                                        Navigator.pop(context);
-                                      } else {
-                                        _showAlert(value);
-                                      }
-                                    }else{
-                                      _showAlert("Debes seleccionar al menos una categoría");
+                                          modelProducto.getCodigo(),
+                                          _user.getEmail(),
+                                          _user.getName(),
+                                          modelProducto.getNombre(),
+                                          selectedReportList, //categoria
+                                          modelProducto.getCantidad(),
+                                          modelProducto.getPrecio(),
+                                          modelProducto.getStock(),
+                                          modelProducto.getStockReservado(),
+                                          modelProducto.getMgPorU());
+                                      _user.setProducto(producto);
+                                      Provider.of<AuthService>(context)
+                                          .actualizarUser(_user);
+                                      Navigator.pop(context);
+                                    } else {
+                                      _showAlert(value);
                                     }
+                                  } else {
+                                    _showAlert(
+                                        "Debes seleccionar al menos una categoría");
+                                  }
                                 }
                                 /*Navigator.push(
                                       context,
@@ -344,8 +349,8 @@ _showReportDialog() {
         ));
   }
 
-  String _createProducto(
-      String stock, String nombre, String codigo, String peso, String precio, List<String> categorias) {
+  String _createProducto(String stock, String nombre, String codigo,
+      String peso, String precio, List<String> categorias) {
     if (_user.getProducto(codigo) == null) {
       Firestore.instance
           .collection('usuarios')
@@ -359,7 +364,6 @@ _showReportDialog() {
         "Nombre": nombre,
         "Cantidad": "0",
         "Precio": precio,
-        "Cantidad": "0",
         "StockReservado": "0",
         "Tienda": _user.getEmail(),
         "nombreTienda": _user.getName(),
@@ -401,6 +405,7 @@ _showReportDialog() {
         context, MaterialPageRoute(builder: (context) => HomeScreen()));
   }
 }
+
 class MultiSelectChip extends StatefulWidget {
   final List<String> reportList;
   final Function(List<String>) onSelectionChanged;

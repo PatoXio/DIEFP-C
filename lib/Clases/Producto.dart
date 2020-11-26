@@ -25,8 +25,18 @@ class Producto {
     _categoria = new List<String>();
   }
 
-  Producto.carga(String id, codigo, idTienda, nombreTienda, nombre, List<String>categoria,
-      int cantidad, precio, stock, stockReservado, double mgPorU) {
+  Producto.carga(
+      String id,
+      codigo,
+      idTienda,
+      nombreTienda,
+      nombre,
+      List<String> categoria,
+      int cantidad,
+      precio,
+      stock,
+      stockReservado,
+      double mgPorU) {
     _id = id;
     _cantidad = cantidad;
     _codigo = codigo;
@@ -41,7 +51,7 @@ class Producto {
   }
 
   String getDatos() {
-    return "Nombre: $_nombre\nStock: $_stock\nPrecio: $_precio\nPeso: $_mgPorU Mg/U\nCodigo: $_codigo";
+    return "Stock: $_stock\nPrecio: $_precio\nPeso: $_mgPorU Mg/U\nCodigo: $_codigo";
   }
 
   String getDatosAlComprar() {
@@ -89,7 +99,7 @@ class Producto {
     return _nombre;
   }
 
-  List<String> getCategoria(){
+  List<String> getCategoria() {
     return _categoria;
   }
 
@@ -132,19 +142,21 @@ class Producto {
   void setId(String id) {
     this._id = id;
   }
-  void setCategorias(List<String> categoria){
+
+  void setCategorias(List<String> categoria) {
     _categoria = categoria;
   }
-   bool setCategoria(String categoria){
-    if(_categoria != null){
-      for(int i = 0; i < _categoria.length; i++){
-         if(_categoria.elementAt(i).compareTo(categoria) == 0 ){
-           return false;
-         }
+
+  bool setCategoria(String categoria) {
+    if (_categoria != null) {
+      for (int i = 0; i < _categoria.length; i++) {
+        if (_categoria.elementAt(i).compareTo(categoria) == 0) {
+          return false;
+        }
       }
       _categoria.add(categoria);
       return true;
     }
     return false;
-   }
+  }
 }

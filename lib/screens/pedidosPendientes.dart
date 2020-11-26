@@ -5,10 +5,12 @@ import 'package:diefpc/screens/productosPedido.dart';
 import 'package:diefpc/states/auth.dart';
 import 'package:flutter/material.dart';
 import 'package:diefpc/app/app.dart';
+import 'package:flutter/services.dart';
 import 'package:mailer/mailer.dart';
 import 'package:mailer/smtp_server.dart';
 import 'package:provider/provider.dart';
 import 'carrito.dart';
+import 'package:intl/intl.dart';
 import 'createProducto.dart';
 
 class PedidosPendientes extends StatefulWidget {
@@ -18,14 +20,14 @@ class PedidosPendientes extends StatefulWidget {
 
 class _PedidosPendientesState extends State<PedidosPendientes> {
   double screenlong;
-
   double screenHeight;
-
+  Widget isLoad;
+  DateFormat formatter = DateFormat('HH:mm');
   Tienda _user;
-
   var _saved = Set<String>();
-
   var _usuarios = Set<String>();
+  final _formKey = GlobalKey<FormState>();
+  var txt = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -33,6 +35,52 @@ class _PedidosPendientesState extends State<PedidosPendientes> {
     _user = Provider.of<AuthService>(context).currentUser();
     screenlong = MediaQuery.of(context).size.longestSide;
     screenHeight = MediaQuery.of(context).size.height;
+    if (_user.getListPedidosPendientes().getPedidosPorAceptar() == null) {
+      isLoad = Center(child: CircularProgressIndicator());
+    } else
+      isLoad = Column(children: <Widget>[
+        Expanded(
+          child: Container(
+            height: screenHeight / 1.35,
+            child: Theme(
+              data: ThemeData(
+                highlightColor: Colors.blue, //Does not work
+              ),
+              child: Scrollbar(child: _queyList(context, _user.getEmail())),
+            ),
+          ),
+        ),
+        Row(children: <Widget>[
+          Divider(
+            indent: screenlong / 90,
+          ),
+          FloatingActionButton.extended(
+            heroTag: "boton1",
+            onPressed: () {
+              if (_saved.length != 0)
+                _showAlertPedidoAceptado(context, _saved, _usuarios);
+              else
+                return _showAlert(context, "Debes elegir al menos 1 pedido");
+            },
+            label: Text("Aceptar Pedidos"),
+            backgroundColor: Colors.blue,
+          ),
+          Divider(
+            indent: screenlong / 60,
+          ),
+          FloatingActionButton.extended(
+            heroTag: "boton2",
+            onPressed: () {
+              if (_saved.length != 0) {
+                _showAlertPedidoCancelado(context, _saved, _usuarios);
+              } else
+                return _showAlert(context, "Debes elegir al menos 1 pedido");
+            },
+            label: Text("Cancelar Pedido"),
+            backgroundColor: Colors.red,
+          ),
+        ]),
+      ]);
     return Scaffold(
       appBar: AppBar(
         title: Text("Pedidos Pendientes"),
@@ -48,49 +96,7 @@ class _PedidosPendientesState extends State<PedidosPendientes> {
       body: Container(
         margin: EdgeInsets.only(top: screenHeight / 100),
         padding: EdgeInsets.only(left: 10, right: 10, bottom: 10),
-        child: Column(children: <Widget>[
-          Expanded(
-            child: Container(
-              height: screenHeight / 1.35,
-              child: Theme(
-                data: ThemeData(
-                  highlightColor: Colors.blue, //Does not work
-                ),
-                child: Scrollbar(child: _queyList(context, _user.getEmail())),
-              ),
-            ),
-          ),
-          Row(children: <Widget>[
-            Divider(
-              indent: screenlong / 90,
-            ),
-            FloatingActionButton.extended(
-              heroTag: "boton1",
-              onPressed: () {
-                if (_saved.length != 0)
-                  aceptarPedido(context, _saved, _usuarios);
-                else
-                  return _showAlert(context, "Debes elegir al menos 1 pedido");
-              },
-              label: Text("Aceptar Pedidos"),
-              backgroundColor: Colors.blue,
-            ),
-            Divider(
-              indent: screenlong / 60,
-            ),
-            FloatingActionButton.extended(
-              heroTag: "boton2",
-              onPressed: () {
-                if (_saved.length != 0) {
-                  _showAlertPedidoCancelado(context, _saved, _usuarios);
-                } else
-                  return _showAlert(context, "Debes elegir al menos 1 pedido");
-              },
-              label: Text("Cancelar Pedido"),
-              backgroundColor: Colors.red,
-            ),
-          ]),
-        ]),
+        child: isLoad,
       ),
     );
   }
@@ -101,12 +107,15 @@ class _PedidosPendientesState extends State<PedidosPendientes> {
   }
 
   Widget _queyList(BuildContext context, String idTienda) {
-    if (_user.getListPedidosPendientes().getListPedido().length != 0) {
+    Provider.of<AuthService>(context).actualizarPedidosPendientes();
+    _user = Provider.of<AuthService>(context).currentUser();
+    if (_user.getListPedidosPendientes().getPedidosPorAceptar().length != 0) {
       return ListView.builder(
-          itemCount: _user.getListPedidosPendientes().getListPedido().length,
+          itemCount:
+              _user.getListPedidosPendientes().getPedidosPorAceptar().length,
           shrinkWrap: true,
-          itemBuilder: (BuildContext context, int index) => buildBody(context,
-              index, _user.getListPedidosPendientes().getListPedido()));
+          itemBuilder: (BuildContext context, int index) =>
+              buildBody(context, index));
     } else {
       return Text(
         "La tienda no posee Pedidos Pendientes",
@@ -120,17 +129,16 @@ class _PedidosPendientesState extends State<PedidosPendientes> {
     }
   }
 
-  Widget buildBody(BuildContext context, int index, List<Pedido> listPedido) {
+  Widget buildBody(BuildContext context, int index) {
     double screenHeight = MediaQuery.of(context).size.height;
-    if (listPedido[index].getIdUsuario() == null)
-      return CircularProgressIndicator();
     return Container(
       margin: EdgeInsets.only(top: screenHeight / 1000),
       padding: EdgeInsets.only(left: 10, right: 10),
       child: Card(
         child: ListTile(
           onLongPress: () {
-            goToProductosPedido(context, listPedido[index]);
+            goToProductosPedido(context,
+                _user.getListPedidosPendientes().getPedidosPorAceptar()[index]);
           },
           leading: IconButton(
             icon: Icon(Icons.local_hospital),
@@ -138,10 +146,30 @@ class _PedidosPendientesState extends State<PedidosPendientes> {
             tooltip: 'Pedidos',
             onPressed: () {},
           ),
-          title: Text(listPedido[index].getIdUsuario().split("@")[0]),
-          subtitle: Text(listPedido[index].getDatosTienda()),
+          title: Text(_user
+              .getListPedidosPendientes()
+              .getPedidosPorAceptar()[index]
+              .getIdUsuario()
+              .split("@")[0]),
+          subtitle: Text("Hora: " +
+              formatter.format(_user
+                  .getListPedidosPendientes()
+                  .getPedidosPorAceptar()[index]
+                  .getFecha()) +
+              "\n" +
+              _user
+                  .getListPedidosPendientes()
+                  .getPedidosPorAceptar()[index]
+                  .getDatosTienda()),
           trailing: _iconTravel(
-              listPedido[index].getId(), listPedido[index].getIdUsuario()),
+              _user
+                  .getListPedidosPendientes()
+                  .getPedidosPorAceptar()[index]
+                  .getId(),
+              _user
+                  .getListPedidosPendientes()
+                  .getPedidosPorAceptar()[index]
+                  .getIdUsuario()),
           isThreeLine: true,
         ),
       ),
@@ -197,27 +225,52 @@ class _PedidosPendientesState extends State<PedidosPendientes> {
         context, MaterialPageRoute(builder: (context) => CrearProducto()));
   }
 
-  void aceptarPedido(BuildContext context, Set<String> _saved, var _user) {
+  void aceptarPedido(BuildContext context, Set<String> _saved,
+      Set<String> _usuarios, String horaEntrega) async {
     int largo = _saved.length;
     int i;
     try {
       for (i = 0; i < largo; i++) {
-        Firestore.instance
+        await Firestore.instance
             .collection('usuarios')
             .document(_user.getEmail())
             .collection('PedidosPendientes')
             .document(_saved.elementAt(i))
             .get()
             // ignore: missing_return
-            .then((DocumentSnapshot ds) {
+            .then((ds) {
           Firestore.instance
               .collection('usuarios')
-              .document(_user.getEmail())
-              .collection('ComprasRealizadas')
-              .add(ds.data);
+              .document(_usuarios.elementAt(i))
+              .collection('Pedidos')
+              .document(ds.documentID)
+              .setData({"PorAceptar": false, "Preparacion": horaEntrega},
+                  merge: true);
+        });
+
+        Firestore.instance
+            .collection("usuarios")
+            .document(_user.getEmail())
+            .collection("PedidosPendientes")
+            .document(_saved.elementAt(i))
+            .setData({"PorAceptar": false, "Preparacion": horaEntrega},
+                merge: true);
+
+        _user
+            .getListPedidosPendientes()
+            .getPedidosPorAceptar()
+            .where((element) {
+          if (element.getId().compareTo(_saved.elementAt(i)) == 0) {
+            element.setPorAceptar(false);
+            element.setTiempoDePreparacion(horaEntrega);
+          }
         });
       }
-      _saved.clear();
+      setState(() {
+        _usuarios.clear();
+        _saved.clear();
+        Provider.of<AuthService>(context).actualizarUser(_user);
+      });
     } catch (error) {
       return _showAlert(context, 'Ocurrió un error al aceptar los pedidos');
     }
@@ -225,7 +278,7 @@ class _PedidosPendientesState extends State<PedidosPendientes> {
   }
 
   void cancelarPedido(BuildContext context, Set<String> _saved,
-      Set<String> _usuarios, String mensaje) {
+      Set<String> _usuarios, String mensaje) async {
     int i;
     int largo = _saved.length;
     for (i = 0; i < largo; i++) {
@@ -235,7 +288,7 @@ class _PedidosPendientesState extends State<PedidosPendientes> {
           .collection('PedidosPendientes')
           .document(_saved.elementAt(i))
           .delete();
-      _user.getListPedidosPendientes().getListPedido().removeWhere(
+      _user.getListPedidosPendientes().getPedidosPorAceptar().removeWhere(
           (element) => element.getId().compareTo(_saved.elementAt(i)) == 0);
 
       Firestore.instance
@@ -245,6 +298,12 @@ class _PedidosPendientesState extends State<PedidosPendientes> {
           .document(_saved.elementAt(i))
           .delete();
       sendEmail(_usuarios.elementAt(i), mensaje);
+
+      setState(() {
+        _usuarios.clear();
+        _saved.clear();
+        Provider.of<AuthService>(context).actualizarUser(_user);
+      });
     }
   }
 
@@ -320,6 +379,76 @@ class _PedidosPendientesState extends State<PedidosPendientes> {
               onPressed: () {
                 cancelarPedido(context, _saved, _usuarios, mensaje);
                 Navigator.pop(context);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showAlertPedidoAceptado(
+      BuildContext context, Set<String> _saved, Set<String> _usuarios) {
+    // flutter defined function
+    String hora;
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          title: Text(
+              'Ingrese cuanto se demorará en preparar los siguientes ${_saved.length} pedidos.'),
+          content: new Row(
+            children: [
+              new Expanded(
+                  child: Form(
+                key: _formKey,
+                child: new TextFormField(
+                  keyboardType: TextInputType.number,
+                  inputFormatters: <TextInputFormatter>[
+                    WhitelistingTextInputFormatter.digitsOnly
+                  ],
+                  controller: txt,
+                  validator: (value) {
+                    if (value == null)
+                      return "Debe ingresar horas y minutos";
+                    else if (value.length < 4)
+                      return "Por favor ingrese 4 digitos";
+                    else if (int.parse(value[0] + value[1]) >= 24)
+                      return "El pedido no puede demorarse\nmás de un día en prepararse";
+                    else if (int.parse(value[2] + value[3]) >= 60)
+                      return "Siga el formato de los minutos\nMiuntos < 60";
+                    return null;
+                  },
+                  maxLength: 4,
+                  autofocus: true,
+                  decoration: new InputDecoration(
+                      labelText: 'Horas y minutos sin el ":" -> 0130 = 01:30',
+                      hintText:
+                          'Ej: 0130 -> Listo a las ${formatter.format(DateTime.now().add(Duration(hours: 1, minutes: 30)))}'),
+                ),
+              ))
+            ],
+          ),
+          actions: [
+            FlatButton(
+              child: Text('Atrás'),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+            FlatButton(
+              child: Text('Aceptar Pedido'),
+              onPressed: () {
+                if (_formKey.currentState.validate()) {
+                  hora = txt.text[0] +
+                      txt.text[1] +
+                      ":" +
+                      txt.text[2] +
+                      txt.text[3];
+                  aceptarPedido(context, _saved, _usuarios, hora);
+                  Navigator.pop(context);
+                }
               },
             ),
           ],

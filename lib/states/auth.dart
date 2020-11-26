@@ -167,6 +167,8 @@ class AuthService with ChangeNotifier {
               listPedido[i].data["HoraEntrega"] == null
                   ? null
                   : DateTime.parse(listPedido[i].data["HoraEntrega"]),
+              listPedido[i].data["Delivery"],
+              listPedido[i].data["Preparacion"],
               List<String>.from(listPedido[i].data["Categorias"]),
               listPedido[i].data["lat"],
               listPedido[i].data["lng"],
@@ -195,6 +197,8 @@ class AuthService with ChangeNotifier {
               historial[i].data["HoraEntrega"] == null
                   ? null
                   : DateTime.parse(historial[i].data["HoraEntrega"]),
+              listPedido[i].data["Delivery"],
+              listPedido[i].data["Preparacion"],
               List<String>.from(historial[i].data["Categorias"]),
               listPedido[i].data["lat"],
               listPedido[i].data["lng"],
@@ -278,6 +282,8 @@ class AuthService with ChangeNotifier {
               listPedido[i].data["HoraEntrega"] == null
                   ? null
                   : DateTime.parse(listPedido[i].data["HoraEntrega"]),
+              listPedido[i].data["Delivery"],
+              listPedido[i].data["Preparacion"],
               List<String>.from(listPedido[i].data["Categorias"]),
               listPedido[i].data["lat"],
               listPedido[i].data["lng"],
@@ -356,6 +362,8 @@ class AuthService with ChangeNotifier {
             listPedido[i].data["HoraEntrega"] == null
                 ? null
                 : DateTime.parse(listPedido[i].data["HoraEntrega"]),
+            listPedido[i].data["Delivery"],
+            listPedido[i].data["Preparacion"],
             List<String>.from(listPedido[i].data["Categorias"]),
             listPedido[i].data["lat"],
             listPedido[i].data["lng"],
@@ -392,6 +400,8 @@ class AuthService with ChangeNotifier {
             listPedido[i].data["HoraEntrega"] == null
                 ? null
                 : DateTime.parse(listPedido[i].data["HoraEntrega"]),
+            listPedido[i].data["Delivery"],
+            listPedido[i].data["Preparacion"],
             List<String>.from(listPedido[i].data["Categorias"]),
             listPedido[i].data["lat"],
             listPedido[i].data["lng"],
@@ -428,6 +438,8 @@ class AuthService with ChangeNotifier {
             listPedido[i].data["HoraEntrega"] == null
                 ? null
                 : DateTime.parse(listPedido[i].data["HoraEntrega"]),
+            listPedido[i].data["Delivery"],
+            listPedido[i].data["Preparacion"],
             List<String>.from(listPedido[i].data["Categorias"]),
             listPedido[i].data["lat"],
             listPedido[i].data["lng"],
@@ -446,6 +458,8 @@ class AuthService with ChangeNotifier {
 
   Future<void> actualizarProductosTienda(String id) async {
     listProducto = await getListDocumentOneCollecionService(id, dbProductos);
+    (_usuario as Tienda)
+        .setListProducto(crearListaProductos(listProducto).getListProducto());
   }
 
   ListProducto crearListaProductos(List<DocumentSnapshot> listDocument) {

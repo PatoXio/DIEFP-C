@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:diefpc/Clases/Producto.dart';
 import 'package:diefpc/Clases/Tienda.dart';
 import 'package:diefpc/states/auth.dart';
 import 'package:flutter/material.dart';
@@ -17,7 +16,6 @@ class ProductosTienda extends StatefulWidget {
 class _ProductosTiendaState extends State<ProductosTienda> {
   var _prodSelect = Set<String>();
   Tienda _user;
-  List<Producto> _listProducto;
   double screenlong;
   double screenHeight;
   @override
@@ -25,7 +23,8 @@ class _ProductosTiendaState extends State<ProductosTienda> {
     screenHeight = MediaQuery.of(context).size.height;
     screenlong = MediaQuery.of(context).size.longestSide;
     _user = Provider.of<AuthService>(context).currentUser();
-    _listProducto = _user.getListProducto();
+    Provider.of<AuthService>(context)
+        .actualizarProductosTienda(_user.getEmail());
     return Scaffold(
       appBar: AppBar(
         title: Text("Productos Disponibles"),
@@ -42,21 +41,6 @@ class _ProductosTiendaState extends State<ProductosTienda> {
         margin: EdgeInsets.only(top: screenHeight / 100),
         padding: EdgeInsets.only(left: 10, right: 10),
         child: Column(children: <Widget>[
-          Row(
-            children: <Widget>[
-              Divider(
-                indent: screenlong / 65,
-              ),
-              Text(
-                "  Productos ",
-                style: _styleText(),
-              ),
-              Divider(
-                indent: screenlong / 4,
-              ),
-              Text(" Seleccionar ", style: _styleText()),
-            ],
-          ),
           Expanded(
             flex: 7,
             child: Container(
@@ -94,8 +78,7 @@ class _ProductosTiendaState extends State<ProductosTienda> {
                   onPressed: () {
                     goToCreateProducto(context);
                     setState(() {
-                      _user = Provider.of<AuthService>(context).currentUser();
-                      _listProducto = _user.getListProducto();
+                      Provider.of<AuthService>(context).actualizarUser(_user);
                       _prodSelect.clear();
                     });
                   },
@@ -114,9 +97,8 @@ class _ProductosTiendaState extends State<ProductosTienda> {
                         if (_prodSelect.length == 1) {
                           goToModificar(context, _prodSelect.first);
                           setState(() {
-                            _user =
-                                Provider.of<AuthService>(context).currentUser();
-                            _listProducto = _user.getListProducto();
+                            Provider.of<AuthService>(context)
+                                .actualizarUser(_user);
                             _prodSelect.clear();
                           });
                         } else {
@@ -153,10 +135,12 @@ class _ProductosTiendaState extends State<ProductosTienda> {
   }
 
   Widget _queyList(BuildContext context) {
-    if (_listProducto != null) {
-      if (_listProducto.length > 0) {
+    Provider.of<AuthService>(context)
+        .actualizarProductosTienda(_user.getEmail());
+    if (_user.getListProducto() != null) {
+      if (_user.getListProducto().length > 0) {
         return ListView.builder(
-            itemCount: _listProducto.length,
+            itemCount: _user.getListProducto().length,
             itemBuilder: (BuildContext context, int index) =>
                 buildBody(context, index));
       } else {
@@ -196,39 +180,56 @@ class _ProductosTiendaState extends State<ProductosTienda> {
             tooltip: 'Productos',
             onPressed: () {},
           ),
-          title: Text(_listProducto.elementAt(index).getNombre()),
-          subtitle: Text(_listProducto.elementAt(index).getDatos()),
-          trailing: _iconTravel(_listProducto.elementAt(index).getCodigo()),
+          title: Text(_user.getListProducto().elementAt(index).getNombre()),
+          subtitle: Text(_user.getListProducto().elementAt(index).getDatos()),
+          trailing:
+              _iconTravel(_user.getListProducto().elementAt(index).getCodigo()),
           isThreeLine: true,
         ),
       ),
     );
   }
 
-  IconButton _iconTravel(String id) {
+  Column _iconTravel(String id) {
     bool isSelect = _prodSelect.contains(id);
     if (isSelect) {
-      return IconButton(
-          icon: Icon(Icons.check_box),
-          color: Colors.blue,
-          iconSize: 30,
-          tooltip: 'Seleccionado',
-          onPressed: () {
-            setState(() {
-              _prodSelect.remove(id);
-            });
-          });
+      return Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text("Seleccionar"),
+          Expanded(
+            child: IconButton(
+                icon: Icon(Icons.check_box),
+                color: Colors.blue,
+                iconSize: 30,
+                tooltip: 'Seleccionado',
+                onPressed: () {
+                  setState(() {
+                    _prodSelect.remove(id);
+                  });
+                }),
+          ),
+        ],
+      );
     } else {
-      return IconButton(
-          icon: Icon(Icons.check_box_outline_blank),
-          color: Colors.grey,
-          iconSize: 30,
-          tooltip: 'Sin seleccionar',
-          onPressed: () {
-            setState(() {
-              _prodSelect.add(id);
-            });
-          });
+      return Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text("Seleccionar"),
+          Expanded(
+            child: IconButton(
+                icon: Icon(Icons.check_box_outline_blank),
+                color: Colors.grey,
+                iconSize: 30,
+                tooltip: 'Sin seleccionar',
+                onPressed: () {
+                  setState(() {
+                    _prodSelect.add(id);
+                  });
+                }),
+          ),
+        ],
+      );
     }
   }
 

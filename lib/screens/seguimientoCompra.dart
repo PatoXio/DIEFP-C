@@ -2,7 +2,7 @@ import 'package:diefpc/Clases/Cliente.dart';
 import 'package:diefpc/Clases/ListPedido.dart';
 import 'package:diefpc/app/app.dart';
 import 'package:diefpc/screens/Menu.dart';
-import 'package:diefpc/screens/historialProductosUser.dart';
+import 'package:diefpc/screens/productosPedido.dart';
 import 'package:diefpc/states/auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
@@ -179,19 +179,11 @@ class _ListTileHistoryState extends State<ListTileHistory> {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => HistorialProductos(
-                              listPedido
-                                  .getListPedido()[widget.index]
-                                  .getIdTienda(),
-                              "${listPedido.getListPedido()[widget.index].getFecha()}:${listPedido.getListPedido()[widget.index].getIdTienda()}",
-                              listPedido
-                                  .getListPedido()[widget.index]
-                                  .getTotalPagado()
-                                  .toString(),
-                              listPedido
-                                  .getListPedido()[widget.index]
-                                  .getCostoDeEnvio()
-                                  .toString())));
+                          builder: (context) => ProductosPedido(
+                                pedido: listPedido
+                                    .getListPedido()
+                                    .elementAt(widget.index),
+                              )));
                 },
               ),
               /* Container(

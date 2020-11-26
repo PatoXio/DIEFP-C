@@ -1,11 +1,8 @@
+import 'package:diefpc/screens/pedidosAceptados.dart';
 import 'package:diefpc/screens/pedidosPendientes.dart';
 import 'package:diefpc/screens/productosTienda.dart';
-import 'package:diefpc/states/login_state.dart';
 import 'package:flutter/material.dart';
-import 'package:diefpc/screens/carrito.dart';
 import 'package:diefpc/app/app.dart';
-import 'package:diefpc/screens/buscarLocales.dart';
-import 'package:provider/provider.dart';
 
 import 'historialVentas.dart';
 
@@ -40,7 +37,7 @@ class _MenuScreenTiendaState extends State<MenuScreenTienda> {
             child: Card(
               child: ListTile(
                 leading: IconButton(
-                  icon: Icon(Icons.shopping_cart),
+                  icon: Icon(Icons.add_shopping_cart),
                   iconSize: 40,
                   tooltip: 'Pedidos',
                   onPressed: () {
@@ -51,6 +48,27 @@ class _MenuScreenTiendaState extends State<MenuScreenTienda> {
                 subtitle: Text('Aquí puedes ver todos los pedidos pendientes'),
                 /*trailing: Icon(Icons.more_vert),
                 // isThreeLine: true,*/
+              ),
+            ),
+          ),
+          Container(
+            margin: EdgeInsets.only(top: screenHeight / 100),
+            padding: EdgeInsets.only(left: 10, right: 10),
+            child: Card(
+              child: ListTile(
+                leading: IconButton(
+                  icon: Icon(Icons.shopping_cart),
+                  iconSize: 40,
+                  tooltip: 'Pedidos Aceptados',
+                  onPressed: () {
+                    goToPedidosAceptados(context);
+                  },
+                ),
+                title: Text('Pedidos Aceptados'),
+                subtitle: Text(
+                    'Aquí puedes ver los pedidos aceptados y asignarles un Delivery'),
+                /*trailing: Icon(Icons.more_vert),
+                    // isThreeLine: true,*/
               ),
             ),
           ),
@@ -109,6 +127,11 @@ void goToProductos(BuildContext context) {
 void goToHistorialVentas(BuildContext context) {
   Navigator.push(
       context, MaterialPageRoute(builder: (context) => HistorialVentas()));
+}
+
+void goToPedidosAceptados(BuildContext context) {
+  Navigator.push(
+      context, MaterialPageRoute(builder: (context) => PedidosAceptados()));
 }
 
 void goToPedidosPendientes(BuildContext context) {

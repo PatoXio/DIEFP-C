@@ -1,13 +1,9 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:diefpc/Clases/Cliente.dart';
 import 'package:diefpc/Clases/Pedido.dart';
 import 'package:diefpc/Clases/Producto.dart';
-import 'package:diefpc/Clases/Tienda.dart';
 import 'package:diefpc/screens/producto.dart';
-import 'package:diefpc/states/auth.dart';
 import 'package:flutter/material.dart';
 import 'package:diefpc/app/app.dart';
-import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
 
 class ProductosPedido extends StatefulWidget {
   Pedido pedido;
@@ -55,16 +51,16 @@ class _ListTileItemState extends State<ListTileItem> {
 class _ProductosPedidoState extends State<ProductosPedido> {
   double screenlong;
   double screenHeight;
+  DateFormat formatter = DateFormat('HH:mm');
   int costoTotal = 0;
   int count = 0;
   @override
   Widget build(BuildContext context) {
     screenlong = MediaQuery.of(context).size.longestSide;
     screenHeight = MediaQuery.of(context).size.height;
-    Provider.of<AuthService>(context).actualizarPedidosPendientes();
     return Scaffold(
       appBar: AppBar(
-        title: Text("Productos Comprados"),
+        title: Text("Productos del Pedido\n${widget.pedido.getIdUsuario()}"),
         actions: <Widget>[
           IconButton(
               icon: Icon(Icons.list),
@@ -91,7 +87,9 @@ class _ProductosPedidoState extends State<ProductosPedido> {
               ),
             ),
             Text(
-                "Costo de Envío: ${widget.pedido.getCostoDeEnvio()}\nCosto Total: ${widget.pedido.getTotalPagado()}",
+                "Delivery: ${widget.pedido.getDelivery() == null ? "No Asignado" : widget.pedido.getDelivery()}"
+                "\nCosto de Envío: ${widget.pedido.getCostoDeEnvio()}"
+                "\nCosto Total: ${widget.pedido.getTotalPagado()}",
                 style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,

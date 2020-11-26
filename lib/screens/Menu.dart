@@ -53,7 +53,7 @@ class _MenuScreenState extends State<MenuScreen> {
                 child: Card(
                   child: ListTile(
                     leading: IconButton(
-                      icon: Icon(Icons.shopping_cart),
+                      icon: Icon(Icons.add_shopping_cart),
                       iconSize: 40,
                       tooltip: 'Carrito',
                       onPressed: () {

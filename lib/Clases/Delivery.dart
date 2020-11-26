@@ -6,7 +6,7 @@ class Delivery extends Usuario {
   String _rut;
   String _telefono;
   String _medioDeTransporte;
-  ListPedido _pedidosPorTomar;
+  ListPedido _pedidosTomados;
   Pedido _pedidoActual;
   ListPedido _listPedidoEntregado;
 
@@ -14,7 +14,7 @@ class Delivery extends Usuario {
     _rut = null;
     _telefono = null;
     _medioDeTransporte = null;
-    _pedidosPorTomar = new ListPedido();
+    _pedidosTomados = new ListPedido();
     _pedidoActual = new Pedido();
     _listPedidoEntregado = new ListPedido();
   }
@@ -41,7 +41,7 @@ class Delivery extends Usuario {
     this._rut = rut;
     this._telefono = telefono;
     this._medioDeTransporte = medioDeTransporte;
-    this._pedidosPorTomar = pedidosPorTomar;
+    this._pedidosTomados = pedidosPorTomar;
     this._pedidoActual = pedidoActual;
     this._listPedidoEntregado = listPedidoEntregado;
   }
@@ -58,11 +58,11 @@ class Delivery extends Usuario {
     return _medioDeTransporte;
   }
 
-  ListPedido getPedidosPorTomar() {
-    return _pedidosPorTomar;
+  ListPedido getPedidosTomados() {
+    return _pedidosTomados;
   }
 
-  Pedido getPedidoPorTomar(String id) {
+  Pedido getPedidoTomado(String id) {
     return _listPedidoEntregado.getPedido(id);
   }
 
@@ -90,12 +90,12 @@ class Delivery extends Usuario {
     this._medioDeTransporte = medioDeTransporte;
   }
 
-  void setPedidosPorTomar(ListPedido pedidosPorTomar) {
-    this._pedidosPorTomar = pedidosPorTomar;
+  void setPedidosTomado(ListPedido pedidosPorTomar) {
+    this._pedidosTomados = pedidosPorTomar;
   }
 
-  void setPedidoPorTomar(Pedido pedido) {
-    _pedidosPorTomar.setPedido(pedido);
+  void setPedidoTomado(Pedido pedido) {
+    _pedidosTomados.setPedido(pedido);
   }
 
   void setPedidoActual(Pedido pedidoActual) {

@@ -25,11 +25,56 @@ class _ModificarProductoState extends State<ModificarProducto> {
   Tienda _user;
   final _formKey = GlobalKey<FormState>();
 
+  List<String> reportList = [
+    "Bebé e infantil",
+    "Belleza",
+    "Bienestar sexual",
+    "Cuidado personal",
+    "Maternidad",
+    "Nutrición",
+    "Medicamentos",
+    "Medicamentos naturales",
+    "Veterinaria"
+  ];
+
+  List<String> selectedReportList = new List();
+
+  _showReportDialog() {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          //Here we will build the content of the dialog
+          return AlertDialog(
+            title: Text("Seleccione Categoria"),
+            content: MultiSelectChip(
+              reportList,
+              onSelectionChanged: (selectedList) {
+                setState(() {
+                  selectedReportList = selectedList;
+                });
+              },
+            ),
+            actions: <Widget>[
+              FlatButton(
+                child: Text("Aceptar"),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+            ],
+          );
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     _user = Provider.of<AuthService>(context).currentUser();
     producto = _user.getProducto(widget.codigo);
     screenHeight = MediaQuery.of(context).size.height;
+    if (producto.getCategoria() != null) {
+      selectedReportList = producto.getCategoria();
+      print(selectedReportList);
+    }
+    print(producto.getCategoria());
+
     return Scaffold(
       body: SingleChildScrollView(
         child: Stack(
@@ -181,6 +226,19 @@ class _ModificarProductoState extends State<ModificarProducto> {
                               modelProducto.setPrecio(int.parse(value));
                             },
                           ),
+                          FloatingActionButton.extended(
+                            onPressed: () {
+                              _showReportDialog();
+                            },
+                            label: Text("Seleccionar Categorías"),
+                            icon: Icon(Icons.category),
+                          ),
+                          SizedBox(
+                            height: 15,
+                          ),
+                          Text(selectedReportList.isEmpty
+                              ? "Debe seleccionar al menos una categoría"
+                              : "Categorías: " + selectedReportList.join(", ")),
                           SizedBox(
                             height: 15,
                           ),
@@ -235,31 +293,41 @@ class _ModificarProductoState extends State<ModificarProducto> {
                                       borderRadius: BorderRadius.circular(15)),
                                   onPressed: () {
                                     if (_formKey.currentState.validate()) {
-                                      String value = _modificarProducto(
-                                          modelProducto.getStock().toString(),
-                                          modelProducto.getNombre(),
-                                          producto.getCodigo(),
-                                          modelProducto.getMgPorU().toString(),
-                                          modelProducto.getPrecio().toString());
-                                      if (value == null) {
-                                        Producto newProducto =
-                                            new Producto.carga(
-                                                producto.getCodigo(),
-                                                producto.getCodigo(),
-                                                _user.getEmail(),
-                                                _user.getName(),
-                                                modelProducto.getNombre(),
-                                                null,//categoria)
-                                                modelProducto.getCantidad(),
-                                                modelProducto.getPrecio(),
-                                                modelProducto.getStock(),
-                                                modelProducto
-                                                    .getStockReservado(),
-                                                modelProducto.getMgPorU());
-                                        _user.editProducto(newProducto);
-                                        Navigator.pop(context);
+                                      if (selectedReportList.isNotEmpty) {
+                                        String value = _modificarProducto(
+                                            modelProducto.getStock().toString(),
+                                            modelProducto.getNombre(),
+                                            producto.getCodigo(),
+                                            modelProducto
+                                                .getMgPorU()
+                                                .toString(),
+                                            modelProducto
+                                                .getPrecio()
+                                                .toString());
+                                        if (value == null) {
+                                          Producto newProducto = new Producto
+                                                  .carga(
+                                              producto.getCodigo(),
+                                              producto.getCodigo(),
+                                              _user.getEmail(),
+                                              _user.getName(),
+                                              modelProducto.getNombre(),
+                                              selectedReportList, //categoria)
+                                              modelProducto.getCantidad(),
+                                              modelProducto.getPrecio(),
+                                              modelProducto.getStock(),
+                                              modelProducto.getStockReservado(),
+                                              modelProducto.getMgPorU());
+                                          _user.editProducto(newProducto);
+                                          Provider.of<AuthService>(context)
+                                              .actualizarUser(_user);
+                                          Navigator.pop(context);
+                                        } else {
+                                          _showAlert(value);
+                                        }
                                       } else {
-                                        _showAlert(value);
+                                        _showAlert(
+                                            "Debes seleccionar al menos una categoría");
                                       }
                                     }
                                   }),
@@ -334,5 +402,51 @@ class _ModificarProductoState extends State<ModificarProducto> {
   void goToHomeScreen(BuildContext context) {
     Navigator.push(
         context, MaterialPageRoute(builder: (context) => HomeScreen()));
+  }
+}
+
+class MultiSelectChip extends StatefulWidget {
+  final List<String> reportList;
+  final Function(List<String>) onSelectionChanged;
+
+  MultiSelectChip(this.reportList, {this.onSelectionChanged});
+
+  @override
+  _MultiSelectChipState createState() => _MultiSelectChipState();
+}
+
+class _MultiSelectChipState extends State<MultiSelectChip> {
+  // String selectedChoice = "";
+  List<String> selectedChoices = List();
+
+  _buildChoiceList() {
+    List<Widget> choices = List();
+
+    widget.reportList.forEach((item) {
+      choices.add(Container(
+        padding: const EdgeInsets.all(2.0),
+        child: ChoiceChip(
+          label: Text(item),
+          selected: selectedChoices.contains(item),
+          onSelected: (selected) {
+            setState(() {
+              selectedChoices.contains(item)
+                  ? selectedChoices.remove(item)
+                  : selectedChoices.add(item);
+              widget.onSelectionChanged(selectedChoices);
+            });
+          },
+        ),
+      ));
+    });
+
+    return choices;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      children: _buildChoiceList(),
+    );
   }
 }

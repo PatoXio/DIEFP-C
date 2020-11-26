@@ -504,7 +504,7 @@ class _ComprarCarritoState extends State<ComprarCarrito> {
       String nombreTienda =
           _user.getCarritoDeCompra().getListProducto().first.getNombreTienda();
       String horaPedido =
-          "$format:${_user.getCarritoDeCompra().getListProducto().first.getIdTienda()}";
+          "$format:${_user.getCarritoDeCompra().getListProducto().first.getIdTienda()}:${_user.getEmail()}";
       Firestore.instance
           .collection('usuarios')
           .document(uid)
@@ -577,6 +577,8 @@ class _ComprarCarritoState extends State<ComprarCarrito> {
           true,
           true,
           fecha,
+          null,
+          null,
           null,
           categorias,
           _user.getDireccion().getLatitud().toString(),

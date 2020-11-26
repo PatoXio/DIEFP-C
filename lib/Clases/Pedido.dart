@@ -9,16 +9,19 @@ class Pedido {
   String _medioDePago;
   bool _porAceptar;
   bool _porEntregar;
+  String _tiempoPreparacion;
   String _idTienda;
   String _idUsuario;
   String _nombreTienda;
   int _totalPagado;
+  String _delivery;
   List<String> _categorias;
   String _lat;
   String _lng;
   ListProducto _listProducto;
 
   Pedido() {
+    _delivery = null;
     _id = null;
     _costoDeEnvio = 0;
     _fecha = null;
@@ -27,6 +30,7 @@ class Pedido {
     _porAceptar = false;
     _porEntregar = false;
     _idTienda = null;
+    _tiempoPreparacion = null;
     _idUsuario = null;
     _nombreTienda = null;
     _totalPagado = 0;
@@ -47,6 +51,8 @@ class Pedido {
       _porEntregar,
       DateTime _fecha,
       _horaEntrega,
+      String _delivery,
+      String _tiempoPreparacion,
       List<String> _categorias,
       String _lat,
       String _lng,
@@ -64,7 +70,9 @@ class Pedido {
     this._totalPagado = _totalPagado;
     this._categorias = _categorias;
     this._lat = _lat;
+    this._delivery = _delivery;
     this._lng = _lng;
+    this._tiempoPreparacion = _tiempoPreparacion;
     this._listProducto = _listProducto;
   }
 
@@ -72,8 +80,16 @@ class Pedido {
     return "Tienda: $_nombreTienda\nMonto: $_totalPagado\nEnvío: $_costoDeEnvio\nPago: $_medioDePago";
   }
 
+  String getTiempoDePreparacion() {
+    return _tiempoPreparacion;
+  }
+
+  String getDelivery() {
+    return _delivery;
+  }
+
   String getDatosTienda() {
-    return "Monto: $_totalPagado\nEnvío: $_costoDeEnvio\nPago: $_medioDePago";
+    return "Total: $_totalPagado\nPago: $_medioDePago ${_delivery == null ? "Delivery: No Asignado" : "\nDelivery: $_delivery"}";
   }
 
   String getId() {
@@ -97,7 +113,10 @@ class Pedido {
   }
 
   bool getPorAceptar() {
-    if (_porAceptar == null) return true;
+    if (_porAceptar == null) {
+      print("Es null");
+      return true;
+    }
     return _porAceptar;
   }
 
@@ -158,12 +177,20 @@ class Pedido {
     this._horaEntrega = _horaEntrega;
   }
 
+  void setDelivery(String _delivery) {
+    this._delivery = _delivery;
+  }
+
   void setMedioDePago(String _medioDePago) {
     this._medioDePago = _medioDePago;
   }
 
   void setCategorias(List<String> _categorias) {
     this._categorias = _categorias;
+  }
+
+  void setTiempoDePreparacion(String _tiempoPreparacion) {
+    this._tiempoPreparacion = _tiempoPreparacion;
   }
 
   void setCategoria(String categoria) {
