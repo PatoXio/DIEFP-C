@@ -37,6 +37,19 @@ Future<List<DocumentSnapshot>> getListDocumentOneCollecionService(
   return listDocument;
 }
 
+Future<DocumentSnapshot> getDocumentDireccionService(
+    String id, direccion) async {
+  DocumentSnapshot document;
+  document = (await Firestore.instance
+      .collection("usuarios")
+      .document(id)
+      .collection('Direccion')
+      .document(direccion)
+      .get());
+
+  return document;
+}
+
 Future<List<DocumentSnapshot>> getListDocumentCollectionDocumentService(
     String id, collection, idDocument) async {
   List<DocumentSnapshot> listDocument;

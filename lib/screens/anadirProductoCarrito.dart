@@ -319,7 +319,6 @@ class _AnadirProductoCarritoState extends State<AnadirProductoCarrito> {
               .collection('Carrito')
               .document(ds.data["Codigo"])
               .setData({"Cantidad": "1"}, merge: true);
-          int l = ds.data["Categorias"].length;
           Producto producto = new Producto.carga(
               ds.data["Codigo"],
               ds.data["Codigo"],

@@ -458,8 +458,8 @@ class _PedidosPendientesState extends State<PedidosPendientes> {
   }
 
   Future<void> sendEmail(String correo, String mensaje) async {
-    String username = "patricio.igtr@gmail.com";
-    String password = "Raideon133";
+    String username = "diefpacientescronicos@gmail.com";
+    String password = "Pacientescronicos13";
     final smtpServer = gmail(username, password);
     final message = Message()
       ..from = Address(username, "Aplicación Diefp-c")

@@ -1,10 +1,12 @@
+import 'package:diefpc/Clases/Usuario.dart';
+import 'package:diefpc/screens/entregarPedidos.dart';
+import 'package:diefpc/screens/historialEntregasDelivery.dart';
 import 'package:diefpc/screens/home.dart';
 import 'package:diefpc/screens/preAsignarPedidos.dart';
-import 'package:diefpc/screens/seguimientoCompra.dart';
+import 'package:diefpc/states/auth.dart';
 import 'package:flutter/material.dart';
 import 'package:diefpc/app/app.dart';
-
-import 'historialComprasUser.dart';
+import 'package:provider/provider.dart';
 
 class MenuScreenDelivery extends StatefulWidget {
   @override
@@ -13,10 +15,11 @@ class MenuScreenDelivery extends StatefulWidget {
 
 class _MenuScreenDeliveryState extends State<MenuScreenDelivery> {
   double screenHeight;
-
+  Usuario _user;
   @override
   Widget build(BuildContext context) {
     screenHeight = MediaQuery.of(context).size.height;
+    _user = Provider.of<AuthService>(context).currentUser();
     return Scaffold(
       appBar: AppBar(
         title: Text("Estás en el Menú"),
@@ -74,7 +77,7 @@ class _MenuScreenDeliveryState extends State<MenuScreenDelivery> {
                       iconSize: 40,
                       tooltip: 'Historial de Entregas',
                       onPressed: () {
-                        goToHistorialCompras(context);
+                        goToHistorialCompras(context, _user.email);
                       },
                     ),
                     title: Text('Historial de Entregas'),
@@ -121,10 +124,10 @@ void goToBuscarPedidos(BuildContext context) {
 
 void goToSeguimiento(BuildContext context) {
   Navigator.push(
-      context, MaterialPageRoute(builder: (context) => Seguimiento()));
+      context, MaterialPageRoute(builder: (context) => EntregarPedidos()));
 }
 
-void goToHistorialCompras(BuildContext context) {
+void goToHistorialCompras(BuildContext context, String id) {
   Navigator.push(
-      context, MaterialPageRoute(builder: (context) => HistorialCompras()));
+      context, MaterialPageRoute(builder: (context) => EntregasPedido(id: id)));
 }

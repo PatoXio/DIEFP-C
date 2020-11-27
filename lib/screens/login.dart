@@ -76,7 +76,7 @@ class _LoginScreenState extends State<LoginScreen> {
           alignment: Alignment.bottomCenter,
           child: FlatButton(
             child: Text(
-              "Terminos y Condiciones",
+              "Terminos y Condiciones\n        Versión 1.0.0",
               style: TextStyle(
                 color: Colors.grey,
               ),
@@ -192,9 +192,14 @@ class _LoginScreenState extends State<LoginScreen> {
                                 color: Colors.blue,
                                 onPressed: () async {
                                   if (_formKey.currentState.validate()) {
-                                    Provider.of<AuthService>(context)
+                                    await Provider.of<AuthService>(context)
                                         .singInWithEmailAndPassword(
                                             correo, contrasenia);
+                                    if (Provider.of<AuthService>(context)
+                                            .isLoggedIn() ==
+                                        false) {
+                                      _showDialog();
+                                    }
                                   }
                                 },
                               ),

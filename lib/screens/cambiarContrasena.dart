@@ -1,9 +1,11 @@
-import 'package:diefpc/states/login_state.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:diefpc/app/app.dart';
+import 'package:diefpc/states/auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class CambioContrasenaScreen extends StatefulWidget{
+class CambioContrasenaScreen extends StatefulWidget {
   @override
   _CambioContrasenaScreenState createState() => _CambioContrasenaScreenState();
 }
@@ -17,25 +19,22 @@ class _CambioContrasenaScreenState extends State<CambioContrasenaScreen> {
 
   @override
   Widget build(BuildContext context) {
-    screenHeight = MediaQuery
-        .of( context )
-        .size
-        .height;
-    user = Provider.of<LoginState>(context).currentUser();
+    screenHeight = MediaQuery.of(context).size.height;
+    user = Provider.of<AuthService>(context).usuarioFirebase();
     return Form(
-      key: _formKey,
+        key: _formKey,
         child: Column(
           children: <Widget>[
             Container(
-              margin: EdgeInsets.only( top: screenHeight / 5 ),
-              padding: EdgeInsets.only( left: 10, right: 10 ),
+              margin: EdgeInsets.only(top: screenHeight / 5),
+              padding: EdgeInsets.only(left: 10, right: 10),
               child: Card(
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular( 10 ),
+                  borderRadius: BorderRadius.circular(10),
                 ),
                 elevation: 8,
                 child: Padding(
-                  padding: const EdgeInsets.all( 30.0 ),
+                  padding: const EdgeInsets.all(30.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: <Widget>[
@@ -58,13 +57,14 @@ class _CambioContrasenaScreenState extends State<CambioContrasenaScreen> {
                         decoration: InputDecoration(
                           labelText: "Nueva Contraseña",
                         ),
-                        onChanged: (String value){
+                        onChanged: (String value) {
                           nuevaPass = value;
                         },
-                        validator: (String value){
-                          if(nuevaPass.length > 8){
+                        validator: (String value) {
+                          if (nuevaPass.length > 8) {
                             return "Las Contraseñas deben ser iguales";
-                          }else return null;
+                          } else
+                            return null;
                         },
                       ),
                       TextFormField(
@@ -72,13 +72,14 @@ class _CambioContrasenaScreenState extends State<CambioContrasenaScreen> {
                         decoration: InputDecoration(
                           labelText: "Confirmar Contraseña",
                         ),
-                        onChanged: (String value){
+                        onChanged: (String value) {
                           confPass = value;
                         },
-                        validator: (String value){
-                          if(value != nuevaPass){
+                        validator: (String value) {
+                          if (value != nuevaPass) {
                             return "Las Contraseñas deben ser iguales";
-                          }else return null;
+                          } else
+                            return null;
                         },
                       ),
                       SizedBox(
@@ -88,16 +89,16 @@ class _CambioContrasenaScreenState extends State<CambioContrasenaScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: <Widget>[
                           Expanded(
-                            child: Container( ),
+                            child: Container(),
                           ),
                           FlatButton(
-                            child: Text( "Cambiar Contraseña" ),
+                            child: Text("Cambiar Contraseña"),
                             color: Colors.blue,
                             textColor: Colors.white,
                             shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular( 15 ) ),
+                                borderRadius: BorderRadius.circular(15)),
                             onPressed: () {
-                              if(_formKey.currentState.validate()){
+                              if (_formKey.currentState.validate()) {
                                 _changePassword(confPass);
                               }
                             },
@@ -106,11 +107,11 @@ class _CambioContrasenaScreenState extends State<CambioContrasenaScreen> {
                             width: 20,
                           ),
                           FlatButton(
-                            child: Text( "Atras" ),
+                            child: Text("Atras"),
                             color: Colors.blue,
                             textColor: Colors.white,
                             shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular( 15 ) ),
+                                borderRadius: BorderRadius.circular(15)),
                             onPressed: () {
                               Navigator.pop(context);
                             },
@@ -123,18 +124,24 @@ class _CambioContrasenaScreenState extends State<CambioContrasenaScreen> {
               ),
             ),
           ],
-        )
-    );
+        ));
   }
+
   // ignore: missing_return
-  Future<String> _changePassword(String password) async{
+  Future<String> _changePassword(String password) async {
     //Create an instance of the current user.
     user = await FirebaseAuth.instance.currentUser();
 
     //Pass in the password to updatePassword.
-    user.updatePassword(password).then((_){
+    user.updatePassword(password).then((_) async {
+      await Firestore.instance
+          .collection('usuarios')
+          .document(user.email)
+          .setData({"password": password}, merge: true);
+      Provider.of<AuthService>(context).signOut();
+      Navigator.push(context, MaterialPageRoute(builder: (context) => MyApp()));
       return "La contraseña se cambio con exito";
-    }).catchError((error){
+    }).catchError((error) {
       return "La contraseña no se pudo cambiar:" + error.toString();
       //This might happen, when the wrong password is in, the user isn't found, or if the user hasn't logged in recently.
     });

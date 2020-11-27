@@ -47,25 +47,25 @@ void configMenu(BuildContext context) {
           ),
           body: ListView(
             children: <Widget>[
-              Card(
+              /*Card(
                 child: ListTile(
                   leading: IconButton(
                     icon: Icon(Icons.supervised_user_circle),
                     iconSize: 40,
-                    tooltip: 'Cambio de Contraseña',
+                    tooltip: 'Cambio de Correo',
                     onPressed: () {
-                      goToCambioNombre(context);
+                      goToCambioCorreo(context);
                     },
                   ),
                   title: Text('Cambiar Correo'),
                 ),
-              ),
+              ),*/
               Card(
                 child: ListTile(
                   leading: IconButton(
                     icon: Icon(Icons.lock),
                     iconSize: 40,
-                    tooltip: 'Cambio de Nombre',
+                    tooltip: 'Cambio de Contraseña',
                     onPressed: () {
                       goToCambioContrasena(context);
                     },
@@ -151,7 +151,7 @@ void goToCambioContrasena(BuildContext context) {
       MaterialPageRoute(builder: (context) => CambioContrasenaScreen()));
 }
 
-void goToCambioNombre(BuildContext context) {
+void goToCambioCorreo(BuildContext context) {
   Navigator.push(
       context, MaterialPageRoute(builder: (context) => CambioCorreoScreen()));
 }

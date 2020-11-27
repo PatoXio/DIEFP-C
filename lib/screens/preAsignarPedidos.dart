@@ -1,9 +1,8 @@
 import 'dart:collection';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:diefpc/Clases/Delivery.dart';
 import 'package:diefpc/app/app.dart';
-import 'package:diefpc/screens/anadirProductoCarrito.dart';
+import 'package:diefpc/screens/pedidosDisponiblesPorTienda.dart';
 import 'package:diefpc/states/auth.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -124,7 +123,7 @@ class _BuscarPedidosScreenState extends State<BuscarPedidosScreen> {
 
     return Scaffold(
         appBar: AppBar(
-          title: Text("Tiendas"),
+          title: Text("Tiendas Disponibles"),
           actions: <Widget>[
             IconButton(
                 icon: Icon(Icons.list),
@@ -229,12 +228,15 @@ class _BuscarPedidosScreenState extends State<BuscarPedidosScreen> {
             title: Text(listDocument[index].data["nombre"]),
             subtitle: Text(
                 "${distancia == null ? "Calculando..." : distancia[listDocument[index].documentID] == null ? "Calculando..." : distancia[listDocument[index].documentID].round() > 1000 ? "A ${(distancia[listDocument[index].documentID] / 1000).round()} kilometros" : "A ${distancia[listDocument[index].documentID].round()} metros"}" +
-                    "\n${pedidos == null ? "" : pedidos[listDocument[index].documentID] == null ? "" : pedidos[listDocument[index].documentID] > 0 ? "Pedidos: pedidos[listDocument[index].documentID]" : "No tiene pedidos"}"),
+                    "\n${pedidos == null ? "No Tiene pedidos" : pedidos[listDocument[index].documentID] == null ? "No Tiene pedidos" : pedidos[listDocument[index].documentID] > 0 ? "Pedidos: ${pedidos[listDocument[index].documentID]}" : "No tiene pedidos"}"),
             trailing: FloatingActionButton.extended(
                 heroTag: "hero+${listDocument[index].data["email"]}",
                 onPressed: () {
-                  /*goProductosTest(listDocument[index].documentID,
-                    listDocument[index].data["nombre"]);*/
+                  if (pedidos[listDocument[index].documentID] == 0) {
+                    _showAlert(context, "Esta farmacia no posee pedidos");
+                  } else {
+                    goPedidosTienda(listDocument[index].documentID);
+                  }
                 },
                 label: Text("Ver")),
             isThreeLine: true,
@@ -250,12 +252,15 @@ class _BuscarPedidosScreenState extends State<BuscarPedidosScreen> {
           title: Text(listDocument[index].data["nombre"]),
           subtitle: Text(
               "${distancia == null ? "Calculando..." : distancia[listDocument[index].documentID] == null ? "Calculando..." : distancia[listDocument[index].documentID].round() > 1000 ? "A ${(distancia[listDocument[index].documentID] / 1000).round()} kilometros" : "A ${distancia[listDocument[index].documentID].round()} metros"}" +
-                  "\n${pedidos == null ? "" : pedidos[listDocument[index].documentID] == null ? "" : pedidos[listDocument[index].documentID] > 0 ? "Pedidos: pedidos[listDocument[index].documentID]" : "No tiene pedidos"}"),
+                  "\n${pedidos == null ? "No Tiene pedidos" : pedidos[listDocument[index].documentID] == null ? "No Tiene pedidos" : pedidos[listDocument[index].documentID] > 0 ? "Pedidos: ${pedidos[listDocument[index].documentID]}" : "No tiene pedidos"}"),
           trailing: FloatingActionButton.extended(
               heroTag: "hero+${listDocument[index].data["email"]}",
               onPressed: () {
-                /*goProductosTest(listDocument[index].documentID,
-                       listDocument[index].data["nombre"]);*/
+                if (pedidos[listDocument[index].documentID] == 0) {
+                  _showAlert(context, "Esta farmacia no posee pedidos");
+                } else {
+                  goPedidosTienda(listDocument[index].documentID);
+                }
               },
               label: Text("Ver")),
           isThreeLine: true,
@@ -271,12 +276,14 @@ class _BuscarPedidosScreenState extends State<BuscarPedidosScreen> {
         title: Text(listDocument[index].data["nombre"]),
         subtitle: Text(
             "${distancia == null ? "Calculando..." : distancia[listDocument[index].documentID] == null ? "Calculando..." : distancia[listDocument[index].documentID].round() > 1000 ? "A ${(distancia[listDocument[index].documentID] / 1000).round()} kilometros" : "A ${distancia[listDocument[index].documentID].round()} metros"}" +
-                "\n${pedidos == null ? "No Tiene pedidos" : pedidos[listDocument[index].documentID] == null ? "No Tiene pedidos" : pedidos[listDocument[index].documentID] > 0 ? "Pedidos: pedidos[listDocument[index].documentID]" : "No tiene pedidos"}"),
+                "\n${pedidos == null ? "No Tiene pedidos" : pedidos[listDocument[index].documentID] == null ? "No Tiene pedidos" : pedidos[listDocument[index].documentID] > 0 ? "Pedidos: ${pedidos[listDocument[index].documentID]}" : "No tiene pedidos"}"),
         trailing: FloatingActionButton.extended(
             heroTag: "hero+${listDocument[index].data["email"]}",
             onPressed: () {
-              if (pedidos[listDocument[index].documentID] == null) {
+              if (pedidos[listDocument[index].documentID] == 0) {
                 _showAlert(context, "Esta farmacia no posee pedidos");
+              } else {
+                goPedidosTienda(listDocument[index].documentID);
               }
             },
             label: Text("Ver")),
@@ -290,6 +297,8 @@ class _BuscarPedidosScreenState extends State<BuscarPedidosScreen> {
 
   void obtenerDistancia(
       List<DocumentSnapshot> listDocument /*String codigo*/) async {
+    Query _query;
+    int cont;
     if (currentLocation != null) {
       List<DocumentSnapshot> newList = List<DocumentSnapshot>();
       Map<String, double> distan = Map<String, double>();
@@ -298,21 +307,32 @@ class _BuscarPedidosScreenState extends State<BuscarPedidosScreen> {
           new mp.LatLng(currentLocation.latitude, currentLocation.longitude);
 
       for (int i = 0; i < listDocument.length; i++) {
+        cont = 0;
         DocumentSnapshot document = (await Firestore.instance
             .collection('usuarios')
             .document(listDocument[i].documentID)
             .collection("Direccion")
             .document("0")
             .get());
-        List<DocumentSnapshot> pedidos = (await Firestore.instance
-                .collection('usuarios')
-                .document(listDocument[i].documentID)
-                .collection("PedidosPendientes")
-                .where("PorAceptar", isEqualTo: false)
-                .getDocuments())
-            .documents;
+
+        _query = Firestore.instance
+            .collection('usuarios')
+            .document(listDocument[i].documentID)
+            .collection("PedidosPendientes")
+            .where("PorAceptar", isEqualTo: false);
+
+        List<DocumentSnapshot> pedidos =
+            (await _query.getDocuments()).documents;
+
+        pedidos.forEach((element) {
+          if (element.data["Delivery"] != null) {
+            cont++;
+          }
+        });
+
         double dist = mp.SphericalUtil.computeDistanceBetween(
             latLng, mp.LatLng(document.data["lat"], document.data["lng"]));
+
         if (dist < area) {
           setMarker(LatLng(document.data["lat"], document.data["lng"]),
               listDocument[i].data["nombre"], listDocument[i].documentID);
@@ -322,12 +342,14 @@ class _BuscarPedidosScreenState extends State<BuscarPedidosScreen> {
           } else if (distan.containsKey(listDocument[i].documentID) == false) {
             distan.putIfAbsent(listDocument[i].documentID, () => dist);
           }
+
           if (listPedidos == null) {
             listPedidos.putIfAbsent(
-                listDocument[i].documentID, () => pedidos.length);
-          } else if (distan.containsKey(listDocument[i].documentID) == false) {
+                listDocument[i].documentID, () => pedidos.length - cont);
+          } else if (listPedidos.containsKey(listDocument[i].documentID) ==
+              false) {
             listPedidos.putIfAbsent(
-                listDocument[i].documentID, () => pedidos.length);
+                listDocument[i].documentID, () => pedidos.length - cont);
           }
         }
       }
@@ -443,11 +465,10 @@ class _BuscarPedidosScreenState extends State<BuscarPedidosScreen> {
     );
   }
 
-  void goProductosTest(String idTienda, nombreTienda) {
+  void goPedidosTienda(String idTienda) {
     Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) => AnadirProductoCarrito(
-                idTienda: idTienda, nombre: nombreTienda)));
+            builder: (context) => PedidosDisponibles(id: idTienda)));
   }
 }

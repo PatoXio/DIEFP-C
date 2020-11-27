@@ -297,11 +297,11 @@ class _CreateDelivery2State extends State<CreateDelivery2> {
   }
 
   Future<void> sendEmail(int codigoVerificacion, String correo) async {
-    String username = "";
-    String password = "";
+    String username = "diefpacientescronicos@gmail.com";
+    String password = "Pacientescronicos13";
     final smtpServer = gmail(username, password);
     final message = Message()
-      ..from = Address(username, 'Patricio Ignacio Torres Rojas')
+      ..from = Address(username, 'Aplicación DIEFP-C')
       ..recipients.add('$correo')
       //..ccRecipients.addAll( ['destCc1@example.com', 'destCc2@example.com'] )
       //..bccRecipients.add( Address( 'bccAddress@example.com' ) )
