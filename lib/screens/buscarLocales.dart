@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:diefpc/Clases/Cliente.dart';
 import 'package:diefpc/app/app.dart';
 import 'package:diefpc/screens/anadirProductoCarrito.dart';
 import 'package:diefpc/states/auth.dart';
@@ -24,9 +25,14 @@ class LocalesScreen extends StatefulWidget {
 class _LocalesScreenState extends State<LocalesScreen> {
   String tiendaTest = "TiendaTest";
   double screenlong;
+  int area;
+  Cliente _user;
   double screenHeight;
+  Stream<QuerySnapshot> _stream;
   Map<String, double> distancia = new Map<String, double>();
   List<DocumentSnapshot> _query;
+  List<DocumentSnapshot> newListDocument;
+  Widget tienditas;
   Completer<GoogleMapController> _controller = Completer();
   Set<Marker> _markers = Set<Marker>();
 // para mis rutas dibujadas en el mapa
@@ -36,6 +42,7 @@ class _LocalesScreenState extends State<LocalesScreen> {
   String googleAPIKey = 'AIzaSyDgxiJ5v8gB1Qil9NbS1aVLOCaJtwFKlmA';
 // para mis marcadores personalizados
   BitmapDescriptor sourceIcon;
+  String selected;
   BitmapDescriptor destinationIcon;
 // la ubicación inicial del usuario y la ubicación actual
 // a medida que se mueve
@@ -90,10 +97,15 @@ class _LocalesScreenState extends State<LocalesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    _query = Provider.of<AuthService>(context).getTiendas();
+    area = 1000;
+    _user = Provider.of<AuthService>(context).currentUser();
+    _stream = Firestore.instance
+        .collection('usuarios')
+        .where("tipo", isEqualTo: "Tienda")
+        .snapshots();
+
     screenlong = MediaQuery.of(context).size.longestSide;
     screenHeight = MediaQuery.of(context).size.height;
-    Provider.of<AuthService>(context).actualizarTiendas();
     CameraPosition initialCameraPosition = CameraPosition(
         zoom: CAMERA_ZOOM,
         tilt: CAMERA_TILT,
@@ -107,11 +119,9 @@ class _LocalesScreenState extends State<LocalesScreen> {
           bearing: CAMERA_BEARING);
     }
 
-    return Consumer(
-        builder: (BuildContext context, AuthService state, Widget child) {
-      return Scaffold(
+    return Scaffold(
         appBar: AppBar(
-          title: Text("Tiendas"),
+          title: Text("Tiendas Disponibles"),
           actions: <Widget>[
             IconButton(
                 icon: Icon(Icons.list),
@@ -121,76 +131,72 @@ class _LocalesScreenState extends State<LocalesScreen> {
                 }),
           ],
         ),
-        body: Container(
-          margin: EdgeInsets.only(top: screenHeight / 100),
-          padding: EdgeInsets.only(left: 10, right: 10),
-          child: Column(
-            children: <Widget>[
-              Container(
-                height: screenHeight / 3,
-                child: Card(
-                  //elevation: 5,
-                  margin: EdgeInsets.all(10),
-                  semanticContainer: false,
-                  color: Colors.transparent,
-                  child: GoogleMap(
-                      myLocationEnabled: true,
-                      //compassEnabled: false,
-                      //tiltGesturesEnabled: false,
-                      //markers: _markers,
-                      //polylines: _polylines,
-                      mapType: MapType.normal,
-                      initialCameraPosition: initialCameraPosition,
-                      onMapCreated: (GoogleMapController controller) {
-                        //_controller.complete(controller);
-                        // mi mapa ha terminado de ser creado;
-                        // estoy listo para mostrar los pines en el mapa
-                        //showPinsOnMap();
-                      }),
-                ),
-              ),
-              Expanded(
-                child: Container(
-                  height: screenHeight / 2.6,
-                  child: Card(
-                    //elevation: 10,
-                    margin: EdgeInsets.all(10),
-                    semanticContainer: true,
-                    //color: Colors.transparent,
-                    child: Theme(
-                      data: ThemeData(
-                        highlightColor: Colors.blue, //Does not work
+        body: StreamBuilder<QuerySnapshot>(
+          stream: _stream,
+          builder:
+              (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+            if (!snapshot.hasData) {
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+            }
+            return Container(
+              //margin: EdgeInsets.only(top: screenHeight / 50),
+              //padding: EdgeInsets.only(left: 10, right: 10),
+              child: Column(
+                children: <Widget>[
+                  Container(
+                    height: screenHeight / 2,
+                    child: GoogleMap(
+                        myLocationEnabled: true,
+                        compassEnabled: true,
+                        tiltGesturesEnabled: true,
+                        markers: _markers,
+                        //polylines: _polylines,
+                        mapType: MapType.normal,
+                        initialCameraPosition: initialCameraPosition,
+                        onMapCreated: (GoogleMapController controller) {
+                          _controller.complete(controller);
+                          // mi mapa ha terminado de ser creado;
+                          // estoy listo para mostrar los pines en el mapa
+                          //showPinsOnMap(newListDocument);
+                        }),
+                  ),
+                  Expanded(
+                    child: Container(
+                      height: screenHeight / 2.6,
+                      child: Card(
+                        //elevation: 10,
+                        //margin: EdgeInsets.all(10),
+                        semanticContainer: true,
+                        //color: Colors.transparent,
+                        child: Theme(
+                          data: ThemeData(
+                            highlightColor: Colors.blue, //Does not work
+                          ),
+                          child: Scrollbar(child: _queyList(context, snapshot)),
+                        ),
                       ),
-                      child: Scrollbar(child: _queyList(context)),
                     ),
                   ),
-                ),
+                ],
               ),
-            ],
-          ),
-        ),
-      );
-    });
+            );
+          },
+        ));
   }
 
-  Widget _queyList(BuildContext context) {
-    if (_query != null) {
-      if (_query.isNotEmpty) {
+  Widget _queyList(BuildContext context, AsyncSnapshot<QuerySnapshot> _query) {
+    if (_query.data.documents != null) {
+      obtenerDistancia(_query.data.documents);
+      if (newListDocument != null) {
         return ListView.builder(
-            itemCount: _query.length,
+            itemCount: newListDocument.length,
             shrinkWrap: true,
             itemBuilder: (BuildContext context, int index) =>
-                buildBody(context, index));
+                buildBody(context, index, newListDocument));
       } else {
-        return Text(
-          "No posees productos en tu carrito",
-          style: TextStyle(
-            color: Colors.red,
-            fontSize: 28,
-            fontWeight: FontWeight.w600,
-          ),
-          textAlign: TextAlign.center,
-        );
+        return Center(child: CircularProgressIndicator());
       }
     } else {
       return Text(
@@ -205,20 +211,58 @@ class _LocalesScreenState extends State<LocalesScreen> {
     }
   }
 
-  Widget buildBody(BuildContext context, int index) {
-    if (currentLocation == null) {
-      Future.delayed(Duration(seconds: 5),
-          () => obtenerDistancia(_query[index].documentID));
-    } else
-      obtenerDistancia(_query[index].documentID);
-
-    return Card(
-      child: ListTile(
+  Widget buildBody(
+      BuildContext context, int index, List<DocumentSnapshot> _query) {
+    if (selected != null) {
+      if (selected.compareTo(_query[index].documentID) == 0) {
+        tienditas = Container(
+          decoration: new BoxDecoration(color: Colors.green[50]),
+          child: ListTile(
+            dense: true,
+            //leading: CircleAvatar(
+            //  backgroundImage: NetworkImage(
+            //      "https://firebasestorage.googleapis.com/v0/b/diefp-c.appspot.com/o/528-5286415_doge-dogge-strong-buff-meme-shitpost-nobackground-swole.png?alt=media&token=aeacea8d-2419-40bf-b220-ba7fcc5f2ac1"),
+            // ),
+            title: Text(_query[index].data["nombre"]),
+            subtitle: Text(
+                "${distancia == null ? "Calculando..." : distancia[_query[index].documentID] == null ? "Calculando..." : distancia[_query[index].documentID].round() > 1000 ? "A ${(distancia[_query[index].documentID] / 1000).round()} kilometros" : "A ${distancia[_query[index].documentID].round()} metros"}"),
+            trailing: FloatingActionButton.extended(
+                heroTag: "hero+${_query[index].data["email"]}",
+                onPressed: () {
+                  goProductosTest(
+                      _query[index].documentID, _query[index].data["nombre"]);
+                },
+                label: Text("Ver")),
+            isThreeLine: true,
+          ),
+        );
+      } else {
+        tienditas = ListTile(
+          dense: true,
+          /*  leading: CircleAvatar(
+            backgroundImage: NetworkImage(
+                "https://firebasestorage.googleapis.com/v0/b/diefp-c.appspot.com/o/528-5286415_doge-dogge-strong-buff-meme-shitpost-nobackground-swole.png?alt=media&token=aeacea8d-2419-40bf-b220-ba7fcc5f2ac1"),
+          ),*/
+          title: Text(_query[index].data["nombre"]),
+          subtitle: Text(
+              "${distancia == null ? "Calculando..." : distancia[_query[index].documentID] == null ? "Calculando..." : distancia[_query[index].documentID].round() > 1000 ? "A ${(distancia[_query[index].documentID] / 1000).round()} kilometros" : "A ${distancia[_query[index].documentID].round()} metros"}"),
+          trailing: FloatingActionButton.extended(
+              heroTag: "hero+${_query[index].data["email"]}",
+              onPressed: () {
+                goProductosTest(
+                    _query[index].documentID, _query[index].data["nombre"]);
+              },
+              label: Text("Ver")),
+          isThreeLine: true,
+        );
+      }
+    } else {
+      tienditas = ListTile(
         dense: true,
-        leading: CircleAvatar(
+        /* leading: CircleAvatar(
           backgroundImage: NetworkImage(
               "https://firebasestorage.googleapis.com/v0/b/diefp-c.appspot.com/o/528-5286415_doge-dogge-strong-buff-meme-shitpost-nobackground-swole.png?alt=media&token=aeacea8d-2419-40bf-b220-ba7fcc5f2ac1"),
-        ),
+        ),*/
         title: Text(_query[index].data["nombre"]),
         subtitle: Text(
             "${distancia == null ? "Calculando..." : distancia[_query[index].documentID] == null ? "Calculando..." : distancia[_query[index].documentID].round() > 1000 ? "A ${(distancia[_query[index].documentID] / 1000).round()} kilometros" : "A ${distancia[_query[index].documentID].round()} metros"}"),
@@ -230,28 +274,59 @@ class _LocalesScreenState extends State<LocalesScreen> {
             },
             label: Text("Ver")),
         isThreeLine: true,
-      ),
+      );
+    }
+    return Card(
+      child: tienditas,
     );
   }
 
-  void obtenerDistancia(String codigo) async {
-    mp.LatLng latLng =
-        new mp.LatLng(currentLocation.latitude, currentLocation.longitude);
-    DocumentSnapshot document = await Firestore.instance
-        .collection('usuarios')
-        .document(codigo)
-        .collection("Direccion")
-        .document("0")
-        .get();
-    double dist = mp.SphericalUtil.computeDistanceBetween(
-        latLng, mp.LatLng(document.data["lat"], document.data["lng"]));
-    setState(() {
-      if (distancia == null) {
-        distancia.putIfAbsent(codigo, () => dist);
-      } else if (distancia.containsKey(codigo) == false) {
-        distancia.putIfAbsent(codigo, () => dist);
+  void obtenerDistancia(
+      List<DocumentSnapshot> listDocument /*String codigo*/) async {
+    if (currentLocation != null) {
+      List<DocumentSnapshot> newList = List<DocumentSnapshot>();
+      Map<String, double> distan = Map<String, double>();
+      mp.LatLng latLng =
+          new mp.LatLng(currentLocation.latitude, currentLocation.longitude);
+
+      for (int i = 0; i < listDocument.length; i++) {
+        DocumentSnapshot document = (await Firestore.instance
+            .collection('usuarios')
+            .document(listDocument[i].documentID)
+            .collection("Direccion")
+            .document("0")
+            .get());
+
+        double dist = mp.SphericalUtil.computeDistanceBetween(
+            latLng, mp.LatLng(document.data["lat"], document.data["lng"]));
+
+        if (dist < area) {
+          setMarker(LatLng(document.data["lat"], document.data["lng"]),
+              listDocument[i].data["nombre"], listDocument[i].documentID);
+          newList.add(listDocument[i]);
+          if (distan == null) {
+            distan.putIfAbsent(listDocument[i].documentID, () => dist);
+          } else if (distan.containsKey(listDocument[i].documentID) == false) {
+            distan.putIfAbsent(listDocument[i].documentID, () => dist);
+          }
+        }
       }
-    });
+      distancia = distan;
+      newListDocument = newList;
+    }
+  }
+
+  void setMarker(LatLng point, String nombre, String id) {
+    _markers.add(Marker(
+        markerId: MarkerId(id),
+        position: point,
+        onTap: () {
+          setState(() {
+            selected = id;
+          });
+        },
+        icon: BitmapDescriptor.defaultMarker,
+        infoWindow: InfoWindow(title: nombre)));
   }
 
   void showPinsOnMap() {

@@ -13,7 +13,7 @@ import 'package:provider/provider.dart';
 import 'dart:async';
 import 'package:maps_toolkit/maps_toolkit.dart' as mp;
 
-const double CAMERA_ZOOM = 12;
+const double CAMERA_ZOOM = 13;
 const double CAMERA_TILT = 80;
 const double CAMERA_BEARING = 30;
 const LatLng SOURCE_LOCATION = LatLng(42.747932, -71.167889);
@@ -105,7 +105,6 @@ class _EntregarPedidosScreenState extends State<EntregarPedidos> {
         .document(_user.email)
         .collection("Pedidos")
         .snapshots();
-
     screenlong = MediaQuery.of(context).size.longestSide;
     screenHeight = MediaQuery.of(context).size.height;
     CameraPosition initialCameraPosition = CameraPosition(
@@ -143,8 +142,6 @@ class _EntregarPedidosScreenState extends State<EntregarPedidos> {
               );
             }
             return Container(
-              //margin: EdgeInsets.only(top: screenHeight / 50),
-              //padding: EdgeInsets.only(left: 10, right: 10),
               child: Column(
                 children: <Widget>[
                   Container(
@@ -155,7 +152,6 @@ class _EntregarPedidosScreenState extends State<EntregarPedidos> {
                         zoomGesturesEnabled: true,
                         tiltGesturesEnabled: false,
                         markers: _markers,
-                        //polylines: _polylines,
                         mapType: MapType.normal,
                         initialCameraPosition: initialCameraPosition,
                         onMapCreated: (GoogleMapController controller) {
@@ -220,10 +216,10 @@ class _EntregarPedidosScreenState extends State<EntregarPedidos> {
           decoration: new BoxDecoration(color: Colors.green[50]),
           child: ListTile(
             dense: true,
-            leading: CircleAvatar(
-              backgroundImage: NetworkImage(
-                  "https://firebasestorage.googleapis.com/v0/b/diefp-c.appspot.com/o/528-5286415_doge-dogge-strong-buff-meme-shitpost-nobackground-swole.png?alt=media&token=aeacea8d-2419-40bf-b220-ba7fcc5f2ac1"),
-            ),
+            // leading: CircleAvatar(
+            //  backgroundImage: NetworkImage(
+            //    "https://firebasestorage.googleapis.com/v0/b/diefp-c.appspot.com/o/528-5286415_doge-dogge-strong-buff-meme-shitpost-nobackground-swole.png?alt=media&token=aeacea8d-2419-40bf-b220-ba7fcc5f2ac1"),
+            // ),
             title: Text(listDocument[index].data["Cliente"]),
             subtitle: Text(
                 "${distancia == null ? "Calculando..." : distancia[listDocument[index].documentID] == null ? "Calculando..." : distancia[listDocument[index].documentID].round() > 1000 ? "A ${(distancia[listDocument[index].documentID] / 1000).round()} kilometros" : "A ${distancia[listDocument[index].documentID].round()} metros"}" +
@@ -245,10 +241,10 @@ class _EntregarPedidosScreenState extends State<EntregarPedidos> {
       } else {
         tienditas = ListTile(
           dense: true,
-          leading: CircleAvatar(
-            backgroundImage: NetworkImage(
-                "https://firebasestorage.googleapis.com/v0/b/diefp-c.appspot.com/o/528-5286415_doge-dogge-strong-buff-meme-shitpost-nobackground-swole.png?alt=media&token=aeacea8d-2419-40bf-b220-ba7fcc5f2ac1"),
-          ),
+          // leading: CircleAvatar(
+          // backgroundImage: NetworkImage(
+          //  "https://firebasestorage.googleapis.com/v0/b/diefp-c.appspot.com/o/528-5286415_doge-dogge-strong-buff-meme-shitpost-nobackground-swole.png?alt=media&token=aeacea8d-2419-40bf-b220-ba7fcc5f2ac1"),
+          //   ),
           title: Text(listDocument[index].data["Cliente"]),
           subtitle: Text(
               "${distancia == null ? "Calculando..." : distancia[listDocument[index].documentID] == null ? "Calculando..." : distancia[listDocument[index].documentID].round() > 1000 ? "A ${(distancia[listDocument[index].documentID] / 1000).round()} kilometros" : "A ${distancia[listDocument[index].documentID].round()} metros"}" +
@@ -270,10 +266,11 @@ class _EntregarPedidosScreenState extends State<EntregarPedidos> {
     } else {
       tienditas = ListTile(
         dense: true,
-        leading: CircleAvatar(
-          backgroundImage: NetworkImage(
+        // leading: CircleAvatar(
+        /* backgroundImage: NetworkImage(
               "https://firebasestorage.googleapis.com/v0/b/diefp-c.appspot.com/o/528-5286415_doge-dogge-strong-buff-meme-shitpost-nobackground-swole.png?alt=media&token=aeacea8d-2419-40bf-b220-ba7fcc5f2ac1"),
-        ),
+       */
+        //    ),
         title: Text(listDocument[index].data["Cliente"]),
         subtitle: Text(
             "${distancia == null ? "Calculando..." : distancia[listDocument[index].documentID] == null ? "Calculando..." : distancia[listDocument[index].documentID].round() > 1000 ? "A ${(distancia[listDocument[index].documentID] / 1000).round()} kilometros" : "A ${distancia[listDocument[index].documentID].round()} metros"}" +
@@ -331,56 +328,22 @@ class _EntregarPedidosScreenState extends State<EntregarPedidos> {
           distan.putIfAbsent(listDocument[i].documentID, () => dist);
         }
       }
-      setState(() {
-        distancia = distan;
-      });
+      distancia = distan;
     }
   }
 
   void setMarker(LatLng point, String nombre, String id) async {
-    if (this.mounted) {
-      setState(() {
-        _markers.add(Marker(
-            markerId: MarkerId(id),
-            position: point,
-            onTap: () {
-              setState(() {
-                selected = id;
-              });
-            },
-            icon: BitmapDescriptor.defaultMarker,
-            infoWindow: InfoWindow(title: nombre)));
-      });
-    }
+    _markers.add(Marker(
+        markerId: MarkerId(id),
+        position: point,
+        onTap: () {
+          setState(() {
+            selected = id;
+          });
+        },
+        icon: BitmapDescriptor.defaultMarker,
+        infoWindow: InfoWindow(title: nombre)));
   }
-
-  /*void showPinsOnMap(List<DocumentSnapshot> listDocument) async {
-// obtener un LatLng para la ubicación de origen
-    // del objeto LocationData currentLocation
-
-    for (int i = 0; i < listDocument.length; i++) {
-      DocumentSnapshot direccion = await Firestore.instance
-          .collection('usuarios')
-          .document(listDocument[i].documentID)
-          .collection('Direccion')
-          .document('0')
-          .get();
-
-      var pinPosition = LatLng(direccion.data["lat"], direccion.data["lng"]);
-
-      setState(() {
-        _markers.add(Marker(
-            markerId: MarkerId('id:${listDocument[i].documentID}'),
-            position: pinPosition,
-            icon: sourceIcon));
-      });
-
-      //print("marcador: " + marker.toString());
-    }
-    // establece las líneas de ruta en el mapa desde el origen hasta   el destino
-    // para más información sigue este tutorial
-    //setPolylines();
-  }*/
 
   void updatePinOnMap() async {
     // crea una nueva instancia de CameraPosition
@@ -398,49 +361,22 @@ class _EntregarPedidosScreenState extends State<EntregarPedidos> {
 // haz esto dentro de setState () para que se notifique a Flutter
     // que se debe actualizar un widget
 
-    setState(() {
-      //controller.animateCamera(CameraUpdate.newCameraPosition(cPosition));
-      // updated position
-      var pinPosition =
-          LatLng(currentLocation.latitude, currentLocation.longitude);
+    if (this.mounted) {
+      setState(() {
+        //controller.animateCamera(CameraUpdate.newCameraPosition(cPosition));
+        // updated position
+        var pinPosition =
+            LatLng(currentLocation.latitude, currentLocation.longitude);
 
-      // el truco es eliminar el marcador (por id)
-      // y agregarlo nuevamente en la ubicación actualizada
-      _markers.removeWhere((m) => m.markerId.toString() == _user.email);
-      _markers.add(Marker(
-          markerId: MarkerId(_user.email),
-          position: pinPosition, // posición actualizada
-          icon: sourceIcon));
-    });
-  }
-
-  void _showAlert(BuildContext context, String notify) {
-    // flutter defined function
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        // return object of type Dialog
-        return AlertDialog(
-          title: new Text("Aviso"),
-          content: new Text(notify),
-          actions: <Widget>[
-            // usually buttons at the bottom of the dialog
-            new FlatButton(
-              child: new Text("Ok"),
-              onPressed: () {
-                /*Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => AnadirProductoCarrito(
-                            idTienda: widget.idTienda, nombre: widget.nombre)));
-              */
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        );
-      },
-    );
+        // el truco es eliminar el marcador (por id)
+        // y agregarlo nuevamente en la ubicación actualizada
+        _markers.removeWhere((m) => m.markerId.toString() == _user.email);
+        _markers.add(Marker(
+            markerId: MarkerId(_user.email),
+            position: pinPosition, // posición actualizada
+            icon: sourceIcon));
+      });
+    }
   }
 
   void goPedidosTienda(String idTienda) {

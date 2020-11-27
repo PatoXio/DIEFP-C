@@ -222,8 +222,10 @@ class _DireccionesState extends State<Direcciones> {
                     .document(id)
                     .delete();
 
-                _user.deleteDireccion(id);
-                Provider.of<AuthService>(context).actualizarUser(_user);
+                setState(() {
+                  _user.deleteDireccion(id);
+                  Provider.of<AuthService>(context).actualizarUser(_user);
+                });
                 Navigator.pop(context);
               },
             ),

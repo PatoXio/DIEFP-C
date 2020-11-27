@@ -221,10 +221,10 @@ class _BuscarPedidosScreenState extends State<BuscarPedidosScreen> {
           decoration: new BoxDecoration(color: Colors.green[50]),
           child: ListTile(
             dense: true,
-            leading: CircleAvatar(
+            /*leading: CircleAvatar(
               backgroundImage: NetworkImage(
                   "https://firebasestorage.googleapis.com/v0/b/diefp-c.appspot.com/o/528-5286415_doge-dogge-strong-buff-meme-shitpost-nobackground-swole.png?alt=media&token=aeacea8d-2419-40bf-b220-ba7fcc5f2ac1"),
-            ),
+            ),*/
             title: Text(listDocument[index].data["nombre"]),
             subtitle: Text(
                 "${distancia == null ? "Calculando..." : distancia[listDocument[index].documentID] == null ? "Calculando..." : distancia[listDocument[index].documentID].round() > 1000 ? "A ${(distancia[listDocument[index].documentID] / 1000).round()} kilometros" : "A ${distancia[listDocument[index].documentID].round()} metros"}" +
@@ -245,10 +245,10 @@ class _BuscarPedidosScreenState extends State<BuscarPedidosScreen> {
       } else {
         tienditas = ListTile(
           dense: true,
-          leading: CircleAvatar(
+          /* leading: CircleAvatar(
             backgroundImage: NetworkImage(
                 "https://firebasestorage.googleapis.com/v0/b/diefp-c.appspot.com/o/528-5286415_doge-dogge-strong-buff-meme-shitpost-nobackground-swole.png?alt=media&token=aeacea8d-2419-40bf-b220-ba7fcc5f2ac1"),
-          ),
+          ),*/
           title: Text(listDocument[index].data["nombre"]),
           subtitle: Text(
               "${distancia == null ? "Calculando..." : distancia[listDocument[index].documentID] == null ? "Calculando..." : distancia[listDocument[index].documentID].round() > 1000 ? "A ${(distancia[listDocument[index].documentID] / 1000).round()} kilometros" : "A ${distancia[listDocument[index].documentID].round()} metros"}" +
@@ -269,10 +269,10 @@ class _BuscarPedidosScreenState extends State<BuscarPedidosScreen> {
     } else {
       tienditas = ListTile(
         dense: true,
-        leading: CircleAvatar(
+        /*leading: CircleAvatar(
           backgroundImage: NetworkImage(
               "https://firebasestorage.googleapis.com/v0/b/diefp-c.appspot.com/o/528-5286415_doge-dogge-strong-buff-meme-shitpost-nobackground-swole.png?alt=media&token=aeacea8d-2419-40bf-b220-ba7fcc5f2ac1"),
-        ),
+        ),*/
         title: Text(listDocument[index].data["nombre"]),
         subtitle: Text(
             "${distancia == null ? "Calculando..." : distancia[listDocument[index].documentID] == null ? "Calculando..." : distancia[listDocument[index].documentID].round() > 1000 ? "A ${(distancia[listDocument[index].documentID] / 1000).round()} kilometros" : "A ${distancia[listDocument[index].documentID].round()} metros"}" +
@@ -353,56 +353,24 @@ class _BuscarPedidosScreenState extends State<BuscarPedidosScreen> {
           }
         }
       }
-      setState(() {
-        distancia = distan;
-        newListDocument = newList;
-        pedidos = listPedidos;
-      });
+      distancia = distan;
+      newListDocument = newList;
+      pedidos = listPedidos;
     }
   }
 
   void setMarker(LatLng point, String nombre, String id) {
-    setState(() {
-      _markers.add(Marker(
-          markerId: MarkerId(id),
-          position: point,
-          onTap: () {
-            setState(() {
-              selected = id;
-            });
-          },
-          icon: BitmapDescriptor.defaultMarker,
-          infoWindow: InfoWindow(title: nombre)));
-    });
+    _markers.add(Marker(
+        markerId: MarkerId(id),
+        position: point,
+        onTap: () {
+          setState(() {
+            selected = id;
+          });
+        },
+        icon: BitmapDescriptor.defaultMarker,
+        infoWindow: InfoWindow(title: nombre)));
   }
-
-  /*void showPinsOnMap(List<DocumentSnapshot> listDocument) async {
-// obtener un LatLng para la ubicación de origen
-    // del objeto LocationData currentLocation
-
-    for (int i = 0; i < listDocument.length; i++) {
-      DocumentSnapshot direccion = await Firestore.instance
-          .collection('usuarios')
-          .document(listDocument[i].documentID)
-          .collection('Direccion')
-          .document('0')
-          .get();
-
-      var pinPosition = LatLng(direccion.data["lat"], direccion.data["lng"]);
-
-      setState(() {
-        _markers.add(Marker(
-            markerId: MarkerId('id:${listDocument[i].documentID}'),
-            position: pinPosition,
-            icon: sourceIcon));
-      });
-
-      //print("marcador: " + marker.toString());
-    }
-    // establece las líneas de ruta en el mapa desde el origen hasta   el destino
-    // para más información sigue este tutorial
-    //setPolylines();
-  }*/
 
   void updatePinOnMap() async {
     // crea una nueva instancia de CameraPosition
