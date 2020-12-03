@@ -197,11 +197,11 @@ class AuthService with ChangeNotifier {
               historial[i].data["HoraEntrega"] == null
                   ? null
                   : DateTime.parse(historial[i].data["HoraEntrega"]),
-              listPedido[i].data["Delivery"],
-              listPedido[i].data["Preparacion"],
+              historial[i].data["Delivery"],
+              historial[i].data["Preparacion"],
               List<String>.from(historial[i].data["Categorias"]),
-              listPedido[i].data["lat"],
-              listPedido[i].data["lng"],
+              historial[i].data["lat"],
+              historial[i].data["lng"],
               crearListaProductos(listDocumentProducto));
           listaPedidos.add(pedido);
         }
