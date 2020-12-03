@@ -25,7 +25,7 @@ class _EntregasPedidoState extends State<EntregasPedido> {
   double screenlong;
   double screenHeight;
   Widget isLoad;
-  DateFormat formatter = DateFormat('HH:mm');
+  DateFormat formatter = DateFormat('dd-MM-yyyy HH:mm');
   Delivery _user;
   Stream<QuerySnapshot> _stream;
 
@@ -127,7 +127,7 @@ class _EntregasPedidoState extends State<EntregasPedido> {
             onPressed: () {},
           ),
           title: Text(listDocument[index].data["Cliente"]),
-          subtitle: Text("Hora: " +
+          subtitle: Text("Fecha: " +
               formatter
                   .format(DateTime.parse(listDocument[index].data["Fecha"])) +
               "\n" +
@@ -151,7 +151,7 @@ class _EntregasPedidoState extends State<EntregasPedido> {
         listPedido.documentID,
         listPedido.data["Medio de Pago"],
         listPedido.data["Tienda"],
-        listPedido.data[_user.email],
+        listPedido.data["Cliente"].split("@")[0],
         listPedido.data["nombreTienda"],
         listPedido.data["Costo de Envío"],
         listPedido.data["Total Pagado"],

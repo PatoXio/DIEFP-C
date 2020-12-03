@@ -60,7 +60,9 @@ class _ProductosPedidoState extends State<ProductosPedido> {
     screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       appBar: AppBar(
-        title: Text("Productos del Pedido\n${widget.pedido.getIdUsuario()}"),
+        title: Text(
+          "Productos del Pedido\n${widget.pedido.getIdUsuario()}",
+        ),
         actions: <Widget>[
           IconButton(
               icon: Icon(Icons.list),

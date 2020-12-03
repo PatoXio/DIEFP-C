@@ -11,6 +11,7 @@ import 'package:location/location.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'dart:async';
+import 'package:intl/intl.dart';
 import 'package:maps_toolkit/maps_toolkit.dart' as mp;
 
 const double CAMERA_ZOOM = 13;
@@ -30,6 +31,7 @@ class _EntregarPedidosScreenState extends State<EntregarPedidos> {
   double screenHeight;
   int area;
   String selected;
+  DateFormat formatter = DateFormat('HH:mm:ss');
   Widget tienditas;
   Map<String, double> distancia = new Map<String, double>();
   Map<String, int> pedidos = new Map<String, int>();
@@ -223,7 +225,8 @@ class _EntregarPedidosScreenState extends State<EntregarPedidos> {
             title: Text(listDocument[index].data["Cliente"]),
             subtitle: Text(
                 "${distancia == null ? "Calculando..." : distancia[listDocument[index].documentID] == null ? "Calculando..." : distancia[listDocument[index].documentID].round() > 1000 ? "A ${(distancia[listDocument[index].documentID] / 1000).round()} kilometros" : "A ${distancia[listDocument[index].documentID].round()} metros"}" +
-                    "\nTotal: ${listDocument[index].data["Total Pagado"]}"),
+                    "\nTotal: ${listDocument[index].data["Total Pagado"]}" +
+                    "\nHora De entrega: ${listDocument[index].data["HoraEntrega"] != null ? formatter.format(DateTime.parse(listDocument[index].data["HoraEntrega"])) : "Debes asignarle una hora de entrega"}"),
             trailing: Column(
               children: [
                 FloatingActionButton.extended(
@@ -248,7 +251,9 @@ class _EntregarPedidosScreenState extends State<EntregarPedidos> {
           title: Text(listDocument[index].data["Cliente"]),
           subtitle: Text(
               "${distancia == null ? "Calculando..." : distancia[listDocument[index].documentID] == null ? "Calculando..." : distancia[listDocument[index].documentID].round() > 1000 ? "A ${(distancia[listDocument[index].documentID] / 1000).round()} kilometros" : "A ${distancia[listDocument[index].documentID].round()} metros"}" +
-                  "\nTotal: ${listDocument[index].data["Total Pagado"]}"),
+                  "\nTotal: ${listDocument[index].data["Total Pagado"]}" +
+                  "\nHora De entrega: ${listDocument[index].data["HoraEntrega"] != null ? formatter.format(DateTime.parse(listDocument[index].data["HoraEntrega"])) : "Debes asignarle una hora de entrega"}"),
+
           trailing: Column(
             children: [
               FloatingActionButton.extended(
@@ -274,7 +279,9 @@ class _EntregarPedidosScreenState extends State<EntregarPedidos> {
         title: Text(listDocument[index].data["Cliente"]),
         subtitle: Text(
             "${distancia == null ? "Calculando..." : distancia[listDocument[index].documentID] == null ? "Calculando..." : distancia[listDocument[index].documentID].round() > 1000 ? "A ${(distancia[listDocument[index].documentID] / 1000).round()} kilometros" : "A ${distancia[listDocument[index].documentID].round()} metros"}" +
-                "\nTotal: ${listDocument[index].data["Total Pagado"]}"),
+                "\nTotal: ${listDocument[index].data["Total Pagado"]}" +
+                "\nHora De entrega: ${listDocument[index].data["HoraEntrega"] != null ? formatter.format(DateTime.parse(listDocument[index].data["HoraEntrega"])) : "Debes asignarle una hora de entrega"}"),
+
         trailing: Column(
           children: [
             FloatingActionButton.extended(

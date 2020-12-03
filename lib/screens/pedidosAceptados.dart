@@ -24,7 +24,7 @@ class _PedidosAceptadosState extends State<PedidosAceptados> {
   double screenHeight;
   Widget isLoad;
   Widget verDelivery;
-  DateFormat formatter = DateFormat('HH:mm');
+  DateFormat formatter = DateFormat('yyyy-MM-dd HH:mm:ss');
   Tienda _user;
   var _saved = List<String>();
   var _usuarios = List<String>();
@@ -66,15 +66,13 @@ class _PedidosAceptadosState extends State<PedidosAceptados> {
       isLoad = Center(child: CircularProgressIndicator());
     } else
       isLoad = Column(children: <Widget>[
-        Expanded(
-          child: Container(
-            height: screenHeight / 1.35,
-            child: Theme(
-              data: ThemeData(
-                highlightColor: Colors.blue, //Does not work
-              ),
-              child: Scrollbar(child: _queyList(context, _user.getEmail())),
+        Container(
+          height: screenHeight / 1.35,
+          child: Theme(
+            data: ThemeData(
+              highlightColor: Colors.blue, //Does not work
             ),
+            child: Scrollbar(child: _queyList(context, _user.getEmail())),
           ),
         ),
         Row(children: <Widget>[
@@ -113,7 +111,7 @@ class _PedidosAceptadosState extends State<PedidosAceptados> {
       body: Container(
         margin: EdgeInsets.only(top: screenHeight / 100),
         padding: EdgeInsets.only(left: 10, right: 10, bottom: 10),
-        child: isLoad,
+        child: SingleChildScrollView(child: isLoad),
       ),
     );
   }
@@ -251,9 +249,13 @@ class _PedidosAceptadosState extends State<PedidosAceptados> {
         context, MaterialPageRoute(builder: (context) => CrearProducto()));
   }
 
-  void asignarPedido(BuildContext context, String delivery) async {
+  void asignarPedido(BuildContext context, String delivery, String hora) async {
     int largo = _saved.length;
     int i;
+    int horas;
+    int minutos;
+    horas = int.parse(hora[0] + hora[1]);
+    minutos = int.parse(hora[2] + hora[3]);
     try {
       for (i = 0; i < largo; i++) {
         await Firestore.instance
@@ -269,7 +271,11 @@ class _PedidosAceptadosState extends State<PedidosAceptados> {
               .document(_user.getEmail())
               .collection("PedidosPendientes")
               .document(ds.documentID)
-              .setData({"Delivery": delivery}, merge: true);
+              .setData({
+            "Delivery": delivery,
+            "HoraEntrega": formatter.format(
+                DateTime.now().add(Duration(hours: horas, minutes: minutos))),
+          }, merge: true);
 
           await Firestore.instance
               .collection('usuarios')
@@ -293,6 +299,7 @@ class _PedidosAceptadosState extends State<PedidosAceptados> {
                       .where((element) {
                     if (element.getId().compareTo(ds.documentID) == 0) {
                       element.setDelivery(null);
+                      element.setHoraEntrega(null);
                     }
                   });
                   sendEmail(
@@ -311,7 +318,22 @@ class _PedidosAceptadosState extends State<PedidosAceptados> {
                   .document(delivery)
                   .collection('Pedidos')
                   .document(ds.documentID)
-                  .setData({"Delivery": delivery}, merge: true);
+                  .setData({
+                "Delivery": delivery,
+                "HoraEntrega": formatter.format(DateTime.now()
+                    .add(Duration(hours: horas, minutes: minutos))),
+              }, merge: true);
+
+              Firestore.instance
+                  .collection('usuarios')
+                  .document(ds.data["Cliente"])
+                  .collection('Pedidos')
+                  .document(ds.documentID)
+                  .setData({
+                "Delivery": delivery,
+                "HoraEntrega": formatter.format(DateTime.now()
+                    .add(Duration(hours: horas, minutes: minutos))),
+              }, merge: true);
 
               (await Firestore.instance
                       .collection('usuarios')
@@ -339,6 +361,7 @@ class _PedidosAceptadosState extends State<PedidosAceptados> {
         _user.getListPedidosPendientes().getPedidosAceptados().where((element) {
           if (element.getId().compareTo(_saved.elementAt(i)) == 0) {
             element.setDelivery(delivery);
+            element.setHoraEntrega(DateTime.parse(hora));
           }
         });
       }
@@ -461,35 +484,69 @@ class _PedidosAceptadosState extends State<PedidosAceptados> {
 
   void _showAlertAsignarPedido(BuildContext context) {
     // flutter defined function
+    String hora;
     showDialog(
       context: context,
       builder: (BuildContext context) {
         // return object of type Dialog
         return AlertDialog(
           title: Text('Se asignaran ${_saved.length} pedido(s).'),
-          content: new Row(
-            children: [
-              new Expanded(
-                child: Form(
-                  key: _formKey,
-                  child: new TextFormField(
-                    keyboardType: TextInputType.emailAddress,
-                    controller: txt,
-                    validator: (value) {
-                      if (value == null) {
-                        return "Debe ingresar el correo del Delivery";
-                      } else if (value.contains('@') == false) {
-                        return "Debe ingresar un correo válido";
-                      } else {}
-                    },
-                    autofocus: true,
-                    decoration: new InputDecoration(
-                        labelText: 'Correo del Delivery',
-                        hintText: 'Ej: ejemplo@mail.com'),
-                  ),
+          content: Form(
+            key: _formKey,
+            child: Container(
+              height: screenHeight / 2,
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    TextFormField(
+                      keyboardType: TextInputType.emailAddress,
+                      controller: txt,
+                      validator: (value) {
+                        if (value == null) {
+                          return "Debe ingresar el correo del Delivery";
+                        } else if (value.contains('@') == false) {
+                          return "Debe ingresar un correo válido";
+                        } else {}
+                      },
+                      autofocus: true,
+                      decoration: new InputDecoration(
+                          labelText: 'Correo del Delivery',
+                          hintText: 'Ej: ejemplo@mail.com'),
+                    ),
+                    TextFormField(
+                      keyboardType: TextInputType.number,
+                      inputFormatters: <TextInputFormatter>[
+                        WhitelistingTextInputFormatter.digitsOnly
+                      ],
+                      validator: (value) {
+                        if (value == null)
+                          return "Debe ingresar horas y minutos";
+                        else if (value.length < 4)
+                          return "Por favor ingrese 4 digitos";
+                        else if (int.parse(value[0] + value[1]) >= 24)
+                          return "El pedido no puede demorarse\nmás de un día para su entrega";
+                        else if (int.parse(value[2] + value[3]) >= 60)
+                          return "Siga el formato de los minutos\nMiuntos < 60";
+                        return null;
+                      },
+                      onChanged: (value) {
+                        setState(() {
+                          hora = value;
+                          print(hora);
+                        });
+                      },
+                      maxLength: 4,
+                      autofocus: true,
+                      decoration: new InputDecoration(
+                          labelText:
+                              'Horas y minutos sin el ":" -> 0130 = 01:30',
+                          hintText:
+                              'Ej: 0130 -> Llegará a las ${formatter.format(DateTime.now().add(Duration(hours: 1, minutes: 30)))}'),
+                    ),
+                  ],
                 ),
               ),
-            ],
+            ),
           ),
           actions: [
             FlatButton(
@@ -503,7 +560,7 @@ class _PedidosAceptadosState extends State<PedidosAceptados> {
               onPressed: () {
                 if (_formKey.currentState.validate()) {
                   print(txt.text);
-                  asignarPedido(context, txt.text);
+                  asignarPedido(context, txt.text, hora);
                   Navigator.pop(context);
                 }
               },

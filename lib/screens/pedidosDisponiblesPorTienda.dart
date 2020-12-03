@@ -29,7 +29,7 @@ class _PedidosDisponiblesState extends State<PedidosDisponibles> {
   Widget isLoad;
   Query _query;
   Widget verDelivery;
-  DateFormat formatter = DateFormat('HH:mm');
+  DateFormat formatter = DateFormat('yyyy-MM-dd HH:mm:ss');
   Delivery _user;
   Stream<QuerySnapshot> _stream;
   var _saved = List<String>();
@@ -156,7 +156,7 @@ class _PedidosDisponiblesState extends State<PedidosDisponibles> {
               onPressed: () {},
             ),
             title: Text(listDocument[index].data["Cliente"]),
-            subtitle: Text("Hora: " +
+            subtitle: Text("Fecha: " +
                 formatter
                     .format(DateTime.parse(listDocument[index].data["Fecha"])) +
                 "\n" +

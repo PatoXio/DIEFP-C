@@ -387,21 +387,22 @@ class _BuscarPedidosScreenState extends State<BuscarPedidosScreen> {
     controller.animateCamera(CameraUpdate.newCameraPosition(cPosition));
 // haz esto dentro de setState () para que se notifique a Flutter
     // que se debe actualizar un widget
+    if (this.mounted) {
+      setState(() {
+        //controller.animateCamera(CameraUpdate.newCameraPosition(cPosition));
+        // updated position
+        var pinPosition =
+            LatLng(currentLocation.latitude, currentLocation.longitude);
 
-    setState(() {
-      //controller.animateCamera(CameraUpdate.newCameraPosition(cPosition));
-      // updated position
-      var pinPosition =
-          LatLng(currentLocation.latitude, currentLocation.longitude);
-
-      // el truco es eliminar el marcador (por id)
-      // y agregarlo nuevamente en la ubicación actualizada
-      _markers.removeWhere((m) => m.markerId.toString() == _user.email);
-      _markers.add(Marker(
-          markerId: MarkerId(_user.email),
-          position: pinPosition, // posición actualizada
-          icon: sourceIcon));
-    });
+        // el truco es eliminar el marcador (por id)
+        // y agregarlo nuevamente en la ubicación actualizada
+        _markers.removeWhere((m) => m.markerId.toString() == _user.email);
+        _markers.add(Marker(
+            markerId: MarkerId(_user.email),
+            position: pinPosition, // posición actualizada
+            icon: sourceIcon));
+      });
+    }
   }
 
   void _showAlert(BuildContext context, String notify) {

@@ -5,10 +5,14 @@ import 'package:diefpc/screens/direccionVista.dart';
 import 'package:diefpc/screens/home.dart';
 import 'package:diefpc/states/auth.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:diefpc/app/app.dart';
+import 'package:flutter/services.dart';
 import 'package:mailer/mailer.dart';
 import 'package:mailer/smtp_server.dart';
 import 'package:provider/provider.dart';
+
+import 'entregarPedidos.dart';
 
 class DetallesPedidoEntregar extends StatefulWidget {
   DocumentSnapshot document;
@@ -58,6 +62,10 @@ class _DetallesPedidoEntregarState extends State<DetallesPedidoEntregar> {
   double screenlong;
   double screenHeight;
   int cont;
+  final _formKey = GlobalKey<FormState>();
+  var txt = TextEditingController();
+  DateFormat formatter = DateFormat('yyyy-MM-dd HH:mm:ss');
+
   Delivery _user;
   List<DocumentSnapshot> listDocuments;
 
@@ -124,14 +132,32 @@ class _DetallesPedidoEntregarState extends State<DetallesPedidoEntregar> {
                   ),
                 ),
               ),
-              FloatingActionButton.extended(
-                backgroundColor: Colors.blue,
-                foregroundColor: Colors.white,
-                onPressed: () {
-                  goToDireccionVista(widget.document.data["Cliente"]);
-                },
-                icon: Icon(Icons.directions),
-                label: Text('Ver Direccion'),
+              Row(
+                children: [
+                  FloatingActionButton.extended(
+                    heroTag: "1",
+                    backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white,
+                    onPressed: () {
+                      _showAlertAsignarPedido(context);
+                    },
+                    icon: Icon(Icons.timelapse),
+                    label: Text('Modificar\nEntrega'),
+                  ),
+                  Divider(
+                    indent: screenlong / 12,
+                  ),
+                  FloatingActionButton.extended(
+                    heroTag: "2",
+                    backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white,
+                    onPressed: () {
+                      goToDireccionVista(widget.document.data["Cliente"]);
+                    },
+                    icon: Icon(Icons.directions),
+                    label: Text('Ver Direccion'),
+                  ),
+                ],
               ),
               Container(
                 //height: screenHeight / 3,
@@ -199,7 +225,7 @@ class _DetallesPedidoEntregarState extends State<DetallesPedidoEntregar> {
                 heroTag: "botonh1",
                 icon: Icon(Icons.check_box),
                 onPressed: () {
-                  _showAlert(context,
+                  _showAlertConfirmar(context,
                       "Confirmar la entrega del pedido.\nEn caso contrario, presione en el botón ATRÁS o fuera del cuadro AVISO");
                 },
                 label: Text("Entregar Pedido"),
@@ -416,6 +442,35 @@ class _DetallesPedidoEntregarState extends State<DetallesPedidoEntregar> {
             new FlatButton(
               child: new Text("Ok"),
               onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showAlertConfirmar(BuildContext context, String notify) {
+    // flutter defined function
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          title: new Text("Aviso"),
+          content: new Text(notify),
+          actions: <Widget>[
+            // usually buttons at the bottom of the dialog
+            new FlatButton(
+              child: new Text("Atrás"),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+            new FlatButton(
+              child: new Text("Ok"),
+              onPressed: () {
                 entregarPedido();
                 Navigator.push(context,
                     MaterialPageRoute(builder: (context) => HomeScreen()));
@@ -427,28 +482,177 @@ class _DetallesPedidoEntregarState extends State<DetallesPedidoEntregar> {
     );
   }
 
-  /*void _showAlertExist(BuildContext context) {
-            // flutter defined function
-            showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                // return object of type Dialog
-                return AlertDialog(
-                  title: new Text("Aviso"),
-                  content: new Text("Este Producto ya está añadido"),
-                  actions: <Widget>[
-                    // usually buttons at the bottom of the dialog
-                    new FlatButton(
-                      child: new Text("Ok"),
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                    ),
+  void _showAlertAsignarPedido(BuildContext context) {
+    // flutter defined function
+    String hora;
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          title: Text(
+              'Hora de entrega: ${widget.document.data["HoraEntrega"] != null ? widget.document.data["HoraEntrega"] + " del" : "Debe asignarle una hora de entrega al pedido al"} pedido.'),
+          content: Form(
+            key: _formKey,
+            child: Container(
+              height: screenHeight / 2,
+              child: SingleChildScrollView(
+                child: TextFormField(
+                  keyboardType: TextInputType.number,
+                  inputFormatters: <TextInputFormatter>[
+                    WhitelistingTextInputFormatter.digitsOnly
                   ],
-                );
+                  validator: (value) {
+                    if (value == null)
+                      return "Debe ingresar horas y minutos";
+                    else if (value.length < 4)
+                      return "Por favor ingrese 4 digitos";
+                    else if (int.parse(value[0] + value[1]) >= 24)
+                      return "El pedido no puede demorarse\nmás de un día para su entrega";
+                    else if (int.parse(value[2] + value[3]) >= 60)
+                      return "Siga el formato de los minutos\nMiuntos < 60";
+                    return null;
+                  },
+                  onChanged: (value) {
+                    setState(() {
+                      hora = value;
+                      print(hora);
+                    });
+                  },
+                  maxLength: 4,
+                  autofocus: true,
+                  decoration: new InputDecoration(
+                      labelText: 'Horas y minutos sin el ":" -> 0130 = 01:30',
+                      hintText:
+                          'Ej: 0130 -> Llegará a las ${formatter.format(DateTime.now().add(Duration(hours: 1, minutes: 30)))}'),
+                ),
+              ),
+            ),
+          ),
+          actions: [
+            FlatButton(
+              child: Text('Atrás'),
+              onPressed: () {
+                Navigator.pop(context);
               },
-            );
-          }*/
+            ),
+            FlatButton(
+              child: Text('Aceptar Cambio'),
+              onPressed: () {
+                if (_formKey.currentState.validate()) {
+                  print(txt.text);
+                  asignarHora(context, hora);
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => EntregarPedidos()));
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void asignarHora(BuildContext context, String hora) async {
+    int horas;
+    int minutos;
+    String delivery = widget.document.data["Delivery"];
+    String tienda = widget.document.data["Tienda"];
+    horas = int.parse(hora[0] + hora[1]);
+    minutos = int.parse(hora[2] + hora[3]);
+    try {
+      await Firestore.instance
+          .collection('usuarios')
+          .document(tienda)
+          .collection('PedidosPendientes')
+          .document(widget.document.documentID)
+          .get()
+          // ignore: missing_return
+          .then((ds) async {
+        Firestore.instance
+            .collection("usuarios")
+            .document(tienda)
+            .collection("PedidosPendientes")
+            .document(ds.documentID)
+            .setData({
+          "HoraEntrega": formatter.format(
+              DateTime.now().add(Duration(hours: horas, minutes: minutos))),
+        }, merge: true);
+
+        await Firestore.instance
+            .collection('usuarios')
+            .document(delivery)
+            .get()
+            .then((deli) async {
+          if (deli.data["tipo"].compareTo("Delivery") == 0) {
+            Firestore.instance
+                .collection('usuarios')
+                .document(delivery)
+                .collection('Pedidos')
+                .document(ds.documentID)
+                .delete();
+
+            sendEmail(delivery,
+                "Se está cambiando la hora al pedido ${widget.document.documentID}, en caso de no aparecer en su lista, contactese con la tienda");
+
+            Firestore.instance
+                .collection('usuarios')
+                .document(delivery)
+                .collection('Pedidos')
+                .document(ds.documentID)
+                .setData(ds.data);
+            Firestore.instance
+                .collection('usuarios')
+                .document(delivery)
+                .collection('Pedidos')
+                .document(ds.documentID)
+                .setData({
+              "HoraEntrega": formatter.format(
+                  DateTime.now().add(Duration(hours: horas, minutes: minutos))),
+            }, merge: true);
+
+            Firestore.instance
+                .collection('usuarios')
+                .document(ds.data["Cliente"])
+                .collection('Pedidos')
+                .document(ds.documentID)
+                .setData({
+              "HoraEntrega": formatter.format(
+                  DateTime.now().add(Duration(hours: horas, minutes: minutos))),
+            }, merge: true);
+
+            (await Firestore.instance
+                    .collection('usuarios')
+                    .document(_user.getEmail())
+                    .collection('PedidosPendientes')
+                    .document(widget.document.documentID)
+                    .collection('Productos')
+                    .getDocuments())
+                .documents
+                .forEach((element) {
+              Firestore.instance
+                  .collection('usuarios')
+                  .document(delivery)
+                  .collection('Pedidos')
+                  .document(ds.documentID)
+                  .collection('Productos')
+                  .document(element.documentID)
+                  .setData(element.data);
+            });
+          }
+        });
+      });
+      sendEmail(delivery,
+          "Se ha modificado la hora de entrega del pedido ${widget.document.documentID}, por favor revise su aplicación DIEFP-C en la seccion de Pedidos");
+    } catch (error) {
+      return _showAlert(
+          context, 'Ocurrió un error al cambiar la hora de entrega');
+    }
+    return _showAlert(context, "Se cambio la hora de entrega");
+  }
+
   Future<void> sendEmail(String correo, String mensaje) async {
     String username = "diefpacientescronicos@gmail.com";
     String password = "Pacientescronicos13";

@@ -455,7 +455,7 @@ class _ComprarCarritoState extends State<ComprarCarrito> {
     final _deleted = Set<String>();
     List<String> categorias = List();
     DateTime fecha = DateTime.now();
-    String format = DateFormat('yyyy-MM-dd – kk:mm').format(fecha);
+    String format = DateFormat('yyyy-MM-dd – kk:mm:ss').format(fecha);
     String pivot;
     int i;
     int j;
@@ -586,52 +586,6 @@ class _ComprarCarritoState extends State<ComprarCarrito> {
           _user.getCarritoDeCompra());
 
       _user.setPedidoPendiente(newPedido);
-
-      /*/Testing compra
-            Firestore.instance
-                .collection('usuarios')
-                .document(_user.getEmail())
-                .collection('HistorialCompras')
-                .document(horaPedido)
-                .setData({
-              "Fecha": fecha.toString(),
-              "PorAceptar": false, //aceptado
-              "PorEntregar": false, //entregado
-              "Medio de Pago": medioDePago,
-              "HoraEntrega": fecha.add(new Duration(hours: 2)).toString(),
-              "Total Pagado": _totalCostoEnvio(
-                  costoDeEnvio(),
-                  _user
-                      .getCarritoDeCompra()
-                      .getListProducto()
-                      .elementAt(x)
-                      .getIdTienda()),
-              "Costo de Envío": costoDeEnvio(),
-              "Tienda": _user
-                  .getCarritoDeCompra()
-                  .getListProducto()
-                  .elementAt(x)
-                  .getIdTienda(),
-              "Cliente": _user.email,
-              "Categorias": categorias,
-              "nombreTienda": _user
-                  .getCarritoDeCompra()
-                  .getListProducto()
-                  .elementAt(x)
-                  .getNombreTienda()
-            });
-
-            Firestore.instance
-                .collection('usuarios')
-                .document(_user.getEmail())
-                .collection('HistorialCompras')
-                .document(horaPedido)
-                .collection('Productos')
-                .document(
-                    'Producto:$horaPedido:${carritoDocument.elementAt(x).documentID}')
-                .setData(carritoDocument.elementAt(x).data);
-
-            _user.setCompra(newPedido);*/
 
       Firestore.instance
           .collection('usuarios')

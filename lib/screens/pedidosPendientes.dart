@@ -131,49 +131,60 @@ class _PedidosPendientesState extends State<PedidosPendientes> {
 
   Widget buildBody(BuildContext context, int index) {
     double screenHeight = MediaQuery.of(context).size.height;
-    return Container(
-      margin: EdgeInsets.only(top: screenHeight / 1000),
-      padding: EdgeInsets.only(left: 10, right: 10),
-      child: Card(
-        child: ListTile(
-          onLongPress: () {
-            goToProductosPedido(context,
-                _user.getListPedidosPendientes().getPedidosPorAceptar()[index]);
-          },
-          leading: IconButton(
-            icon: Icon(Icons.local_hospital),
-            iconSize: 40,
-            tooltip: 'Pedidos',
-            onPressed: () {},
+    if (_user
+            .getListPedidosPendientes()
+            .getPedidosPorAceptar()[index]
+            .getIdUsuario() !=
+        null) {
+      return Container(
+        margin: EdgeInsets.only(top: screenHeight / 1000),
+        padding: EdgeInsets.only(left: 10, right: 10),
+        child: Card(
+          child: ListTile(
+            onLongPress: () {
+              goToProductosPedido(
+                  context,
+                  _user
+                      .getListPedidosPendientes()
+                      .getPedidosPorAceptar()[index]);
+            },
+            leading: IconButton(
+              icon: Icon(Icons.local_hospital),
+              iconSize: 40,
+              tooltip: 'Pedidos',
+              onPressed: () {},
+            ),
+            title: Text(_user
+                .getListPedidosPendientes()
+                .getPedidosPorAceptar()[index]
+                .getIdUsuario()
+                .split("@")[0]),
+            subtitle: Text("Hora: " +
+                formatter.format(_user
+                    .getListPedidosPendientes()
+                    .getPedidosPorAceptar()[index]
+                    .getFecha()) +
+                "\n" +
+                _user
+                    .getListPedidosPendientes()
+                    .getPedidosPorAceptar()[index]
+                    .getDatosTienda()),
+            trailing: _iconTravel(
+                _user
+                    .getListPedidosPendientes()
+                    .getPedidosPorAceptar()[index]
+                    .getId(),
+                _user
+                    .getListPedidosPendientes()
+                    .getPedidosPorAceptar()[index]
+                    .getIdUsuario()),
+            isThreeLine: true,
           ),
-          title: Text(_user
-              .getListPedidosPendientes()
-              .getPedidosPorAceptar()[index]
-              .getIdUsuario()
-              .split("@")[0]),
-          subtitle: Text("Hora: " +
-              formatter.format(_user
-                  .getListPedidosPendientes()
-                  .getPedidosPorAceptar()[index]
-                  .getFecha()) +
-              "\n" +
-              _user
-                  .getListPedidosPendientes()
-                  .getPedidosPorAceptar()[index]
-                  .getDatosTienda()),
-          trailing: _iconTravel(
-              _user
-                  .getListPedidosPendientes()
-                  .getPedidosPorAceptar()[index]
-                  .getId(),
-              _user
-                  .getListPedidosPendientes()
-                  .getPedidosPorAceptar()[index]
-                  .getIdUsuario()),
-          isThreeLine: true,
         ),
-      ),
-    );
+      );
+    } else {
+      return CircularProgressIndicator();
+    }
   }
 
   Column _iconTravel(String id, String idUsuario) {
