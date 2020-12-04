@@ -2,6 +2,7 @@ import 'package:diefpc/Clases/Delivery.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:diefpc/documents/documents_service.dart';
 import 'package:diefpc/screens/direccionVista.dart';
+import 'package:diefpc/screens/entregarPedidos.dart';
 import 'package:diefpc/screens/home.dart';
 import 'package:diefpc/states/auth.dart';
 import 'package:flutter/material.dart';
@@ -11,8 +12,6 @@ import 'package:flutter/services.dart';
 import 'package:mailer/mailer.dart';
 import 'package:mailer/smtp_server.dart';
 import 'package:provider/provider.dart';
-
-import 'entregarPedidos.dart';
 
 class DetallesPedidoEntregar extends StatefulWidget {
   DocumentSnapshot document;

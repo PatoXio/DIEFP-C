@@ -1,6 +1,7 @@
 import 'dart:collection';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:diefpc/Clases/Delivery.dart';
+import 'package:diefpc/Clases/Tienda.dart';
 import 'package:diefpc/app/app.dart';
 import 'package:diefpc/screens/detallesPedidoEntregar.dart';
 import 'package:diefpc/screens/pedidosDisponiblesPorTienda.dart';
@@ -38,7 +39,7 @@ class _EntregarPedidosScreenState extends State<EntregarPedidos> {
   Stream<QuerySnapshot> _stream;
   Completer<GoogleMapController> _controller = Completer();
   Set<Marker> _markers = HashSet<Marker>();
-  Delivery _user;
+  var _user;
 // para mis rutas dibujadas en el mapa
   List<LatLng> polylineCoordinates = [];
   PolylinePoints polylinePoints;
