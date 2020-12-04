@@ -32,6 +32,7 @@ class _AnadirProductoCarritoState extends State<AnadirProductoCarrito> {
   List<DocumentSnapshot> listDocuments;
 
   Cliente _user;
+  String filtro;
 
   Set<String> _saved = Set<String>();
 
@@ -58,6 +59,16 @@ class _AnadirProductoCarritoState extends State<AnadirProductoCarrito> {
         margin: EdgeInsets.only(top: screenHeight / 100),
         padding: EdgeInsets.only(left: 10, right: 10),
         child: Column(children: <Widget>[
+          TextField(
+            decoration: InputDecoration(
+              labelText: "Ingrese la fecha para filtrar",
+            ),
+            onChanged: (String value) {
+              setState(() {
+                filtro = value;
+              });
+            },
+          ),
           Expanded(
             flex: 7,
             child: Container(
@@ -70,38 +81,41 @@ class _AnadirProductoCarritoState extends State<AnadirProductoCarrito> {
               ),
             ),
           ),
-          Expanded(
-            child: Row(children: <Widget>[
-              Divider(
-                indent: screenlong / 90,
-              ),
-              FloatingActionButton.extended(
-                heroTag: "boton1",
-                onPressed: () {
-                  if (_saved.length != 0)
-                    AnadirAlCarrito(context, _saved, _user);
-                  else
-                    return _showAlert(
-                        context, "Debes elegir productos para agregarlos.");
-                },
-                label: Text("Añadir al\nCarrito (${_saved.length})",
-                    style: TextStyle(fontSize: 15)),
-                backgroundColor: Colors.blue,
-              ),
-              Divider(
-                indent: screenlong / 7,
-              ),
-              FloatingActionButton.extended(
-                heroTag: "boton2",
-                onPressed: () {
-                  goToCarrito(context);
-                },
-                label: Text(
-                    "Ver Carrito\n\t\t\t\t(${_user.getCarritoDeCompra().getListProducto().length})",
-                    style: TextStyle(fontSize: 15)),
-                backgroundColor: Colors.blue,
-              ),
-            ]),
+          SingleChildScrollView(
+            child: Container(
+              margin: EdgeInsets.only(bottom: 10),
+              child: Row(children: <Widget>[
+                Divider(
+                  indent: screenlong / 90,
+                ),
+                FloatingActionButton.extended(
+                  heroTag: "boton1",
+                  onPressed: () {
+                    if (_saved.length != 0)
+                      AnadirAlCarrito(context, _saved, _user);
+                    else
+                      return _showAlert(
+                          context, "Debes elegir productos para agregarlos.");
+                  },
+                  label: Text("Añadir al\nCarrito (${_saved.length})",
+                      style: TextStyle(fontSize: 15)),
+                  backgroundColor: Colors.blue,
+                ),
+                Divider(
+                  indent: screenlong / 7,
+                ),
+                FloatingActionButton.extended(
+                  heroTag: "boton2",
+                  onPressed: () {
+                    goToCarrito(context);
+                  },
+                  label: Text(
+                      "Ver Carrito\n\t\t\t\t(${_user.getCarritoDeCompra().getListProducto().length})",
+                      style: TextStyle(fontSize: 15)),
+                  backgroundColor: Colors.blue,
+                ),
+              ]),
+            ),
           ),
         ]),
       ),
@@ -116,25 +130,47 @@ class _AnadirProductoCarritoState extends State<AnadirProductoCarrito> {
   Widget _queyList(BuildContext context) {
     cargarListDocument();
     if (listDocuments != null) {
-      if (listDocuments.isNotEmpty) {
+      List<DocumentSnapshot> listProductos = new List<DocumentSnapshot>();
+      if (filtro != null) {
+        for (int i = 0; i < listDocuments.length; i++) {
+          DocumentSnapshot document = listDocuments[i];
+          String nombre = document.data["Nombre"].toString().toLowerCase();
+          if (nombre.contains(filtro.toLowerCase()) == true) {
+            setState(() {
+              listProductos.add(document);
+            });
+          }
+        }
+        if (listProductos != null) {
+          return ListView.builder(
+              itemCount: listProductos.length,
+              shrinkWrap: true,
+              itemBuilder: (BuildContext context, int index) =>
+                  buildBody(context, index, listProductos));
+        } else {
+          return ListView.builder(
+              itemCount: listDocuments.length,
+              shrinkWrap: true,
+              itemBuilder: (BuildContext context, int index) =>
+                  buildBody(context, index, listDocuments));
+        }
+      } else {
         return ListView.builder(
             itemCount: listDocuments.length,
             shrinkWrap: true,
             itemBuilder: (BuildContext context, int index) =>
-                buildBody(context, index));
-      } else {
-        return Text(
-          "La tienda no posee Productos",
-          style: TextStyle(
-            color: Colors.red,
-            fontSize: 28,
-            fontWeight: FontWeight.w600,
-          ),
-          textAlign: TextAlign.center,
-        );
+                buildBody(context, index, listDocuments));
       }
     } else {
-      return ListView(children: <Widget>[CircularProgressIndicator()]);
+      return Text(
+        "La tienda no posee Productos",
+        style: TextStyle(
+          color: Colors.red,
+          fontSize: 28,
+          fontWeight: FontWeight.w600,
+        ),
+        textAlign: TextAlign.center,
+      );
     }
   }
 
@@ -148,7 +184,8 @@ class _AnadirProductoCarritoState extends State<AnadirProductoCarrito> {
     }
   }
 
-  Widget buildBody(BuildContext context, int index) {
+  Widget buildBody(
+      BuildContext context, int index, List<DocumentSnapshot> listProductos) {
     if (estaCargados() == false) {
       return Container(
         margin: EdgeInsets.only(top: screenHeight / 1000),
@@ -167,13 +204,13 @@ class _AnadirProductoCarritoState extends State<AnadirProductoCarrito> {
               tooltip: 'Productos',
               onPressed: () {},
             ),
-            title: Text(listDocuments[index].data["Nombre"]),
+            title: Text(listProductos[index].data["Nombre"]),
             subtitle: TextProducto(
                 context,
-                listDocuments[index].data.keys.toList(),
-                listDocuments[index].data.values.toList()),
-            trailing: _iconTravel(listDocuments[index].documentID, context,
-                listDocuments[index].data["Nombre"]),
+                listProductos[index].data.keys.toList(),
+                listProductos[index].data.values.toList()),
+            trailing: _iconTravel(listProductos[index].documentID, context,
+                listProductos[index].data["Nombre"]),
             isThreeLine: true,
           ),
         ),

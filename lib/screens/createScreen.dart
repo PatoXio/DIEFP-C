@@ -215,7 +215,7 @@ class _CreateScreenState extends State<CreateScreen> {
         ),
         TextFormField(
           obscureText: true,
-          maxLength: 50,
+          maxLength: 12,
           validator: (String value) {
             if (value.isEmpty) {
               return 'Ingrese una contraseña valida';
@@ -234,7 +234,7 @@ class _CreateScreenState extends State<CreateScreen> {
         ),
         TextFormField(
           obscureText: true,
-          maxLength: 10,
+          maxLength: 12,
           validator: (String value) {
             if (value.isEmpty) {
               return 'Debe ingresar una contraseña';
@@ -527,7 +527,7 @@ class _CreateScreenState extends State<CreateScreen> {
           height: 15,
         ),
         TextFormField(
-          maxLength: 50,
+          maxLength: 12,
           obscureText: true,
           validator: (value) {
             if (value.isEmpty) {
@@ -547,7 +547,7 @@ class _CreateScreenState extends State<CreateScreen> {
           height: 15,
         ),
         TextFormField(
-          maxLength: 20,
+          maxLength: 12,
           obscureText: true,
           validator: (value) {
             if (value.isEmpty) {
@@ -738,7 +738,7 @@ class _CreateScreenState extends State<CreateScreen> {
           height: 15,
         ),
         TextFormField(
-          maxLength: 20,
+          maxLength: 50,
           validator: (value) {
             if (value.isEmpty) {
               return 'Ingrese su nombre completo';
@@ -755,6 +755,7 @@ class _CreateScreenState extends State<CreateScreen> {
           height: 15,
         ),
         TextFormField(
+          maxLength: 50,
           validator: (value) {
             if (value.isEmpty) {
               return 'Por favor ingrese un correo valido';
@@ -771,7 +772,7 @@ class _CreateScreenState extends State<CreateScreen> {
           height: 15,
         ),
         TextFormField(
-          maxLength: 10,
+          maxLength: 12,
           obscureText: true,
           validator: (value) {
             if (value.isEmpty) {
@@ -790,7 +791,7 @@ class _CreateScreenState extends State<CreateScreen> {
           height: 15,
         ),
         TextFormField(
-          maxLength: 10,
+          maxLength: 12,
           obscureText: true,
           validator: (String value) {
             if (value.isEmpty) {
@@ -822,7 +823,7 @@ class _CreateScreenState extends State<CreateScreen> {
           height: 15,
         ),
         TextFormField(
-          maxLength: 12,
+          maxLength: 15,
           decoration: InputDecoration(
             labelText: "Codigo de Invitación",
           ),

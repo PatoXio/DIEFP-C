@@ -1,4 +1,5 @@
 import 'package:diefpc/Clases/Cliente.dart';
+import 'package:diefpc/Clases/Pedido.dart';
 import 'package:diefpc/states/auth.dart';
 import 'package:flutter/material.dart';
 import 'package:diefpc/app/app.dart';
@@ -15,6 +16,7 @@ class _HistorialComprasState extends State<HistorialCompras> {
   Cliente _user;
   double screenlong;
   var isHistorialCompra;
+  String filtro;
   double screenHeight;
   @override
   Widget build(BuildContext context) {
@@ -57,13 +59,16 @@ class _HistorialComprasState extends State<HistorialCompras> {
           padding: EdgeInsets.only(left: 10, right: 10),
           child: Column(
             children: <Widget>[
-              /*TextFormField(
-                maxLength: 20,
+              TextField(
                 decoration: InputDecoration(
-                  labelText: "Nombre Completo",
+                  labelText: "Ingrese la fecha/tienda para filtrar",
                 ),
-                onChanged: (String value) {},
-              ),*/
+                onChanged: (String value) {
+                  setState(() {
+                    filtro = value;
+                  });
+                },
+              ),
               isHistorialCompra,
             ],
           ),
@@ -74,24 +79,52 @@ class _HistorialComprasState extends State<HistorialCompras> {
 
   Widget _queyList(BuildContext context) {
     if (_user.getHistorialDeCompras() != null) {
-      return ListView.builder(
-          itemCount: _user.getHistorialDeCompras().getListPedido().length,
-          shrinkWrap: true,
-          itemBuilder: (BuildContext context, int index) =>
-              buildBody(context, index));
-    } else {
+      List<Pedido> listPedidos = new List<Pedido>();
+      if (filtro != null) {
+        // ignore: missing_return
+        for (int i = 0;
+            i < _user.getHistorialDeCompras().getListPedido().length;
+            i++) {
+          Pedido element = _user.getHistorialDeCompras().getListPedido()[i];
+          String fecha = element.getFecha().toString().toLowerCase();
+          String tienda = element.getNombreTienda().toLowerCase();
+          if (fecha.contains(filtro.toLowerCase()) == true ||
+              tienda.contains(filtro.toLowerCase()) == true) {
+            setState(() {
+              listPedidos.add(element);
+            });
+          }
+        }
+        if (listPedidos != null) {
+          return ListView.builder(
+              itemCount: listPedidos.length,
+              shrinkWrap: true,
+              itemBuilder: (BuildContext context, int index) =>
+                  buildBody(context, index, listPedidos));
+        } else {
+          return ListView.builder(
+              itemCount: _user.getHistorialDeCompras().getListPedido().length,
+              shrinkWrap: true,
+              itemBuilder: (BuildContext context, int index) => buildBody(
+                  context,
+                  index,
+                  _user.getHistorialDeCompras().getListPedido()));
+        }
+      } else {
+        return ListView.builder(
+            itemCount: _user.getHistorialDeCompras().getListPedido().length,
+            shrinkWrap: true,
+            itemBuilder: (BuildContext context, int index) => buildBody(
+                context, index, _user.getHistorialDeCompras().getListPedido()));
+      }
+    } else
       return Text("Aún no has comprado algun medicamento");
-    }
   }
 
-  Widget buildBody(BuildContext context, int index) {
-    String fecha = DateFormat('yyyy-MM-dd – kk:mm').format(DateTime.parse(_user
-        .getHistorialDeCompras()
-        .getListPedido()[index]
-        .getFecha()
-        .toString()));
-    String idDocument =
-        _user.getHistorialDeCompras().getListPedido()[index].getId();
+  Widget buildBody(BuildContext context, int index, List<Pedido> listPedidos) {
+    String fecha = DateFormat('yyyy-MM-dd – kk:mm')
+        .format(DateTime.parse(listPedidos[index].getFecha().toString()));
+    String idDocument = listPedidos[index].getId();
     return Card(
         child: ListTile(
       leading: IconButton(
@@ -104,29 +137,17 @@ class _HistorialComprasState extends State<HistorialCompras> {
         onPressed: () {},
       ),
       title: Text("$fecha"),
-      subtitle:
-          Text(_user.getHistorialDeCompras().getListPedido()[index].getDatos()),
+      subtitle: Text(listPedidos[index].getDatos()),
       trailing: FloatingActionButton(
         heroTag: "hero$index",
         child: Text("Ver"),
         onPressed: () {
           goToComprasHechas(
               context,
-              _user
-                  .getHistorialDeCompras()
-                  .getListPedido()[index]
-                  .getIdTienda(),
+              listPedidos[index].getIdTienda(),
               idDocument,
-              _user
-                  .getHistorialDeCompras()
-                  .getListPedido()[index]
-                  .getTotalPagado()
-                  .toString(),
-              _user
-                  .getHistorialDeCompras()
-                  .getListPedido()[index]
-                  .getCostoDeEnvio()
-                  .toString());
+              listPedidos[index].getTotalPagado().toString(),
+              listPedidos[index].getCostoDeEnvio().toString());
         },
       ),
       isThreeLine: true,

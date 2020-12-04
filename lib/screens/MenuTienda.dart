@@ -29,91 +29,94 @@ class _MenuScreenTiendaState extends State<MenuScreenTienda> {
               }),
         ],
       ),
-      body: Column(
-        children: <Widget>[
-          Container(
-            margin: EdgeInsets.only(top: screenHeight / 100),
-            padding: EdgeInsets.only(left: 10, right: 10),
-            child: Card(
-              child: ListTile(
-                leading: IconButton(
-                  icon: Icon(Icons.add_shopping_cart),
-                  iconSize: 40,
-                  tooltip: 'Pedidos',
-                  onPressed: () {
-                    goToPedidosPendientes(context);
-                  },
-                ),
-                title: Text('Pedidos Pendientes'),
-                subtitle: Text('Aquí puedes ver todos los pedidos pendientes'),
-                /*trailing: Icon(Icons.more_vert),
-                // isThreeLine: true,*/
-              ),
-            ),
-          ),
-          Container(
-            margin: EdgeInsets.only(top: screenHeight / 100),
-            padding: EdgeInsets.only(left: 10, right: 10),
-            child: Card(
-              child: ListTile(
-                leading: IconButton(
-                  icon: Icon(Icons.shopping_cart),
-                  iconSize: 40,
-                  tooltip: 'Pedidos Aceptados',
-                  onPressed: () {
-                    goToPedidosAceptados(context);
-                  },
-                ),
-                title: Text('Pedidos Aceptados'),
-                subtitle: Text(
-                    'Aquí puedes ver los pedidos aceptados y asignarles un Delivery'),
-                /*trailing: Icon(Icons.more_vert),
-                    // isThreeLine: true,*/
-              ),
-            ),
-          ),
-          Container(
-            margin: EdgeInsets.only(top: screenHeight / 100),
-            padding: EdgeInsets.only(left: 10, right: 10),
-            child: Card(
-              child: ListTile(
-                leading: IconButton(
-                  icon: Icon(Icons.store_mall_directory),
-                  iconSize: 40,
-                  tooltip: 'Bodega',
-                  onPressed: () {
-                    goToProductos(context);
-                  },
-                ),
-                title: Text('Bodega'),
-                subtitle: Text(
-                    'Aquí puedes ver todos los productos disponibles en la tienda'),
-                /*trailing: Icon(Icons.more_vert),
-                // isThreeLine: true,*/
-              ),
-            ),
-          ),
-          Container(
+      body: SingleChildScrollView(
+        child: Column(
+          children: <Widget>[
+            Container(
               margin: EdgeInsets.only(top: screenHeight / 100),
               padding: EdgeInsets.only(left: 10, right: 10),
               child: Card(
                 child: ListTile(
                   leading: IconButton(
-                    icon: Icon(Icons.history),
+                    icon: Icon(Icons.add_shopping_cart),
                     iconSize: 40,
-                    tooltip: 'Historial Ventas',
+                    tooltip: 'Pedidos',
                     onPressed: () {
-                      goToHistorialVentas(context);
+                      goToPedidosPendientes(context);
                     },
                   ),
-                  title: Text('Historial de Ventas'),
-                  subtitle: Text(
-                      'Aquí puedes ver tu historial de ventas y revisar tus ganancias'),
-                  //trailing: Icon(Icons.more_vert),
-                  isThreeLine: true,
+                  title: Text('Pedidos Pendientes'),
+                  subtitle:
+                      Text('Aquí puedes ver todos los pedidos pendientes'),
+                  /*trailing: Icon(Icons.more_vert),
+                  // isThreeLine: true,*/
                 ),
-              ))
-        ],
+              ),
+            ),
+            Container(
+              margin: EdgeInsets.only(top: screenHeight / 100),
+              padding: EdgeInsets.only(left: 10, right: 10),
+              child: Card(
+                child: ListTile(
+                  leading: IconButton(
+                    icon: Icon(Icons.shopping_cart),
+                    iconSize: 40,
+                    tooltip: 'Pedidos Aceptados',
+                    onPressed: () {
+                      goToPedidosAceptados(context);
+                    },
+                  ),
+                  title: Text('Pedidos Aceptados'),
+                  subtitle: Text(
+                      'Aquí puedes ver los pedidos aceptados y asignarles un Delivery'),
+                  /*trailing: Icon(Icons.more_vert),
+                      // isThreeLine: true,*/
+                ),
+              ),
+            ),
+            Container(
+              margin: EdgeInsets.only(top: screenHeight / 100),
+              padding: EdgeInsets.only(left: 10, right: 10),
+              child: Card(
+                child: ListTile(
+                  leading: IconButton(
+                    icon: Icon(Icons.store_mall_directory),
+                    iconSize: 40,
+                    tooltip: 'Bodega',
+                    onPressed: () {
+                      goToProductos(context);
+                    },
+                  ),
+                  title: Text('Bodega'),
+                  subtitle: Text(
+                      'Aquí puedes ver todos los productos disponibles en la tienda'),
+                  /*trailing: Icon(Icons.more_vert),
+                  // isThreeLine: true,*/
+                ),
+              ),
+            ),
+            Container(
+                margin: EdgeInsets.only(top: screenHeight / 100),
+                padding: EdgeInsets.only(left: 10, right: 10),
+                child: Card(
+                  child: ListTile(
+                    leading: IconButton(
+                      icon: Icon(Icons.history),
+                      iconSize: 40,
+                      tooltip: 'Historial Ventas',
+                      onPressed: () {
+                        goToHistorialVentas(context);
+                      },
+                    ),
+                    title: Text('Historial de Ventas'),
+                    subtitle: Text(
+                        'Aquí puedes ver tu historial de ventas y revisar tus ganancias'),
+                    //trailing: Icon(Icons.more_vert),
+                    isThreeLine: true,
+                  ),
+                ))
+          ],
+        ),
       ),
     );
   }

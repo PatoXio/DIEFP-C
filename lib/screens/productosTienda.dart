@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:diefpc/Clases/Producto.dart';
 import 'package:diefpc/Clases/Tienda.dart';
 import 'package:diefpc/states/auth.dart';
 import 'package:flutter/material.dart';
@@ -17,6 +18,7 @@ class _ProductosTiendaState extends State<ProductosTienda> {
   var _prodSelect = Set<String>();
   Tienda _user;
   double screenlong;
+  String filtro;
   double screenHeight;
   @override
   Widget build(BuildContext context) {
@@ -41,6 +43,16 @@ class _ProductosTiendaState extends State<ProductosTienda> {
         margin: EdgeInsets.only(top: screenHeight / 100),
         padding: EdgeInsets.only(left: 10, right: 10),
         child: Column(children: <Widget>[
+          TextField(
+            decoration: InputDecoration(
+              labelText: "Ingrese el nombre para filtrar",
+            ),
+            onChanged: (String value) {
+              setState(() {
+                filtro = value;
+              });
+            },
+          ),
           Expanded(
             flex: 7,
             child: Container(
@@ -53,7 +65,7 @@ class _ProductosTiendaState extends State<ProductosTienda> {
               ),
             ),
           ),
-          Expanded(
+          SingleChildScrollView(
             child: Row(
               children: [
                 FloatingActionButton.extended(
@@ -138,21 +150,33 @@ class _ProductosTiendaState extends State<ProductosTienda> {
     Provider.of<AuthService>(context)
         .actualizarProductosTienda(_user.getEmail());
     if (_user.getListProducto() != null) {
-      if (_user.getListProducto().length > 0) {
+      List<Producto> listProducto = new List<Producto>();
+      if (filtro != null) {
+        for (int i = 0; i < _user.getListProducto().length; i++) {
+          Producto element = _user.getListProducto()[i];
+          String nombre = element.getNombre().toLowerCase();
+          if (nombre.contains(filtro.toLowerCase()) == true) {
+            setState(() {
+              listProducto.add(element);
+            });
+          }
+        }
+        if (listProducto != null) {
+          return ListView.builder(
+              itemCount: listProducto.length,
+              itemBuilder: (BuildContext context, int index) =>
+                  buildBody(context, index, listProducto));
+        } else {
+          return ListView.builder(
+              itemCount: _user.getListProducto().length,
+              itemBuilder: (BuildContext context, int index) =>
+                  buildBody(context, index, _user.getListProducto()));
+        }
+      } else {
         return ListView.builder(
             itemCount: _user.getListProducto().length,
             itemBuilder: (BuildContext context, int index) =>
-                buildBody(context, index));
-      } else {
-        return Text(
-          "La tienda no posee Productos asociados :c",
-          style: TextStyle(
-            color: Colors.red,
-            fontSize: 28,
-            fontWeight: FontWeight.w600,
-          ),
-          textAlign: TextAlign.center,
-        );
+                buildBody(context, index, _user.getListProducto()));
       }
     } else {
       return Text(
@@ -167,7 +191,7 @@ class _ProductosTiendaState extends State<ProductosTienda> {
     }
   }
 
-  Widget buildBody(BuildContext ctxt, int index) {
+  Widget buildBody(BuildContext ctxt, int index, List<Producto> listProducto) {
     //double screenHeight = MediaQuery.of(context).size.height;
     return Container(
       margin: EdgeInsets.only(top: screenHeight / 1000),
@@ -180,10 +204,9 @@ class _ProductosTiendaState extends State<ProductosTienda> {
             tooltip: 'Productos',
             onPressed: () {},
           ),
-          title: Text(_user.getListProducto().elementAt(index).getNombre()),
-          subtitle: Text(_user.getListProducto().elementAt(index).getDatos()),
-          trailing:
-              _iconTravel(_user.getListProducto().elementAt(index).getCodigo()),
+          title: Text(listProducto.elementAt(index).getNombre()),
+          subtitle: Text(listProducto.elementAt(index).getDatos()),
+          trailing: _iconTravel(listProducto.elementAt(index).getCodigo()),
           isThreeLine: true,
         ),
       ),

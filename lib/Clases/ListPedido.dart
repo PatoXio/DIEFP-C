@@ -19,7 +19,7 @@ class ListPedido {
     List<Pedido> listPedidos = new List<Pedido>();
     int i;
     if (_listPedido != null) {
-      for (i = 0; i < _listPedido.length; i++) {
+      for (i = _listPedido.length - 1; i >= 0; i--) {
         if (_listPedido.elementAt(i) != null) {
           if (_listPedido.elementAt(i).getPorAceptar() == false) {
             listPedidos.add(_listPedido.elementAt(i));
