@@ -457,6 +457,7 @@ class _ComprarCarritoState extends State<ComprarCarrito> {
     DateTime fecha = DateTime.now();
     String format = DateFormat('yyyy-MM-dd – kk:mm:ss').format(fecha);
     String pivot;
+    String idTienda;
     int i;
     int j;
     int x;
@@ -498,12 +499,13 @@ class _ComprarCarritoState extends State<ComprarCarrito> {
         }
       }
 
-      String idTienda =
+      idTienda =
           _user.getCarritoDeCompra().getListProducto().first.getIdTienda();
       String nombreTienda =
           _user.getCarritoDeCompra().getListProducto().first.getNombreTienda();
       String horaPedido =
           "$format:${_user.getCarritoDeCompra().getListProducto().first.getIdTienda()}:${_user.getEmail()}";
+
       Firestore.instance
           .collection('usuarios')
           .document(uid)
@@ -565,6 +567,7 @@ class _ComprarCarritoState extends State<ComprarCarrito> {
                 'Producto:$horaPedido:${carritoDocument.elementAt(x).documentID}')
             .setData(carritoDocument.elementAt(x).data);
       }
+
       Pedido newPedido = new Pedido.carga(
           horaPedido,
           medioDePago,
@@ -596,10 +599,30 @@ class _ComprarCarritoState extends State<ComprarCarrito> {
           ds.reference.delete();
         }
       });
+
+      for (int y = 0; y < _saved.length; y++) {
+        DocumentSnapshot producto = await getProductoTiendaService(idTienda,
+            _user.getCarritoDeCompra().getListProducto()[y].getCodigo());
+
+        int stock = int.parse(producto.data["Stock"]);
+        int cantidad =
+            _user.getCarritoDeCompra().getListProducto()[y].getCantidad();
+        int resta = stock - cantidad;
+
+        // ignore: unnecessary_statements
+        (await Firestore.instance
+            .collection('usuarios')
+            .document(idTienda)
+            .collection('Productos')
+            .document(
+                _user.getCarritoDeCompra().getListProducto()[y].getCodigo())
+            .setData({"Stock": resta.toString()}, merge: true));
+      }
       _user.deleteCarrito();
       _deleted.add(_saved.first);
       _saved.clear();
     }
+
     Navigator.push(
         context, MaterialPageRoute(builder: (context) => Seguimiento()));
   }

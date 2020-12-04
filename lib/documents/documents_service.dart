@@ -24,6 +24,18 @@ Future<List<DocumentSnapshot>> getListDocumentTiendasService() async {
   return listDocument;
 }
 
+Future<DocumentSnapshot> getProductoTiendaService(
+    String idTienda, idProducto) async {
+  DocumentSnapshot document = (await Firestore.instance
+      .collection("usuarios")
+      .document(idTienda)
+      .collection('Productos')
+      .document(idProducto)
+      .get());
+
+  return document;
+}
+
 Future<List<DocumentSnapshot>> getListDocumentOneCollecionService(
     String id, collection) async {
   List<DocumentSnapshot> listDocument;

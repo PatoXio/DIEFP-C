@@ -178,9 +178,11 @@ class _AnadirProductoCarritoState extends State<AnadirProductoCarrito> {
     var documentos =
         await getListDocumentOneCollecionService(widget.idTienda, dbProductos);
     if (documentos != null) {
-      setState(() {
-        listDocuments = documentos;
-      });
+      for (int i = 0; i < documentos.length; i++) {
+        setState(() {
+          listDocuments = documentos;
+        });
+      }
     }
   }
 
@@ -209,8 +211,11 @@ class _AnadirProductoCarritoState extends State<AnadirProductoCarrito> {
                 context,
                 listProductos[index].data.keys.toList(),
                 listProductos[index].data.values.toList()),
-            trailing: _iconTravel(listProductos[index].documentID, context,
-                listProductos[index].data["Nombre"]),
+            trailing: _iconTravel(
+                listProductos[index].documentID,
+                context,
+                listProductos[index].data["Nombre"],
+                int.parse(listProductos[index].data["Stock"])),
             isThreeLine: true,
           ),
         ),
@@ -225,9 +230,27 @@ class _AnadirProductoCarritoState extends State<AnadirProductoCarrito> {
     }
   }
 
-  Column _iconTravel(String id, BuildContext context, String nombre) {
+  Column _iconTravel(
+      String id, BuildContext context, String nombre, int stock) {
     bool alreadySaved = _saved.contains(id);
-    if (idIntoCarrito(context, nombre) == true) {
+    if (stock <= 0) {
+      return Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Text("Seleccionar"),
+          Expanded(
+            child: IconButton(
+                icon: Icon(Icons.watch_later),
+                color: Colors.green,
+                iconSize: 25,
+                tooltip: 'Sin Stock',
+                onPressed: () {
+                  _showAlert(context, "Este producto ya no tiene STOCK");
+                }),
+          ),
+        ],
+      );
+    } else if (idIntoCarrito(context, nombre) == true) {
       return Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
