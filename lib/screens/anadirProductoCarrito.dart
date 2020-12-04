@@ -61,7 +61,7 @@ class _AnadirProductoCarritoState extends State<AnadirProductoCarrito> {
         child: Column(children: <Widget>[
           TextField(
             decoration: InputDecoration(
-              labelText: "Ingrese la fecha para filtrar",
+              labelText: "Ingrese el nombre para filtrar",
             ),
             onChanged: (String value) {
               setState(() {

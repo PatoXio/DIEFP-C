@@ -11,12 +11,14 @@ class HistorialProductos extends StatefulWidget {
   String idDocument;
   String totalPagado;
   String costoEnvio;
+  String delivery;
   HistorialProductos(String idTienda, String idDocument, String totalPagado,
-      String costoEnvio) {
+      String costoEnvio, String delivery) {
     this.idTienda = idTienda;
     this.idDocument = idDocument;
     this.totalPagado = totalPagado;
     this.costoEnvio = costoEnvio;
+    this.delivery = delivery;
   }
   @override
   _HistorialProductosState createState() => _HistorialProductosState();
@@ -103,7 +105,7 @@ class _HistorialProductosState extends State<HistorialProductos> {
               ),
             ),
             Text(
-                "Costo de Envío: ${widget.costoEnvio}\nCosto Total: ${widget.totalPagado}",
+                "Delivery: ${widget.delivery}\nCosto de Envío: ${widget.costoEnvio}\nCosto Total: ${widget.totalPagado}",
                 style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,

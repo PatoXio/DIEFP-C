@@ -39,15 +39,12 @@ class _PedidosDisponiblesState extends State<PedidosDisponibles> {
     _user = Provider.of<AuthService>(context).currentUser();
     screenlong = MediaQuery.of(context).size.longestSide;
     screenHeight = MediaQuery.of(context).size.height;
+    print(widget.id);
     _query = Firestore.instance
         .collection('usuarios')
         .document(widget.id)
         .collection('PedidosPendientes')
-        .where("PorAceptar", isEqualTo: false);
-    _query = Firestore.instance
-        .collection('usuarios')
-        .document(widget.id)
-        .collection('PedidosPendientes')
+        .where("PorAceptar", isEqualTo: false)
         .orderBy("Fecha", descending: false);
     _stream = _query.snapshots();
     return Scaffold(
@@ -120,11 +117,29 @@ class _PedidosDisponiblesState extends State<PedidosDisponibles> {
   Widget _queyList(
       BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
     if (snapshot.data.documents.length != 0) {
-      return ListView.builder(
-          itemCount: snapshot.data.documents.length,
-          shrinkWrap: true,
-          itemBuilder: (BuildContext context, int index) =>
-              buildBody(context, index, snapshot.data.documents));
+      List<DocumentSnapshot> listDocument = new List<DocumentSnapshot>();
+      for (int i = 0; i < snapshot.data.documents.length; i++) {
+        if (snapshot.data.documents[i].data["Delivery"] == null) {
+          listDocument.add(snapshot.data.documents[i]);
+        }
+      }
+      if (listDocument.length > 0) {
+        return ListView.builder(
+            itemCount: listDocument.length,
+            shrinkWrap: true,
+            itemBuilder: (BuildContext context, int index) =>
+                buildBody(context, index, listDocument));
+      } else {
+        Text(
+          "La tienda no posee Pedidos Pendientes",
+          style: TextStyle(
+            color: Colors.red,
+            fontSize: 28,
+            fontWeight: FontWeight.w600,
+          ),
+          textAlign: TextAlign.center,
+        );
+      }
     } else {
       return Text(
         "La tienda no posee Pedidos Pendientes",

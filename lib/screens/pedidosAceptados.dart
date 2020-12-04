@@ -67,7 +67,7 @@ class _PedidosAceptadosState extends State<PedidosAceptados> {
     } else
       isLoad = Column(children: <Widget>[
         Container(
-          height: screenHeight / 1.35,
+          height: screenHeight / 1.32,
           child: Theme(
             data: ThemeData(
               highlightColor: Colors.blue, //Does not work
@@ -91,7 +91,7 @@ class _PedidosAceptadosState extends State<PedidosAceptados> {
             backgroundColor: Colors.green,
           ),
           Divider(
-            indent: screenlong / 40,
+            indent: screenlong / 30,
           ),
           verDelivery,
         ]),
@@ -110,7 +110,7 @@ class _PedidosAceptadosState extends State<PedidosAceptados> {
       ),
       body: Container(
         margin: EdgeInsets.only(top: screenHeight / 100),
-        padding: EdgeInsets.only(left: 10, right: 10, bottom: 10),
+        padding: EdgeInsets.only(left: 10, right: 10, bottom: 0),
         child: SingleChildScrollView(child: isLoad),
       ),
     );

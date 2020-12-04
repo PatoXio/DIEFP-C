@@ -147,19 +147,25 @@ class _HistorialComprasState extends State<HistorialCompras> {
               listPedidos[index].getIdTienda(),
               idDocument,
               listPedidos[index].getTotalPagado().toString(),
-              listPedidos[index].getCostoDeEnvio().toString());
+              listPedidos[index].getCostoDeEnvio().toString(),
+              listPedidos[index].getDelivery().toString());
         },
       ),
       isThreeLine: true,
     ));
   }
 
-  void goToComprasHechas(BuildContext context, String idTienda,
-      String idDocument, String totalPagado, String costoEnvio) {
+  void goToComprasHechas(
+      BuildContext context,
+      String idTienda,
+      String idDocument,
+      String totalPagado,
+      String costoEnvio,
+      String delivery) {
     Navigator.push(
         context,
         MaterialPageRoute(
             builder: (context) => new HistorialProductos(
-                idTienda, idDocument, totalPagado, costoEnvio)));
+                idTienda, idDocument, totalPagado, costoEnvio, delivery)));
   }
 }

@@ -487,12 +487,11 @@ class _ComprarCarritoState extends State<ComprarCarrito> {
       }
 
       for (x = 0; x < _saved.length; x++) {
-        List<String> listCatego = List<String>.from(_user
+        List<String> listCatego = _user
             .getCarritoDeCompra()
             .getListProducto()
             .elementAt(x)
-            .getCategoria());
-        print(listCatego);
+            .getCategoria();
         for (int v = 0; v < listCatego.length; v++) {
           if (categorias.contains(listCatego.elementAt(v)) == false)
             categorias.add(listCatego.elementAt(v));

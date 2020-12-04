@@ -474,7 +474,7 @@ class AuthService with ChangeNotifier {
             document.data["Tienda"],
             document.data["nombreTienda"],
             document.data["Nombre"],
-            document.data["Categoria"],
+            List<String>.from(document.data["Categorias"]),
             int.parse(document.data["Cantidad"]),
             int.parse(document.data["Precio"]),
             int.parse(document.data["Stock"]),

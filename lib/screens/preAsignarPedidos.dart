@@ -325,7 +325,7 @@ class _BuscarPedidosScreenState extends State<BuscarPedidosScreen> {
             (await _query.getDocuments()).documents;
 
         pedidos.forEach((element) {
-          if (element.data["Delivery"] != null) {
+          if (element.data["Delivery"] == null) {
             cont++;
           }
         });
@@ -344,12 +344,10 @@ class _BuscarPedidosScreenState extends State<BuscarPedidosScreen> {
           }
 
           if (listPedidos == null) {
-            listPedidos.putIfAbsent(
-                listDocument[i].documentID, () => pedidos.length - cont);
+            listPedidos.putIfAbsent(listDocument[i].documentID, () => cont);
           } else if (listPedidos.containsKey(listDocument[i].documentID) ==
               false) {
-            listPedidos.putIfAbsent(
-                listDocument[i].documentID, () => pedidos.length - cont);
+            listPedidos.putIfAbsent(listDocument[i].documentID, () => cont);
           }
         }
       }
