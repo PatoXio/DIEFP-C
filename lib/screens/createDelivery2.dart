@@ -298,7 +298,7 @@ class _CreateDelivery2State extends State<CreateDelivery2> {
 
   Future<void> sendEmail(int codigoVerificacion, String correo) async {
     String username = "diefpacientescronicos@gmail.com";
-    String password = "Pacientescronicos13";
+    String password = "";
     final smtpServer = gmail(username, password);
     final message = Message()
       ..from = Address(username, 'Aplicación DIEFP-C')
